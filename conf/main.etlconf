@@ -1,0 +1,33 @@
+{
+    "comment": "draft configuration with design derived from CDMKit",
+    "ddl": 
+    {
+        "type": "sql",
+        "scripts": [
+            "etl/ddl_cdm_5_3_1.sql",
+            "etl/ddl_voc_5_3_1.sql"
+        ]
+    },
+    "staging_workflow": 
+    {
+        "scripts": [
+            "st_core.sql"
+        ]
+    },
+    "etl_workflow": 
+    {
+        "scripts": [
+            "cdm_location.sql",
+            "cdm_care_site.sql",
+            "cdm_person.sql",
+            "cdm_visit_occurrence.sql"
+        ]
+    },
+    "voc_workflow":
+    {
+        "type": "py",
+        "scripts": [
+            "vocabulary_refresh/vocabulary_refresh.py"
+        ]
+    }
+}

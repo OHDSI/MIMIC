@@ -1,0 +1,8 @@
+[
+  {"name": "relationship_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "relationship_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "is_hierarchical", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "defines_ancestry", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "reverse_relationship_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "relationship_concept_id", "type": "INT64", "mode": "REQUIRED"}
+]
