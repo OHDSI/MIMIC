@@ -28,6 +28,21 @@
 
 ### Change Log (latest first) ###
 
+
+**2020-09-21**
+
+* TUF-10 Implement basic logic based on MIMIC III conversion
+    * Tables implemented: 
+        cdm_location, care_site, cdm_person, 
+        cdm_visit_occurrence, cdm_visit_detail, 
+        cdm_condition_occurrence, cdm_procedure_occurrence, cdm_measurement, cdm_drug_exposure, cdm_observation, cdm_device_exposure
+        cdm_observation_period, cdm_cdm_source
+* TUF-75 Implement basic orchestration
+    * configuration design - in progress
+    * Real dataset names are replaced with variables
+    * folders structure is changed
+
+
 **2020-09-21**
 
 * TUF-10 Implement basic logic based on MIMIC III conversion

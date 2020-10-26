@@ -159,6 +159,8 @@ def main():
 
     # 6. Copy custom mapping files to GCP bucket
     if return_code == 0 and params['step'] in [21, 20, 0]:
+        run_command = gsutil_rm_csv.format(target_path=config['gs_mapping_csv_path'])
+        print(run_command)
         run_command = gsutil_cp_csv.format(
             source_path=config['local_mapping_csv_path'], target_path=config['gs_mapping_csv_path'])
         print(run_command)

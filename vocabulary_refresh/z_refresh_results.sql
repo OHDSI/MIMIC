@@ -39,3 +39,25 @@ GROUP BY c.vocabulary_id
 ORDER BY c.vocabulary_id
 ;
 
+
+-- -----------------------------------------------------------------------------------
+-- 2020-10-19
+-- TUF-55, Load custom mapping
+-- -----------------------------------------------------------------------------------
+
++----------+--------------------------------------------------------------------------+-----------+
+| check_id |                                check_name                                | row_count |
++----------+--------------------------------------------------------------------------+-----------+
+|        5 | wrong relationships: Maps to TO D OR U or replacement relationships TO D |        26 |
+|        7 | wrong valid_start_date, valid_end_date or invalid_reason for the concept |      4271 |
+|       12 | wrong relationships: Maps to/Maps to value not to S                      |        32 |
+|       15 | nonexistent classes                                                      |         1 |
+|       16 | nonexistent domains                                                      |         1 |
++----------+--------------------------------------------------------------------------+-----------+
+
+--       5 | wrong relationships: mimiciv_drug_ndc needs to be re-mapped              |        26 |
+--       7 | ICD10PSC, invalid_reason is null, and valid_end_date = 2019-12-31        |      4271 |
+--      12 | wrong relationships: mimiciv_drug_ndc needs to be re-mapped              |        32 |
+--      15 | nonexistent classes - mimiciv_marital_status - fixed
+--      16 | nonexistent domains - mimiciv_marital_status - fixed
+

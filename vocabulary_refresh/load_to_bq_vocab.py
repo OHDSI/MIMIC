@@ -38,9 +38,13 @@ config_default = {
 
     "local_athena_csv_path":    "somewhere",
     "gs_athena_csv_path":       "gs://some_path",
+    "athena_csv_delimiter":     "\t",
+    "athena_csv_quote":         "",
 
     "local_mapping_csv_path":   "custom_mapping_csv",
     "gs_mapping_csv_path":      "gs://some_path",
+    "mapping_csv_delimiter":    ",",
+    "mapping_csv_quote":        "\"",
 
     "schemas_dir_all_csv":      "omop_schemas_vocab_bq",
 
@@ -133,11 +137,10 @@ def read_config(config_file):
 ----------------------------------------------------
 '''
 
-def load_table(table, gs_path, ext, field_delimiter, config):
+def load_table(table, gs_path, field_delimiter, quote, config):
 
     return_code = 0
 
-    gs_file_path = '{gs_path}/{table}{ext}'
     schema_path = '{dir}/{table}.json'
     # bq_table = '{project}.{dataset}.{prefix}{table}'
     bq_table = '{dataset}.{prefix}{table}'
@@ -148,7 +151,7 @@ def load_table(table, gs_path, ext, field_delimiter, config):
         " --allow_quoted_newlines=True " + \
         " --skip_leading_rows=1 " + \
         " --field_delimiter=\"{field_delimiter}\" " + \
-        " --quote=\"\" " + \
+        " --quote=\"{quote}\" " + \
         " {table_name} " + \
         " \"{files_path}\" " + \
         "\"{schema_path}\" "
@@ -159,7 +162,6 @@ def load_table(table, gs_path, ext, field_delimiter, config):
         # project=config['bq_target_project'], 
         dataset=config['bq_target_dataset'], \
         prefix=config['bq_athena_temp_table_prefix'], table=table)
-    gs_path = gs_file_path.format(gs_path=gs_path, table=table.upper(), ext=ext)
     table_schema = schema_path.format(dir=config['schemas_dir_all_csv'], table=table)
     
     if os.path.isfile(table_schema):
@@ -167,7 +169,8 @@ def load_table(table, gs_path, ext, field_delimiter, config):
             table_name = table_path, \
             files_path = gs_path, \
             schema_path = table_schema,
-            field_delimiter=field_delimiter
+            field_delimiter=field_delimiter,
+            quote=quote
         )
         print('To BQ: ' + bqc)
 
@@ -198,6 +201,7 @@ def main():
     config = read_config(params.get('config_file'))
 
     return_code = 0
+    gs_file_path = '{gs_path}/{table}{ext}'
 
     for step in params['steps']:
 
@@ -205,15 +209,22 @@ def main():
         if step == 'athena':
             for table in config['vocabulary_tables']:
 
-                rc = load_table(table, \
-                    config['gs_athena_csv_path'], '.csv', '\t', config)
+                gs_path = gs_file_path.format(
+                    gs_path=config['gs_athena_csv_path'], table=table.upper(), ext='.csv')
+
+                rc = load_table(table, gs_path, config['athena_csv_delimiter'], \
+                    config['athena_csv_quote'], config)
                 if rc != 0:
                     rca += 1
                     continue
         rcm = 0
         if step == 'mapping':
-            rc = load_table(config['custom_mapping_table'], \
-                config['gs_mapping_csv_path'], '/*.csv', ',', config)
+
+            gs_path = gs_file_path.format(
+                gs_path=config['gs_mapping_csv_path'], table='*', ext='.csv')
+
+            rc = load_table(config['custom_mapping_table'], gs_path, config['mapping_csv_delimiter'], \
+                config['mapping_csv_quote'], config)
             if rc != 0:
                 rcm += 1
 

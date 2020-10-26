@@ -142,14 +142,13 @@ def format_query(s_query, config):
 
 def main():
 
-    return_code = 0
-
     params = read_params()
     config = read_config(params['config_file'])
 
     bq_command = "bq query --use_legacy_sql=false \"{query}\""
     s_done = []
-    
+    rc = 0
+
     for s_filename in params['script_files']:
 
         print('Run script {file}\n'.format(file=s_filename))
@@ -158,29 +157,32 @@ def main():
         s_queries = trim_queries(s_queries)
 
         for s_query in s_queries:
-            try:
-                bqc = bq_command.format(query=format_query(s_query, config))
-                print('Starting query...')
-                os.system(bqc)
-            except Exception as e:
-                return_code = 100
-                s_done.append('Error in: {0}\n{1}'.format(s_filename, bqc))        
-                raise e                
+            bqc = bq_command.format(query=format_query(s_query, config))
+            print('Starting query...')
+            rc = os.system(bqc)
+
+            if rc != 0:
+                s_done.append('Error in: {0}\n{1}'.format(s_filename, bqc))
+                break
         
-        s_done.append(s_filename)
+        if rc != 0:
+            break
+        else:    
+            s_done.append(s_filename)
 
 
     print('\nScripts executed:')
     for a in s_done:
         print(a)
 
-    return return_code
+    return rc
 
 # ----------------------------------------------------
 # run
 # ----------------------------------------------------
 return_code = main()
 
+print('bq_run_script.exit()', return_code)
 exit(return_code)
 
-# last edit: 2020-09-18
+# last edit: 2020-10-20
