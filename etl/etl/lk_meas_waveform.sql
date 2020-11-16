@@ -53,6 +53,8 @@
 -- - identify the visit: CAST(waveform_source.hadm_id AS STRING) = vis.visit_source_value
 -- -------------------------------------------------------------------
 
+-- from meas.chart.4: note gcpt_chart_label_to_concept
+
 -- -------------------------------------------------------------------
 -- lk_meas_waveform_mapped
 -- Rule 10 (waveform)

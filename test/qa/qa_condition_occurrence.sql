@@ -11,7 +11,7 @@
 -- count (count by trace_id?)
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_test
 SELECT
     CAST(NULL AS STRING)                AS report_id, -- task_id, run_id, target_dataset etc.
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -25,7 +25,7 @@ FROM
 (
     SELECT unit_id, row_count
     FROM
-        `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+        `@metrics_project`.@metrics_dataset.report_qa_row_count
     WHERE
         table_id = 'src_diagnoses_icd'
 ) src
@@ -33,7 +33,7 @@ LEFT JOIN
 (
     SELECT unit_id, row_count
     FROM
-        `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+        `@metrics_project`.@metrics_dataset.report_qa_row_count
     WHERE
         table_id = 'cdm_condition_occurrence'
 ) cdm

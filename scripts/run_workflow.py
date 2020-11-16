@@ -19,20 +19,20 @@ import datetime
 # ----------------------------------------------------
 
 config_default = {
+
+    "workflow": "ddl, staging, etl etc",
+    "comment": "",
+    "type": "sql or py",
+    "variables": 
     {
-        "workflow": "ddl, staging, etl etc",
-        "comment": "",
-        "type": "sql or py",
-        "variables": 
-        {
-            "target_project": "target project name",
-            "target_dataset": "target dataset name"
-        },
-        "scripts": 
-        [
-            {"script": "path relative to the project root",          "comment": ""}
-        ]
+        "@target_project": "target project name",
+        "@target_dataset": "target dataset name"
     },
+    "scripts": 
+    [
+        {"script": "path_relative_to_the_project_root",          "comment": ""}
+    ]
+
 }
 
 # ----------------------------------------------------
@@ -43,14 +43,15 @@ def read_params():
 
     print('Reading params...')
     params = {
-        "config_file":   "mandatory: indicate '-c' for 'config', json file name"
+        "config_file":   "mandatory: indicate '-c' for 'config', json file name",
+        "script_files": []
     }
     
     # Parsing command line arguments
     try:
         opts, args = getopt.getopt(sys.argv[1:],"c:",["config="])
-        if len(args) == 0:
-            print("Expected:\npython run_job.py ../conf/workflow_ddl.conf")
+        if len(opts) == 0:
+            print("Expected:\npython run_workflow.py -c ../conf/workflow_ddl.conf")
             raise getopt.GetoptError("read_params() error", "Mandatory argument is missing.")
 
     except getopt.GetoptError as err:
@@ -68,7 +69,7 @@ def read_params():
     params['script_files'] = []
     for arg in args:
         if os.path.isfile(arg):
-            params['script_files'].append(arg)
+            params['script_files'].append({"script": arg})
 
     print(params)
     return params
@@ -95,44 +96,32 @@ def read_config(config_file):
     return config
 
 
-
 '''
 ----------------------------------------------------
     main()
-    return codes: 0, ...
+    return codes: 0 = ok, !0 = error
 ----------------------------------------------------
 '''
 
 def main():
 
-    # params = read_params()
-    # config = read_config(params['config_file'])
+    params = read_params()
+    config = read_config(params['config_file'])
 
-    # run_command_bq_script = "python bq_run_script.py --config {config_file} {script_file}"
-    # to update bq_run_script to replace more than on pair of project-dataset
-    run_command_bq_script = "python scripts/bq_run_script.py {script_file}"
+    run_command_bq_script = "python scripts/bq_run_script.py -c {config_file} {script_file}"
 
-    s_done = []
-    rc = 0
+    to_run = \
+        config['scripts'] \
+            if len(params['script_files']) == 0 \
+        else params['script_files']
 
-    for s in config_default['scripts']:
-
-        s_filename = s['script']
-        run_command = run_command_bq_script.format(script_file=s_filename)
-        print(run_command)
-        rc = os.system(run_command)
-        print("return_code", rc)
-
-        if rc != 0:
-            s_done.append('{2} | {0} | Error in:\n{1}'.format(s_filename.ljust(30, ' '), run_command, datetime.datetime.now()))
-            break
-        else:    
-            s_done.append('{1} | {0} | Done.'.format(s_filename.ljust(30, ' '), datetime.datetime.now()))
-
-
-    print('\nScripts executed:')
-    for a in s_done:
-        print(a)
+    # run all given scripts at a time
+    run_command = run_command_bq_script.format(
+        script_file= ' '.join(map( lambda s : s['script'], to_run)),
+        config_file= params['config_file']
+    )
+    print(run_command)
+    rc = os.system(run_command)
 
     return rc
 
@@ -141,7 +130,7 @@ def main():
 # ----------------------------------------------------
 return_code = main()
 
-print('run_job.exit()', return_code)
+print('run_workflow.exit()', return_code)
 exit(return_code)
 
-# last edit: 2020-10-21
+# last edit: 2020-11-12

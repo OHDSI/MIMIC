@@ -45,7 +45,7 @@ SELECT
     subject_id                          AS subject_id,
     admittime                           AS admittime,
     dischtime                           AS dischtime,
-    -- deathtime
+    deathtime                           AS deathtime,
     admission_type                      AS admission_type,
     admission_location                  AS admission_location,
     discharge_location                  AS discharge_location,

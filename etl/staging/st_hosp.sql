@@ -93,6 +93,27 @@ FROM
     `@source_project`.@hosp_dataset.labevents
 ;
 
+-- -------------------------------------------------------------------
+-- src_d_labitems
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_d_labitems AS
+SELECT
+    itemid                              AS itemid,
+    label                               AS label,
+    fluid                               AS fluid,
+    category                            AS category,
+    loinc_code                          AS loinc_code,
+    --
+    'd_labitems'                        AS load_table_id,
+    FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        itemid AS itemid
+    ))                                  AS trace_id
+FROM
+    `@source_project`.@hosp_dataset.d_labitems
+;
+
 
 -- -------------------------------------------------------------------
 -- for Procedure
@@ -198,3 +219,54 @@ FROM
     `@source_project`.@hosp_dataset.prescriptions
 ;
 
+
+-- -------------------------------------------------------------------
+-- src_microbiologyevents
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_microbiologyevents AS
+SELECT
+    microevent_id               AS microevent_id,
+    subject_id                  AS subject_id,
+    hadm_id                     AS hadm_id,
+    chartdate                   AS chartdate,
+    charttime                   AS charttime, -- usage: COALESCE(charttime, chartdate)
+    spec_itemid                 AS spec_itemid, -- d_micro, type of specimen taken. If no grouth, then all other fields is null
+    spec_type_desc              AS spec_type_desc, -- for reference
+    test_itemid                 AS test_itemid, -- d_micro, what test is taken, goes to measurement
+    test_name                   AS test_name, -- for reference
+    org_itemid                  AS org_itemid, -- d_micro, what bacteria have grown
+    org_name                    AS org_name, -- for reference
+    ab_itemid                   AS ab_itemid, -- d_micro, antibiotic tested on the bacteria
+    ab_name                     AS ab_name, -- for reference
+    dilution_comparison         AS dilution_comparison, -- operator sign
+    dilution_value              AS dilution_value, -- numeric value
+    interpretation              AS interpretation, -- bacteria's degree of resistance to the antibiotic
+    --
+    'microbiologyevents'                AS load_table_id,
+    FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        microevent_id AS microevent_id
+    ))                                  AS trace_id
+FROM
+    `@source_project`.@hosp_dataset.microbiologyevents
+;
+
+-- -------------------------------------------------------------------
+-- src_d_micro
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_d_micro AS
+SELECT
+    itemid                      AS itemid, -- numeric ID
+    label                       AS label, -- source_code for custom mapping
+    category                    AS category, 
+    --
+    'd_micro'                   AS load_table_id,
+    FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        itemid AS itemid
+    ))                                  AS trace_id
+FROM
+    `@source_project`.@hosp_dataset.d_micro
+;

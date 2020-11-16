@@ -42,13 +42,14 @@ SELECT
     src.subject_id                          AS subject_id,
     src.charttime                           AS charttime, -- measurement_datetime,
     src.hadm_id                             AS hadm_id,
-    src.itemid                              AS itemid,
+    src.itemid                              AS itemid, -- dlab.itemid
     src.value                               AS value, -- value_source_value
     REGEXP_EXTRACT(src.value, r'^(\<=|\>=|\>|\<|=|)')   AS value_operator,
     REGEXP_EXTRACT(src.value, r'[-]?[\d]+[.]?[\d]*')    AS value_number, -- assume "-0.34 etc"
     src.valueuom                            AS valueuom, -- unit_source_value,
     src.ref_range_lower                     AS ref_range_lower,
     src.ref_range_upper                     AS ref_range_upper,
+    'labevents'                             AS unit_id,
     --
     src.load_table_id       AS load_table_id,
     src.load_row_id         AS load_row_id,
@@ -74,7 +75,7 @@ SELECT
     vc.concept_id           AS source_concept_id,
     vc2.domain_id           AS target_domain_id,
     vc2.concept_id          AS target_concept_id,
-    dlab.fluid              AS fluid,
+    dlab.fluid              AS fluid,   -- 
     dlab.category           AS category -- 'Blood Gas', 'Chemistry', 'Hematology'
 FROM
     `@etl_project`.@etl_dataset.src_d_labitems dlab
@@ -159,7 +160,7 @@ SELECT
     src.valueuom                            AS unit_source_value,
     src.value                               AS value_source_value,
     --
-    'meas.labevents'                AS unit_id,
+    CONCAT('meas.', src.unit_id)    AS unit_id,
     src.load_table_id               AS load_table_id,
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id

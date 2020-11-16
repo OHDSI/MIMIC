@@ -23,11 +23,13 @@
 -- loaded custom mapping:
 --      gcpt_procedure_to_concept -> mimiciv_proc_itemid
 --      gcpt_datetimeevents_to_concept -> mimiciv_proc_datetimeevents
--- split Rule 4 to Observation too
 -- to review "custom mapping" from d_icd_procedures: domain_id = 'd_icd_procedures' AND vocabulary_id = 'MIMIC Local Codes'
 -- to review relationship_id IN ('CPT4 - SNOMED eq','Maps to')
 -- datetimeevents: to summarize count of duplicated rows or to use charttime instead of value?
--- Rule 1 - implement procedure_type_concept_id(seq_num, 'Carrier claim detail - ([\d]+)th position')
+-- Rule 1
+--      implement procedure_type_concept_id(seq_num, 'Carrier claim detail - ([\d]+)th position')
+-- Rule 1
+--      add more custom mapping: gcpt_cpt4_to_concept --> mimiciv_proc_xxx (?)
 -- -------------------------------------------------------------------
 
 
@@ -133,6 +135,7 @@ LEFT JOIN
 -- -------------------------------------------------------------------
 -- mapping
 -- HCPCS Rule 1
+-- add gcpt_cpt4_to_concept --> mimiciv_proc_xxx (?)
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_hcpcs_concept AS

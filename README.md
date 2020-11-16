@@ -29,7 +29,32 @@
 ### Change Log (latest first) ###
 
 
-**2020-09-21**
+**2020-11-16**
+
+* TUF-10 Basic logic for CDM tables based on MIMIC-III logic
+    * TUF-19 Measurement - Rule 3 (microbiology) - done (without tests)
+        * Mapping for antibiotic susceptibility is done
+    * TUF-19 Measurement - Rule 2 (chartevent) is started
+    * TUF-20 Death table - done
+    * TUF-51 Device_exposure - done with Rule 1 lk_drug_mapped
+    * TUF-58 Specimen - done (without tests)
+* TUF-76 Bugfix according to Achilles Heel Report
+    * Person count - done
+    * Condition mapping rate - done
+    * Observation periods - done
+    * Open points:
+        * Observation value_as fields all null
+        * Event dates before year of birth
+* TUF-75 Basic Orchestration
+    * run_workflow.py is added
+    * Variables section is added to configs for bq_run_script.py and run_workflow.py
+    * Dataset names are replaced in ut/\*.sql and qa/\*.sql
+    * Nice output is added to bq_run_script
+    * Fixed: dealing with quotes (") inside a query
+    * Known issue: do not use semicolon (;) inside comments
+
+
+**2020-10-26**
 
 * TUF-10 Implement basic logic based on MIMIC III conversion
     * Tables implemented: 

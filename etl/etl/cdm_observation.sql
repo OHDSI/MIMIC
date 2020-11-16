@@ -30,6 +30,9 @@
 --      http://forums.ohdsi.org/t/most-appropriate-omop-table-to-house-drg-information/1591/9,
 -- Chartevents.text
 --      to add from Observation III (see the draft below)
+-- observation.proc.* (Achilless Heel report)
+--      value_as_string IS NULL AND value_as_number IS NULL AND COALESCE(value_as_concept_id, 0) = 0
+--      review custom mapping. if ok, use value_as_concept_id = 4188539 'Yes'?
 -- -------------------------------------------------------------------
 
 -- on demo: 1585 rows
@@ -119,6 +122,8 @@ FROM
 INNER JOIN
     `@etl_project`.@etl_dataset.src_admissions adm
         ON src.hadm_id = adm.hadm_id
+WHERE
+    src.description IS NOT NULL
 ;
 
 

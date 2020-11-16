@@ -11,41 +11,39 @@
 --      cdm_person.sql
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_death_adm AS
-SELECT 
-    subject_id, 
-    least(deathtime, dischtime) as death_datetime, 
-    38003569 as death_type_concept_id
+-- -------------------------------------------------------------------
+-- lk_death_adm_mapped
+-- Rule 1, admissionss
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_death_adm_mapped AS
+SELECT DISTINCT
+    src.subject_id, 
+    FIRST_VALUE(src.deathtime) OVER(
+        PARTITION BY src.subject_id 
+        ORDER BY src.admittime ASC
+    )                                   AS deathtime, 
+    FIRST_VALUE(src.dischtime) OVER(
+        PARTITION BY src.subject_id 
+        ORDER BY src.admittime ASC
+    )                                   AS dischtime,
+    38003569                            AS type_concept_id, -- EHR record patient status "Deceased"
+    --
+    'admissions'                        AS unit_id,
+    src.load_table_id                   AS load_table_id,
+    FIRST_VALUE(src.load_row_id) OVER(
+        PARTITION BY src.subject_id 
+        ORDER BY src.admittime ASC
+    )                                   AS load_row_id,
+    FIRST_VALUE(src.trace_id) OVER(
+        PARTITION BY src.subject_id 
+        ORDER BY src.admittime ASC
+    )                                   AS trace_id
 FROM 
-(
-    SELECT
-        first_value(deathtime) OVER(PARTITION BY subject_id ORDER BY admittime ASC) as deathtime, 
-        subject_id, 
-        dischtime 
-    FROM 
-        admissions 
-    WHERE 
-        deathtime IS NOT NULL
-    GROUP BY
-        subject_id
-) a --donor organs
+    `@etl_project`.@etl_dataset.src_admissions src -- adm
 WHERE 
-    deathtime IS NOT NULL
+    src.deathtime IS NOT NULL
 ;
-
--- to review implemented
--- "death_adm" AS (
---     SELECT patients.mimic_id as person_id, least(deathtime, dischtime) as death_datetime, 38003569 as death_type_concept_id
---     FROM (SELECT distinct on (subject_id) first_value(deathtime) OVER(PARTITION BY subject_id ORDER BY admittime ASC) as deathtime, subject_id, dischtime FROM admissions WHERE deathtime IS NOT NULL) a --donor organs
---     LEFT JOIN patients USING (subject_id)
---     WHERE deathtime IS NOT NULL),
-
-
-death_ssn AS (
-    SELECT mimic_id as person_id, dod_ssn as death_datetime, 261 as death_type_concept_id
-    FROM patients LEFT JOIN death_adm ON (mimic_id = person_id)
-    WHERE dod_ssn IS NOT NULL AND death_adm.person_id IS NULL)
-
 
 -- -------------------------------------------------------------------
 -- cdm_death
@@ -70,9 +68,28 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_death
 ;
 
 INSERT INTO `@etl_project`.@etl_dataset.cdm_death
-SELECT 
-    person_id, death_datetime::date, (death_datetime), death_type_concept_id
-FROM  death_adm
-UNION ALL
-SELECT person_id, death_datetime::date, (death_datetime), death_type_concept_id
-FROM  death_ssn;
+SELECT
+    per.person_id       AS person_id,
+    CAST(IF(
+        src.deathtime <= src.dischtime, 
+            src.deathtime, src.dischtime
+    ) AS DATE)                              AS death_date,
+    IF(
+        src.deathtime <= src.dischtime, 
+            src.deathtime, src.dischtime
+    )                                       AS death_datetime,
+    src.type_concept_id                     AS death_type_concept_id,
+    0                                       AS cause_concept_id,
+    CAST(NULL AS STRING)                    AS cause_source_value,
+    0                                       AS cause_source_concept_id,
+    --
+    CONCAT('death.', src.unit_id)           AS unit_id,
+    src.load_table_id       AS load_table_id,
+    src.load_row_id         AS load_row_id,
+    src.trace_id            AS trace_id
+FROM
+    `@etl_project`.@etl_dataset.lk_death_adm_mapped src
+INNER JOIN
+    `@etl_project`.@etl_dataset.cdm_person per
+        ON CAST(src.subject_id AS STRING) = per.person_source_value
+;

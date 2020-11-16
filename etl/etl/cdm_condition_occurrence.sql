@@ -24,10 +24,6 @@
 --      Because source rows can be multiplied during the ETL.
 -- seq_num in custom mapping (seq_num_to_concept): 
 --      There is no need of custom mapping because we can just parse target concept name
--- condition_source_value
---      exact lk.source_code without dots
---      or CONCAT(src.icd_code, ' | ', CAST(src.icd_version AS STRING))
---      or exact src.icd_code? (this is implemented, and it is compatible with UT idea)
 -- condition_status_source_value / concept_id
 --      investigate if there is data for conditons status
 -- -------------------------------------------------------------------
@@ -66,13 +62,14 @@ SELECT
     END                                         AS seq_num, -- to fit "Inpatient detail %" concepts provided by OMOP
     COALESCE(adm.edregtime, adm.admittime)      AS start_datetime, -- always exists
     dischtime                                   AS end_datetime,
-    REPLACE(TRIM(src.icd_code), '.', '')        AS source_code,
+    src.icd_code                                AS source_code,
     CASE 
         WHEN src.icd_version = 9 THEN 'ICD9CM'
         WHEN src.icd_version = 10 THEN 'ICD10CM'
         ELSE NULL
     END                                         AS source_vocabulary_id,
     --
+    'diagnoses_icd'         AS unit_id,
     src.load_table_id       AS load_table_id,
     src.load_row_id         AS load_row_id,
     src.trace_id            AS trace_id
@@ -84,22 +81,35 @@ INNER JOIN
 ;
 
 -- -------------------------------------------------------------------
--- lk_icd_concept 
+-- lk_djagnoses_icd_mapped
+-- Since Condition_occurrence is quite simple, skip creating a separate codes table,
+-- but create mapped table, which goes to Condition and Drug as well
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_diagnoses_icd_concept AS
-SELECT DISTINCT
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_diagnoses_icd_mapped AS
+SELECT
+    src.subject_id                  AS subject_id,
+    src.hadm_id                     AS hadm_id,
+    src.seq_num                     AS seq_num,
+    src.start_datetime              AS start_datetime,
+    src.end_datetime                AS end_datetime,
+    --
     src.source_code             AS source_code,
     src.source_vocabulary_id    AS source_vocabulary_id,
     vc.concept_id               AS source_concept_id,
     vc.domain_id                AS source_domain_id,
     vc2.concept_id              AS target_concept_id,
-    vc2.domain_id               AS target_domain_id
+    vc2.domain_id               AS target_domain_id,
+    --
+    CONCAT('cond.', src.unit_id) AS unit_id,
+    src.load_table_id       AS load_table_id,
+    src.load_row_id         AS load_row_id,
+    src.trace_id            AS trace_id  
 FROM
     `@etl_project`.@etl_dataset.lk_diagnoses_icd_clean src
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
-        ON REPLACE(vc.concept_code, '.', '') = src.source_code
+        ON REPLACE(vc.concept_code, '.', '') = REPLACE(TRIM(src.source_code), '.', '')
         AND vc.vocabulary_id = src.source_vocabulary_id
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
@@ -122,7 +132,7 @@ LEFT JOIN
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_condition_occurrence
 (
     condition_occurrence_id       INT64     not null ,
     person_id                     INT64     not null ,
@@ -150,33 +160,29 @@ CREATE OR REPLACE TABLE mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurren
 
 INSERT INTO `@etl_project`.@etl_dataset.cdm_condition_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())   AS condition_occurrence_id,
-    per.person_id                       AS person_id,
-    COALESCE(icd.target_concept_id, 0)  AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)    AS condition_start_date,
-    src.start_datetime                  AS condition_start_datetime,
-    CAST(src.end_datetime AS DATE)      AS condition_end_date,
-    src.end_datetime                    AS condition_end_datetime,
-    COALESCE(ct.target_concept_id, 0)   AS condition_type_concept_id,
-    CAST(NULL AS STRING)                AS stop_reason,
-    CAST(NULL AS INT64)                 AS provider_id,
-    vis.visit_occurrence_id             AS visit_occurrence_id,
-    CAST(NULL AS INT64)                 AS visit_detail_id,
-    src.source_code                     AS condition_source_value,
-    COALESCE(icd.source_concept_id, 0)  AS condition_source_concept_id,
-    CAST(NULL AS STRING)                AS condition_status_source_value,
-    CAST(NULL AS INT64)                 AS condition_status_concept_id,
+    FARM_FINGERPRINT(GENERATE_UUID())       AS condition_occurrence_id,
+    per.person_id                           AS person_id,
+    COALESCE(src.target_concept_id, 0)      AS condition_concept_id,
+    CAST(src.start_datetime AS DATE)        AS condition_start_date,
+    src.start_datetime                      AS condition_start_datetime,
+    CAST(src.end_datetime AS DATE)          AS condition_end_date,
+    src.end_datetime                        AS condition_end_datetime,
+    COALESCE(ct.target_concept_id, 0)       AS condition_type_concept_id,
+    CAST(NULL AS STRING)                    AS stop_reason,
+    CAST(NULL AS INT64)                     AS provider_id,
+    vis.visit_occurrence_id                 AS visit_occurrence_id,
+    CAST(NULL AS INT64)                     AS visit_detail_id,
+    src.source_code                         AS condition_source_value,
+    COALESCE(src.source_concept_id, 0)      AS condition_source_concept_id,
+    CAST(NULL AS STRING)                    AS condition_status_source_value,
+    CAST(NULL AS INT64)                     AS condition_status_concept_id,
     --
-    'condition.diagnoses_icd'       AS unit_id,
+    CONCAT('condition.', src.unit_id) AS unit_id,
     src.load_table_id               AS load_table_id,
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_diagnoses_icd_clean src
-LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_diagnoses_icd_concept icd
-        ON  src.source_code = icd.source_code
-        AND src.source_vocabulary_id = icd.source_vocabulary_id
+    `@etl_project`.@etl_dataset.lk_diagnoses_icd_mapped src
 LEFT JOIN   
     `@etl_project`.@etl_dataset.tmp_seq_num_to_concept ct
         ON  src.seq_num = ct.seq_num
@@ -186,5 +192,6 @@ LEFT JOIN
 LEFT JOIN 
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
         ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
-;
+
+        ;
 

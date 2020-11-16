@@ -47,8 +47,7 @@ SELECT
     src.hadm_id                 AS hadm_id,
     src.dose_val_rx             AS dose_val_rx,
     src.starttime               AS start_datetime,
-    COALESCE(src.stoptime, 
-        DATETIME_ADD(src.starttime, INTERVAL 1 DAY)) AS end_datetime,
+    COALESCE(src.stoptime, src.starttime) AS end_datetime,
     src.route                   AS route_source_code, --TODO: add route AS local concept,
     'mimiciv_drug_route'        AS route_source_vocabulary,
     src.form_unit_disp          AS dose_unit_source_code, --TODO: add unit AS local concept,
@@ -167,7 +166,10 @@ SELECT
     COALESCE(vc_ndc.target_concept_id, vc_gcpt.target_concept_id, 0)    AS target_concept_id,
     COALESCE(vc_ndc.target_domain_id, vc_gcpt.target_domain_id, 'Drug') AS target_domain_id,
     src.start_datetime                                                  AS start_datetime,
-    src.end_datetime                                                    AS end_datetime,
+    CASE
+        WHEN src.end_datetime < src.start_datetime THEN src.start_datetime
+        ELSE src.end_datetime
+    END                                             AS end_datetime,
     38000177                                        AS type_concept_id,
     src.quantity                                    AS quantity,
     COALESCE(vc_route.target_concept_id, 0)                             AS route_concept_id,

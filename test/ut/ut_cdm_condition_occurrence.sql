@@ -11,7 +11,7 @@
 -- unique
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -21,7 +21,7 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(condition_occurrence_id) - COUNT(DISTINCT condition_occurrence_id) = 0) AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence
+    `@target_project`.@target_dataset.cdm_condition_occurrence
 ;
 
 -- -------------------------------------------------------------------
@@ -37,7 +37,7 @@ FROM
 --      allows 0?
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -51,9 +51,9 @@ SELECT
     ))                                  AS condition_json,
     (COUNT(*) > 0 AND COUNT(*) - COUNT(vc.concept_id) = 0) AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence cdm
+    `@target_project`.@target_dataset.cdm_condition_occurrence cdm
 LEFT JOIN
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.voc_concept vc
+    `@etl_project`.@etl_dataset.voc_concept vc
         ON cdm.condition_concept_id = vc.concept_id
         AND vc.standard_concept = 'S'
         AND vc.vocabulary_id IN ('ICD9CM', 'ICD10CM')
@@ -71,7 +71,7 @@ WHERE
 -- start time should be not later than end time
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -81,12 +81,12 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(*) = 0) AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence
+    `@target_project`.@target_dataset.cdm_condition_occurrence
 WHERE
     condition_start_date > COALESCE(condition_end_date, PARSE_DATE('%Y-%m-%d','2099-12-31'))
 ;
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -96,7 +96,7 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(*) = 0) AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence
+    `@target_project`.@target_dataset.cdm_condition_occurrence
 WHERE
     condition_start_datetime > COALESCE(condition_end_datetime, PARSE_DATETIME('%F','2099-12-31'))
 ;
@@ -105,7 +105,7 @@ WHERE
 -- foreign key
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -115,16 +115,16 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(*) = 0)                      AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence cdm
+    `@target_project`.@target_dataset.cdm_condition_occurrence cdm
 LEFT JOIN
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_person fk
+    `@target_project`.@target_dataset.cdm_person fk
         ON cdm.person_id = fk.person_id
 WHERE
     -- cdm.person_id -- required = true
     fk.person_id IS NULL
 ;
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -134,16 +134,16 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(*) = 0)                      AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence cdm
+    `@target_project`.@target_dataset.cdm_condition_occurrence cdm
 LEFT JOIN
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_visit_occurrence fk
+    `@target_project`.@target_dataset.cdm_visit_occurrence fk
         ON cdm.visit_occurrence_id = fk.visit_occurrence_id
 WHERE
     cdm.visit_occurrence_id IS NOT NULL -- required = false
     AND fk.visit_occurrence_id IS NULL
 ;
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_unit_test
+INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -151,12 +151,12 @@ SELECT
     'foreign_key'                       AS test_type, -- unique, not null, concept etc.
     'condition_source_value'            AS field_name,
     TO_JSON_STRING(STRUCT(
-        '@source_project.@source_schema.src_diagnoses_icd.icd_code' AS foreign_key
+        '@etl_project.@etl_dataset.src_diagnoses_icd.icd_code' AS foreign_key
     ))                                  AS condition_json,
     (COUNT(*) = 0)                      AS test_passed
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence cdm
+    `@target_project`.@target_dataset.cdm_condition_occurrence cdm
 LEFT JOIN
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.src_diagnoses_icd fk
+    `@etl_project`.@etl_dataset.src_diagnoses_icd fk
         ON cdm.condition_source_value = fk.icd_code
 ;

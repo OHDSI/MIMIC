@@ -19,7 +19,7 @@
 --      table_id || unit_id
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count AS
+CREATE OR REPLACE TABLE `@metrics_project`.@metrics_dataset.report_qa_row_count AS
 SELECT
     CAST(NULL AS STRING)                AS report_id, -- task_id, run_id, target_dataset etc.
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -33,7 +33,7 @@ SELECT
 -- src_patients
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -42,14 +42,14 @@ SELECT
     'person.patients'                   AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.src_patients
+    `@etl_project`.@etl_dataset.src_patients
 ;
 
 -- -------------------------------------------------------------------
 -- cdm_person
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -58,14 +58,14 @@ SELECT
     'person.patients'                   AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_person
+    `@target_project`.@target_dataset.cdm_person
 ;
 
 -- -------------------------------------------------------------------
 -- src_transfers (careunit)
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -74,14 +74,14 @@ SELECT
     'care_site.transfers'               AS unit_id,
     COUNT(DISTINCT careunit)            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.src_transfers
+    `@etl_project`.@etl_dataset.src_transfers
 ;
 
 -- -------------------------------------------------------------------
 -- cdm_care_site
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -90,14 +90,14 @@ SELECT
     'care_site.transfers'               AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_care_site
+    `@target_project`.@target_dataset.cdm_care_site
 ;
 
 -- -------------------------------------------------------------------
 -- cdm_visit_occurrence
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -106,14 +106,14 @@ SELECT
     'visit.admissions'                  AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_visit_occurrence
+    `@target_project`.@target_dataset.cdm_visit_occurrence
 ;
 
 -- -------------------------------------------------------------------
 -- src_admissions
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -122,14 +122,14 @@ SELECT
     'visit.admissions'                  AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.src_admissions
+    `@etl_project`.@etl_dataset.src_admissions
 ;
 
 -- -------------------------------------------------------------------
 -- cdm_visit_detail
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -138,7 +138,7 @@ SELECT
     unit_id                             AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_visit_detail
+    `@target_project`.@target_dataset.cdm_visit_detail
 GROUP BY
     unit_id
 ;
@@ -147,7 +147,7 @@ GROUP BY
 -- src_diagnoses_icd
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -156,14 +156,14 @@ SELECT
     'condition.diagnoses_icd'           AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.src_diagnoses_icd
+    `@etl_project`.@etl_dataset.src_diagnoses_icd
 ;
 
 -- -------------------------------------------------------------------
 -- cdm_condition_occurrence
 -- -------------------------------------------------------------------
 
-INSERT INTO `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.report_qa_row_count
+INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_row_count
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -172,7 +172,7 @@ SELECT
     unit_id                             AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `odysseus-mimic-dev`.mimiciv_cdm_tuf_10_ant_2020_09_11.cdm_condition_occurrence
+    `@target_project`.@target_dataset.cdm_condition_occurrence
 GROUP BY
     unit_id
 ;

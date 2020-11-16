@@ -6,6 +6,7 @@ import os
 import sys
 import getopt
 import json
+import datetime
 
 # ----------------------------------------------------
 # default config values
@@ -14,12 +15,13 @@ import json
 # ----------------------------------------------------
 
 config_default = {
- 
-    "bq_project_template":      "No project replacement by default",
-    "bq_dataset_template":      "No dataset replacement by default",
 
-    "bq_target_project":        "",
-    "bq_target_dataset":        ""
+    "variables": {
+            
+        "bq_target_project":      "No project replacement by default",
+        "bq_target_dataset":      "No dataset replacement by default"
+    }
+    
 }
 
 # ----------------------------------------------------
@@ -53,11 +55,15 @@ def read_params():
                 params['config_file'] = arg
 
     params['script_files'] = []
+    not_found = []
     for arg in args:
         if os.path.isfile(arg):
             params['script_files'].append(arg)
+        else:
+            not_found.append(arg)
 
-    print(params)
+    print('scripts to run', params)
+    print('not found', not_found)
     return params
 
 # ----------------------------------------------------
@@ -126,17 +132,38 @@ def format_query(s_query, config):
     print('Formatting query...')
 
     s_result = s_query \
-        .replace(config['bq_project_template'], config['bq_target_project']) \
-        .replace(config['bq_dataset_template'], config['bq_target_dataset']) \
+        .replace('"', '\\"') \
         .replace('`', '\\`')
+
+    for var, val in config['variables'].items():
+        s_result = s_result.replace(var, val)
 
     print(s_result)
     return s_result
 
 '''
 ----------------------------------------------------
+    nice output about execution result
+
+    s_filename: script executed
+    status:     0 = ok, !0 = error
+    msg:        additional info if there is any
+----------------------------------------------------
+'''
+def nice_message(s_filename, status, msg):
+    time =    datetime.datetime.now()
+    file =    s_filename.ljust(35, ' ')
+    result =  'Done.' if status==0 else 'Error'
+    message = '' if len(msg)==0 else ': ' + msg if len(msg.split('\n')) == 1 \
+        else '\n' + '\n'.join(map(lambda x: ''.ljust(4) + x, msg.split('\n')))
+
+    return '{0} | {1} | {2}{3}'.format(time, file, result, message)
+
+
+'''
+----------------------------------------------------
     main()
-    return codes: 0, 100
+    return codes: 0 = ok, !0 = error
 ----------------------------------------------------
 '''
 
@@ -155,20 +182,23 @@ def main():
 
         s_queries = open(s_filename).read().split(';')
         s_queries = trim_queries(s_queries)
-
+        
+        query_no = 0
         for s_query in s_queries:
+
             bqc = bq_command.format(query=format_query(s_query, config))
+            query_no += 1
             print('Starting query...')
             rc = os.system(bqc)
 
             if rc != 0:
-                s_done.append('Error in: {0}\n{1}'.format(s_filename, bqc))
                 break
         
+        s_done.append(
+            nice_message(s_filename, rc, '' if rc==0 else 'See query No {0}'.format(query_no)))
+
         if rc != 0:
             break
-        else:    
-            s_done.append(s_filename)
 
 
     print('\nScripts executed:')
@@ -176,6 +206,7 @@ def main():
         print(a)
 
     return rc
+
 
 # ----------------------------------------------------
 # run
@@ -185,4 +216,4 @@ return_code = main()
 print('bq_run_script.exit()', return_code)
 exit(return_code)
 
-# last edit: 2020-10-20
+# last edit: 2020-11-12
