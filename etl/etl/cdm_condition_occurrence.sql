@@ -186,12 +186,17 @@ FROM
 LEFT JOIN   
     `@etl_project`.@etl_dataset.tmp_seq_num_to_concept ct
         ON  src.seq_num = ct.seq_num
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
-        ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+;
 
-        ;
+-- -------------------------------------------------------------------
+-- cleanup
+-- -------------------------------------------------------------------
 
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_seq_num_to_concept;

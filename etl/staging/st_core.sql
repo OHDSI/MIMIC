@@ -20,7 +20,7 @@
 -- src_patients
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_patients AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_patients AS
 SELECT 
     subject_id                          AS subject_id,
     anchor_year                         AS year_of_birth,
@@ -39,7 +39,7 @@ FROM
 -- src_admissions
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_admissions AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_admissions AS
 SELECT
     hadm_id                             AS hadm_id, -- PK
     subject_id                          AS subject_id,
@@ -60,6 +60,7 @@ SELECT
     'admissions'                        AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
         hadm_id AS hadm_id
     ))                                  AS trace_id
 FROM
@@ -70,7 +71,7 @@ FROM
 -- src_transfers
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_transfers AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_transfers AS
 SELECT
     transfer_id                         AS transfer_id,
     hadm_id                             AS hadm_id,

@@ -46,6 +46,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_observation_clean AS
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
+    'Insurance'                     AS source_code,
     46235654                        AS target_concept_id, -- Primary insurance,
     src.admittime                   AS start_datetime,
     src.insurance                   AS value_as_string,
@@ -65,6 +66,7 @@ UNION ALL
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
+    'Marital status'                AS source_code,
     40766231                        AS target_concept_id, -- Marital status,
     src.admittime                   AS start_datetime,
     src.marital_status              AS value_as_string,
@@ -84,7 +86,8 @@ UNION ALL
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
-    40758030                        AS target_concept_id, -- Language.preferred,
+    'Language'                      AS source_code,
+    40758030                        AS target_concept_id, -- Preferred language
     src.admittime                   AS start_datetime,
     src.language                    AS value_as_string,
     CAST(NULL AS STRING)            AS source_vocabulary_id,
@@ -108,7 +111,8 @@ INSERT INTO `@etl_project`.@etl_dataset.lk_observation_clean
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
-    4296248                         AS target_concept_id, -- Cost containment drgcode should be in cost table apparently...
+    'DRG code' AS source_code,
+    4296248                         AS target_concept_id, -- Cost containment
     COALESCE(adm.edregtime, adm.admittime)  AS start_datetime,
     src.description                 AS value_as_string,
     'mimiciv_obs_drgcodes'          AS source_vocabulary_id,
@@ -178,7 +182,7 @@ SELECT
     COALESCE(src.target_concept_id, 0)      AS target_concept_id,
     src.start_datetime                      AS start_datetime,
     38000280                                AS type_concept_id, -- Observation recorded from EHR, -- Rules 1-4
-    src.unit_id         AS source_code, -- to add lk_observation_clean.source_code
+    src.source_code                         AS source_code,
     0                                       AS source_concept_id,
     src.value_as_string                     AS value_as_string,
     lc.target_concept_id                    AS value_as_concept_id,
@@ -264,12 +268,13 @@ SELECT
     src.trace_id                    AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_observation_mapped src
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
-        ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 ;
 
 -- -------------------------------------------------------------------
@@ -304,12 +309,13 @@ SELECT
     src.trace_id                    AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_procedure_mapped src
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
-        ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 WHERE
     src.target_domain_id = 'Observation'
 ;

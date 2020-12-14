@@ -1,0 +1,12 @@
+concept_name,source_concept_id,source_vocabulary_id,source_domain_id,source_concept_class_id,standard_concept,concept_code,valid_start_date,valid_end_date,invalid_reason,target_concept_id,relationship_id,reverese_relationship_id,relationship_valid_start_date,relationship_end_date,invalid_reason_cr
+1st AV (First degree AV Block),2000030001,mimiciv_meas_chartevents_value,Meas Value,Answer,,1st AV (First degree AV Block),1970-01-01,2099-12-31,,45884784,Maps to,Mapped from,1970-01-01,2099-12-31,
+3rd AV (Complete Heart Block),2000030002,mimiciv_meas_chartevents_value,Meas Value,Answer,,3rd AV (Complete Heart Block),1970-01-01,2099-12-31,,45884786,Maps to,Mapped from,1970-01-01,2099-12-31,
+A Flut (Atrial Flutter),2000030003,mimiciv_meas_chartevents_value,Meas Value,Answer,,A Flut (Atrial Flutter),1970-01-01,2099-12-31,,45883019,Maps to,Mapped from,1970-01-01,2099-12-31,
+AF (Atrial Fibrillation),2000030004,mimiciv_meas_chartevents_value,Meas Value,Answer,,AF (Atrial Fibrillation),1970-01-01,2099-12-31,,45883018,Maps to,Mapped from,1970-01-01,2099-12-31,
+LBBB (Left Bundle Branch Block),2000030005,mimiciv_meas_chartevents_value,Meas Value,Answer,,LBBB (Left Bundle Branch Block),1970-01-01,2099-12-31,,45883893,Maps to,Mapped from,1970-01-01,2099-12-31,
+RBBB (Right Bundle Branch Block),2000030006,mimiciv_meas_chartevents_value,Meas Value,Answer,,RBBB (Right Bundle Branch Block),1970-01-01,2099-12-31,,45883022,Maps to,Mapped from,1970-01-01,2099-12-31,
+SA (Sinus Arrhythmia),2000030007,mimiciv_meas_chartevents_value,Meas Value,Answer,,SA (Sinus Arrhythmia),1970-01-01,2099-12-31,,45884787,Maps to,Mapped from,1970-01-01,2099-12-31,
+SB (Sinus Bradycardia),2000030008,mimiciv_meas_chartevents_value,Meas Value,Answer,,SB (Sinus Bradycardia),1970-01-01,2099-12-31,,21499419,Maps to,Mapped from,1970-01-01,2099-12-31,
+SR (Sinus Rhythm),2000030009,mimiciv_meas_chartevents_value,Meas Value,Answer,,SR (Sinus Rhythm),1970-01-01,2099-12-31,,45877096,Maps to,Mapped from,1970-01-01,2099-12-31,
+ST (Sinus Tachycardia),2000030010,mimiciv_meas_chartevents_value,Meas Value,Answer,,ST (Sinus Tachycardia),1970-01-01,2099-12-31,,45879290,Maps to,Mapped from,1970-01-01,2099-12-31,
+SVT (Supra Ventricular Tachycardia),2000030011,mimiciv_meas_chartevents_value,Meas Value,Answer,,SVT (Supra Ventricular Tachycardia),1970-01-01,2099-12-31,,36309741,Maps to,Mapped from,1970-01-01,2099-12-31,

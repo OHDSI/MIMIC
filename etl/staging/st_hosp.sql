@@ -23,7 +23,7 @@
 -- src_diagnoses_icd
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_diagnoses_icd AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_diagnoses_icd AS
 SELECT
     subject_id      AS subject_id,
     hadm_id         AS hadm_id,
@@ -49,7 +49,7 @@ FROM
 -- src_services
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_services AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_services AS
 SELECT
     subject_id                          AS subject_id,
     hadm_id                             AS hadm_id,
@@ -71,7 +71,7 @@ FROM
 -- src_labevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_labevents AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_labevents AS
 SELECT
     subject_id                          AS subject_id,
     charttime                           AS charttime,
@@ -97,7 +97,7 @@ FROM
 -- src_d_labitems
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_d_labitems AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_labitems AS
 SELECT
     itemid                              AS itemid,
     label                               AS label,
@@ -123,7 +123,7 @@ FROM
 -- src_procedures_icd
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_procedures_icd AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_procedures_icd AS
 SELECT
     subject_id                          AS subject_id,
     hadm_id                             AS hadm_id,
@@ -145,7 +145,7 @@ FROM
 -- src_hcpcsevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_hcpcsevents AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_hcpcsevents AS
 SELECT
     hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
@@ -169,7 +169,7 @@ FROM
 -- src_drgcodes
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_drgcodes AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_drgcodes AS
 SELECT
     hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
@@ -190,7 +190,7 @@ FROM
 -- src_prescriptions
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_prescriptions AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_prescriptions AS
 SELECT
     hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
@@ -224,7 +224,7 @@ FROM
 -- src_microbiologyevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_microbiologyevents AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_microbiologyevents AS
 SELECT
     microevent_id               AS microevent_id,
     subject_id                  AS subject_id,
@@ -256,7 +256,7 @@ FROM
 -- src_d_micro
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_d_micro AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_micro AS
 SELECT
     itemid                      AS itemid, -- numeric ID
     label                       AS label, -- source_code for custom mapping

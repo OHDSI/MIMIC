@@ -72,7 +72,8 @@ SELECT
     COALESCE(vc2.domain_id, 'Measurement')  AS target_domain_id,
     wm.mx_datetime                          AS start_datetime,
     wm.value_as_number                      AS value_as_number,
-    vcu.concept_id                          AS unit_concept_id,
+    IF(wm.unit_source_value IS NOT NULL, 
+        COALESCE(uc.target_concept_id, 0), NULL)    AS unit_concept_id,
     wm.source_code                          AS source_code, 
     COALESCE(vc1.concept_id, 0)             AS source_concept_id,
     wm.unit_source_value                    AS unit_source_value,
@@ -89,14 +90,13 @@ INNER JOIN
 -- mapping of the main source code
 -- mapping for measurement unit
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vcu
-        ON vcu.concept_code = wm.unit_source_value
-        AND vcu.vocabulary_id IN ('Unit', 'MIMIC_WAVEFORM_UNIT') 
-            -- supposing that the standard mapping is supplemented with custom concepts for waveform specific units
+    `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
+        ON uc.source_code = wm.unit_source_value
+        -- supposing that the standard mapping is supplemented with custom concepts for waveform specific units
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc1
-        ON vcu.concept_code = wm.source_code
-        AND vcu.vocabulary_id = 'MIMIC_WAVEFORM_CODE'
+        ON vc1.concept_code = wm.source_code
+        AND vc1.vocabulary_id = 'mimiciv_meas_waveform_code'
             -- supposing that the standard mapping is supplemented with custom concepts for waveform specific values
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vr

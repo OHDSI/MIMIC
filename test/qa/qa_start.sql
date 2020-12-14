@@ -21,7 +21,7 @@ SELECT
     CAST(NULL AS STRING)                AS unit_id,
     CAST(NULL AS STRING)                AS field_name,
     CAST(NULL AS STRING)                AS test_description, -- count, ...
-    CAST(NULL AS STRING)                AS condition_json, -- for some complex conditions
+    CAST(NULL AS STRING)                AS criteria_json, -- for some complex conditions
     CAST(NULL AS BOOL)                  AS test_passed
 ;
 

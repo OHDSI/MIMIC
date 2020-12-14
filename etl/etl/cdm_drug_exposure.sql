@@ -23,9 +23,8 @@
 --      gcpt_route_to_concept                       -> mimiciv_drug_route
 --      gcpt_prescriptions_ndcisnullzero_to_concept -> mimiciv_drug_ndc
 -- open points: 
---      create src_inputevents
+--      source table pharmacy - it is not here yet
 --      mimiciv_drug_ndc.concept_class_id = 'Prescription Drug' - is it right?
---      at the moment rule 1 is only implemented
 --      TODO: one distinct list of codes, then one join to vocabulary tables (1.42GB per vocab join)
 -- -------------------------------------------------------------------
 
@@ -54,7 +53,7 @@ SELECT
     CAST(src.ndc AS STRING)     AS ndc_source_code, -- ndc was used for automatic/manual mapping,
     'NDC'                       AS ndc_source_vocabulary,
     src.form_val_disp           AS form_val_disp,
-    REGEXP_EXTRACT(src.form_val_disp, r'[-]?[\d]+[.]?[\d]*')  AS quantity,
+    CAST(REGEXP_EXTRACT(src.form_val_disp, r'[-]?[\d]+[.]?[\d]*') AS FLOAT64)  AS quantity,
     COALESCE(
         -- src.drug, src.drug_name_poe, src.drug_name_generic,'')
         src.drug, '')
@@ -68,6 +67,8 @@ SELECT
 
 FROM
     `@etl_project`.@etl_dataset.src_prescriptions src -- pr
+WHERE
+    src.starttime IS NOT NULL
 ;
 
 -- -------------------------------------------------------------------
@@ -251,7 +252,7 @@ SELECT
     src.type_concept_id                         AS drug_type_concept_id,
     CAST(NULL AS STRING)                        AS stop_reason,
     CAST(NULL AS INT64)                         AS refills,
-    CAST(src.quantity AS FLOAT64)               AS quantity,
+    src.quantity                                AS quantity,
     CAST(NULL AS INT64)                         AS days_supply,
     CAST(NULL AS STRING)                        AS sig,
     src.route_concept_id                        AS route_concept_id,
@@ -270,12 +271,13 @@ SELECT
     src.trace_id                    AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_drug_mapped src
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
-        ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 WHERE
     src.target_domain_id = 'Drug'
 ;

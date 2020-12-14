@@ -20,7 +20,7 @@ SELECT
     CAST(NULL AS STRING)                AS table_id,
     CAST(NULL AS STRING)                AS test_type, -- unique, not null, concept etc.
     CAST(NULL AS STRING)                AS field_name,
-    CAST(NULL AS STRING)                AS condition_json, -- for vocabulary, domain, range and FK
+    CAST(NULL AS STRING)                AS criteria_json, -- for vocabulary, domain, range and FK
     CAST(NULL AS BOOL)                  AS test_passed
 ;
 

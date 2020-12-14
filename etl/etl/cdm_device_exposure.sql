@@ -62,7 +62,9 @@ SELECT
     src.end_datetime                            AS device_exposure_end_datetime,
     src.type_concept_id                         AS device_type_concept_id,
     CAST(NULL AS STRING)                        AS unique_device_id,
-    CAST(src.quantity AS INT64)                 AS quantity,
+    CAST(
+        IF(ROUND(src.quantity) = src.quantity, src.quantity, NULL)
+        AS INT64)                               AS quantity,
     CAST(NULL AS INT64)                         AS provider_id,
     vis.visit_occurrence_id                     AS visit_occurrence_id,
     CAST(NULL AS INT64)                         AS visit_detail_id,
@@ -75,12 +77,13 @@ SELECT
     src.trace_id                    AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_drug_mapped src
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
-        ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 WHERE
     src.target_domain_id = 'Device'
 ;

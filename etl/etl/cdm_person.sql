@@ -40,16 +40,16 @@ FROM
 ;
 
 -- -------------------------------------------------------------------
--- tmp_map_ethnicity
+-- lk_pat_ethnicity_concept
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_map_ethnicity AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_pat_ethnicity_concept AS
 SELECT DISTINCT
-    src.ethnicity_first     AS source_value,
+    src.ethnicity_first     AS source_code,
     vc.concept_id           AS source_concept_id,
     vc.vocabulary_id        AS source_vocabulary_id,
     vc1.concept_id          AS target_concept_id,
-    vc1.vocabulary_id       AS target_vocabulary_id
+    vc1.vocabulary_id       AS target_vocabulary_id -- look here to distinguish Race and Ethnicity
 FROM
     `@etl_project`.@etl_dataset.tmp_subject_ethnicity src
 LEFT JOIN
@@ -115,13 +115,13 @@ SELECT
     CAST(NULL AS DATETIME)          AS birth_datetime,
     COALESCE(
         CASE
-            WHEN map_eth.source_vocabulary_id = 'Race'
+            WHEN map_eth.target_vocabulary_id <> 'Ethnicity'
                 THEN map_eth.target_concept_id
             ELSE NULL
         END, 0)                               AS race_concept_id,
     COALESCE(
         CASE
-            WHEN map_eth.source_vocabulary_id = 'Ethnicity'
+            WHEN map_eth.target_vocabulary_id = 'Ethnicity'
                 THEN map_eth.target_concept_id
             ELSE NULL
         END, 0)                     AS ethnicity_concept_id,
@@ -132,17 +132,27 @@ SELECT
     p.gender_source_value           AS gender_source_value,
     0                               AS gender_source_concept_id,
     CASE
-        WHEN map_eth.source_vocabulary_id = 'Race'
+        WHEN map_eth.target_vocabulary_id <> 'Ethnicity'
             THEN eth.ethnicity_first
         ELSE NULL
     END                             AS race_source_value,
-    0                               AS race_source_concept_id,
+    COALESCE(
+        CASE
+            WHEN map_eth.target_vocabulary_id <> 'Ethnicity'
+                THEN map_eth.source_concept_id
+            ELSE NULL
+        END, 0)                        AS race_source_concept_id,
     CASE
-        WHEN map_eth.source_vocabulary_id = 'Ethnicity'
+        WHEN map_eth.target_vocabulary_id = 'Ethnicity'
             THEN eth.ethnicity_first
         ELSE NULL
     END                             AS ethnicity_source_value,
-    0                               AS ethnicity_source_concept_id,
+    COALESCE(
+        CASE
+            WHEN map_eth.target_vocabulary_id = 'Ethnicity'
+                THEN map_eth.source_concept_id
+            ELSE NULL
+        END, 0)                     AS ethnicity_source_concept_id,
     -- 
     'person.patients'               AS unit_id,
     p.load_table_id                 AS load_table_id,
@@ -154,21 +164,13 @@ LEFT JOIN
     `@etl_project`.@etl_dataset.tmp_subject_ethnicity eth 
         ON  p.subject_id = eth.subject_id
 LEFT JOIN
-    `@etl_project`.@etl_dataset.tmp_map_ethnicity map_eth
-        ON  eth.ethnicity_first = map_eth.source_value
+    `@etl_project`.@etl_dataset.lk_pat_ethnicity_concept map_eth
+        ON  eth.ethnicity_first = map_eth.source_code
 ;
 
 
--- gcpt_ethnicity_to_concept AS (
---     SELECT
---         concept_code AS ethnicity,
---         concept_id AS ethnicity_concept_id 
---     FROM 
---         `@etl_project`.@etl_dataset.voc_concept
---     WHERE
---         vocabulary_id = 'Ethnicity'
--- )
+-- -------------------------------------------------------------------
+-- cleanup
+-- -------------------------------------------------------------------
 
-
--- DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_subject_ethnicity;
--- DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_map_ethnicity;
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_subject_ethnicity;

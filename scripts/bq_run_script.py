@@ -32,56 +32,72 @@ def read_params():
 
     print('Reading params...')
     params = {
-        "config_file":   "optional: indicate '-c' for 'config', json file name",
-        "script_files":   ["mandatory: indicate at least one script name as unnamed arguments"]
+        "etlconf_file":     "",
+        "config_file":      "",
+        "script_files":     [],
+        "files_not_found":  []
     }
     
     # Parsing command line arguments
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"c:",["config="])
+        opts, args = getopt.getopt(sys.argv[1:],"e:c:",["etlconf=,config="])
         if len(args) == 0:
             raise getopt.GetoptError("read_params() error", "Mandatory argument is missing.")
 
     except getopt.GetoptError as err:
         print(err.args)
         print("Please indicate correct params:")
-        print(params)
+        print("etlconf_file:   optional: indicate '-e' for 'etlconf', global config json file")
+        print("config_file:    optional: indicate '-c' for 'config', local config json file")
+        print("script_files:   [mandatory: indicate at least one script name as unnamed argument]")
         sys.exit(2)
 
-    params['config_file'] = ''
+    # get config files namess
     for opt, arg in opts:
+        if opt == '-e' or opt == '--etlconf':
+            if os.path.isfile(arg):
+                params['etlconf_file'] = arg
         if opt == '-c' or opt == '--config':
             if os.path.isfile(arg):
                 params['config_file'] = arg
 
-    params['script_files'] = []
-    not_found = []
+    # collect script names
     for arg in args:
         if os.path.isfile(arg):
             params['script_files'].append(arg)
         else:
-            not_found.append(arg)
+            params['files_not_found'].append(arg)
 
     print('scripts to run', params)
-    print('not found', not_found)
     return params
 
 # ----------------------------------------------------
 # read_config()
 # ----------------------------------------------------
 
-def read_config(config_file):
+def read_config(etlconf_file, config_file):
     
     print('Reading config...')
     config = {}
     config_read = {}
+    etlconf_read = {}
+
+    if os.path.isfile(etlconf_file):
+        with open(etlconf_file) as f:
+            etlconf_read = json.load(f)
 
     if os.path.isfile(config_file):
         with open(config_file) as f:
             config_read = json.load(f)
-    
+
+    # global config has lower priority
     for k in config_default:
-        s = config_read.get(k, config_default[k])
+        s = etlconf_read.get(k, config_default[k])
+        config[k] = s
+    
+    # local config has higher priority
+    for k in config_default:
+        s = config_read.get(k, config[k])
         config[k] = s
 
     print(config)
@@ -169,41 +185,49 @@ def nice_message(s_filename, status, msg):
 
 def main():
 
-    params = read_params()
-    config = read_config(params['config_file'])
-
-    bq_command = "bq query --use_legacy_sql=false \"{query}\""
-    s_done = []
     rc = 0
+    params = read_params()
+    config = read_config(params['etlconf_file'], params['config_file'])
 
-    for s_filename in params['script_files']:
+    # stop if any files are not found
 
-        print('Run script {file}\n'.format(file=s_filename))
+    if len(params['files_not_found']) > 0:
+        rc = 2 # No such file or directory # Linux OS error code
+        for s_filename in params['files_not_found']:
+            print('No such file or directory: {file}\n'.format(file=s_filename))
 
-        s_queries = open(s_filename).read().split(';')
-        s_queries = trim_queries(s_queries)
-        
-        query_no = 0
-        for s_query in s_queries:
+    else:
+        bq_command = "bq query --use_legacy_sql=false \"{query}\""
+        s_done = []
+        s_done.append(nice_message('start...', 0, ''))
 
-            bqc = bq_command.format(query=format_query(s_query, config))
-            query_no += 1
-            print('Starting query...')
-            rc = os.system(bqc)
+        for s_filename in params['script_files']:
+
+            print('Run script {file}\n'.format(file=s_filename))
+
+            s_queries = open(s_filename).read().split(';')
+            s_queries = trim_queries(s_queries)
+            
+            query_no = 0
+            for s_query in s_queries:
+
+                bqc = bq_command.format(query=format_query(s_query, config))
+                query_no += 1
+                print('Starting query...')
+                rc = os.system(bqc)
+
+                if rc != 0:
+                    break
+            
+            s_done.append(
+                nice_message(s_filename, rc, '' if rc==0 else 'See query No {0}'.format(query_no)))
 
             if rc != 0:
                 break
-        
-        s_done.append(
-            nice_message(s_filename, rc, '' if rc==0 else 'See query No {0}'.format(query_no)))
 
-        if rc != 0:
-            break
-
-
-    print('\nScripts executed:')
-    for a in s_done:
-        print(a)
+        print('\nScripts executed:')
+        for a in s_done:
+            print(a)
 
     return rc
 
@@ -216,4 +240,4 @@ return_code = main()
 print('bq_run_script.exit()', return_code)
 exit(return_code)
 
-# last edit: 2020-11-12
+# last edit: 2020-12-02

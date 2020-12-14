@@ -21,6 +21,6 @@ SELECT
     COUNT(CASE WHEN measurement_concept_id = 0 THEN 0 ELSE NULL END) AS rows_unmapped,
     COUNT(*) AS rows_total,
     COUNT(CASE WHEN measurement_concept_id = 0 THEN NULL ELSE measurement_concept_id END) / COUNT(*) AS mapping_rate 
-FROM `odysseus-mimic-dev.mimiciv_cdm_tuf_10_ant_2020_09_11.lk_measurement_rule_1`
+FROM `odysseus-mimic-dev.mimiciv_cdm_tuf_10_ant_2020_10_21.lk_measurement_rule_1`
 GROUP BY unit_id
 ;

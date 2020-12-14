@@ -93,7 +93,7 @@ SELECT
     src.trace_id                    AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_specimen_mapped src
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 WHERE

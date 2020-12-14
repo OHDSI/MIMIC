@@ -2,6 +2,532 @@
 
 -- Latest first
 
+-- 2020-12-07
+
+-- Full, ETL
+
+Scripts executed:
+2020-12-07 19:31:37.212251 | start...                            | Done.
+2020-12-07 19:33:03.010728 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-12-07 19:33:37.045907 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-12-07 19:52:55.223610 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-12-07 19:58:35.608506 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-12-07 20:00:02.258063 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(30 min???)
+
+-- Full, ETL
+
+Scripts executed:
+2020-12-07 19:02:04.422818 | start...                            | Done.
+2020-12-07 19:03:53.319370 | etl/etl/cdm_observation.sql         | Done.
+2020-12-07 19:05:27.370936 | etl/etl/cdm_observation_period.sql  | Done.
+2020-12-07 19:05:59.089848 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-12-07 19:09:04.014248 | etl/etl/cdm_condition_era.sql       | Done.
+2020-12-07 19:16:28.171653 | etl/etl/cdm_drug_era.sql            | Done.
+2020-12-07 19:18:29.999482 | etl/etl/cdm_dose_era.sql            | Done.
+2020-12-07 19:18:35.475699 | etl/etl/cdm_cdm_source.sql          | Done.
+(~16 min)
+
+Scripts executed:
+2020-12-07 18:45:55.980741 | start...                            | Done.
+2020-12-07 18:49:08.655358 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-07 18:49:16.747375 | etl/etl/cdm_device_exposure.sql     | Done.
+(4 min)
+
+Scripts executed:
+2020-12-07 18:10:58.922181 | start...                            | Done.
+2020-12-07 18:11:05.447952 | etl/etl/cdm_location.sql            | Done.
+2020-12-07 18:11:19.742011 | etl/etl/cdm_care_site.sql           | Done.
+2020-12-07 18:11:42.062463 | etl/etl/cdm_person.sql              | Done.
+2020-12-07 18:11:52.298663 | etl/etl/cdm_death.sql               | Done.
+2020-12-07 18:13:56.181460 | etl/etl/lk_vis_adm_transfers.sql    | Done.
+2020-12-07 18:14:17.473804 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-12-07 18:15:01.848981 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-12-07 18:17:18.769995 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-12-07 18:20:31.838979 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-12-07 18:25:08.556831 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-12-07 18:26:31.474257 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-12-07 18:28:02.937824 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-12-07 18:28:09.799680 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-12-07 18:28:18.284535 | etl/etl/cdm_specimen.sql            | Done.
+2020-12-07 18:30:14.450944 | etl/etl/cdm_measurement.sql         | Done.
+2020-12-07 18:33:16.785919 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-07 18:33:25.051489 | etl/etl/cdm_device_exposure.sql     | Error: See query No 2
+(~24 min)
+
+-- Demo, Unload
+
+Scripts executed:
+2020-12-07 18:13:04.555612 | start...                            | Done.
+2020-12-07 18:17:24.310792 | etl/unload/unload_to_atlas_gen.sql  | Done.
+(~4 min)
+
+-- Demo, ETL
+
+Scripts executed:
+2020-12-07 17:52:21.077727 | start...                            | Done.
+2020-12-07 17:52:25.985666 | etl/etl/cdm_location.sql            | Done.
+2020-12-07 17:52:37.842696 | etl/etl/cdm_care_site.sql           | Done.
+2020-12-07 17:52:53.894965 | etl/etl/cdm_person.sql              | Done.
+2020-12-07 17:53:03.211364 | etl/etl/cdm_death.sql               | Done.
+2020-12-07 17:53:28.444292 | etl/etl/lk_vis_adm_transfers.sql    | Done.
+2020-12-07 17:53:34.815964 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-12-07 17:53:44.322791 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-12-07 17:54:06.257835 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-12-07 17:55:09.243618 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-12-07 17:55:36.940027 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-12-07 17:56:09.525831 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-12-07 17:56:18.223890 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-12-07 17:56:26.052817 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-12-07 17:56:32.292292 | etl/etl/cdm_specimen.sql            | Done.
+2020-12-07 17:56:56.336967 | etl/etl/cdm_measurement.sql         | Done.
+2020-12-07 17:57:35.004334 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-07 17:57:40.135100 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-12-07 17:58:07.692068 | etl/etl/cdm_observation.sql         | Done.
+2020-12-07 17:58:44.732982 | etl/etl/cdm_observation_period.sql  | Done.
+2020-12-07 17:58:59.291317 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-12-07 17:59:29.892637 | etl/etl/cdm_condition_era.sql       | Done.
+2020-12-07 18:00:57.175484 | etl/etl/cdm_drug_era.sql            | Done.
+2020-12-07 18:01:51.194249 | etl/etl/cdm_dose_era.sql            | Done.
+2020-12-07 18:01:56.237400 | etl/etl/cdm_cdm_source.sql          | Done.
+(~10 min)
+
+-- Demo, ETL
+
+Scripts executed:
+2020-12-07 17:38:06.532486 | start...                            | Done.
+2020-12-07 17:38:13.229217 | etl/etl/cdm_location.sql            | Done.
+2020-12-07 17:38:25.632340 | etl/etl/cdm_care_site.sql           | Done.
+2020-12-07 17:38:41.395910 | etl/etl/cdm_person.sql              | Done.
+2020-12-07 17:38:50.070199 | etl/etl/cdm_death.sql               | Done.
+2020-12-07 17:39:21.740361 | etl/etl/lk_vis_adm_transfers.sql    | Done.
+2020-12-07 17:39:27.811185 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-12-07 17:39:37.454064 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-12-07 17:40:02.458178 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-12-07 17:41:04.323727 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-12-07 17:41:30.748272 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-12-07 17:42:03.579935 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-12-07 17:42:14.734223 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-12-07 17:42:21.300709 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-12-07 17:42:27.647954 | etl/etl/cdm_specimen.sql            | Done.
+2020-12-07 17:42:49.937503 | etl/etl/cdm_measurement.sql         | Done.
+2020-12-07 17:43:28.469068 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-07 17:43:34.604793 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-12-07 17:43:59.580918 | etl/etl/cdm_observation.sql         | Done.
+2020-12-07 17:44:34.213278 | etl/etl/cdm_observation_period.sql  | Done.
+2020-12-07 17:45:26.187851 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-12-07 17:45:58.925400 | etl/etl/cdm_condition_era.sql       | Done.
+2020-12-07 17:47:24.548323 | etl/etl/cdm_drug_era.sql            | Done.
+2020-12-07 17:48:13.212369 | etl/etl/cdm_dose_era.sql            | Done.
+2020-12-07 17:48:18.369771 | etl/etl/cdm_cdm_source.sql          | Done.
+(~10 min)
+
+-- Demo, QA
+
+2020-12-07 15:24:20.156656 | start...                            | Done.
+2020-12-07 15:24:57.210549 | test/qa/metric_total_row_count.sql  | Done.
+2020-12-07 15:25:00.792872 | test/qa/qa_start.sql                | Done.
+2020-12-07 15:25:05.423810 | test/qa/qa_care_site.sql            | Done.
+2020-12-07 15:25:08.823390 | test/qa/qa_person.sql               | Done.
+2020-12-07 15:25:12.627311 | test/qa/qa_visit_occurrence.sql     | Done.
+2020-12-07 15:25:24.064326 | test/qa/qa_visit_detail.sql         | Done.
+
+
+-- 2020-12-04
+
+-- Demo, Metrics
+
+Scripts executed:
+2020-12-05 01:56:44.933372 | start...                            | Done.
+2020-12-05 01:58:09.593740 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-12-05 02:03:00.480584 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-12-05 02:17:28.905073 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-12-05 02:18:52.433699 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(all 22:08, top100 14:28, MR 4:51)
+
+Scripts executed:
+2020-12-05 00:51:21.821751 | start...                            | Done.
+2020-12-05 00:56:43.645901 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-12-05 01:14:46.731921 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-12-05 01:16:11.255781 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(all 24:50, top100 18:03, MR 5:22)
+
+
+-- 2020-12-02
+
+-- Demo, Metrics
+
+Scripts executed:
+2020-12-03 03:19:53.664279 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-12-03 03:21:03.499813 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-12-03 03:37:01.949889 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-12-03 03:43:39.145102 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-12-03 03:45:01.449340 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(all ~25 min, top100 ~16 min, MR ~7 min)
+
+-- Demo, UT
+
+Scripts executed:
+2020-12-03 03:14:44.857165 | test/ut/ut_start.sql                | Done.
+2020-12-03 03:15:00.543907 | test/ut/ut_care_site.sql            | Done.
+2020-12-03 03:15:34.827997 | test/ut/ut_person.sql               | Done.
+2020-12-03 03:15:57.567634 | test/ut/ut_cdm_visit_occurrence.sql | Done.
+2020-12-03 03:16:44.564206 | test/ut/ut_cdm_visit_detail.sql     | Done.
+(2 min)
+
+-- Demo, ETL
+
+Scripts executed:
+2020-12-03 03:02:14.309126 | etl/etl/cdm_location.sql            | Done.
+2020-12-03 03:02:30.099628 | etl/etl/cdm_care_site.sql           | Done.
+2020-12-03 03:02:47.675185 | etl/etl/cdm_person.sql              | Done.
+2020-12-03 03:02:57.711920 | etl/etl/cdm_death.sql               | Done.
+2020-12-03 03:03:29.138501 | etl/etl/lk_vis_adm_transfers.sql    | Done.
+2020-12-03 03:03:35.617203 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-12-03 03:03:46.604226 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-12-03 03:04:16.132708 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-12-03 03:05:31.793818 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-12-03 03:06:02.068299 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-12-03 03:06:38.139914 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-12-03 03:06:49.644002 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-12-03 03:06:56.461640 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-12-03 03:07:02.155629 | etl/etl/cdm_specimen.sql            | Done.
+2020-12-03 03:07:26.947619 | etl/etl/cdm_measurement.sql         | Done.
+2020-12-03 03:08:11.389124 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-03 03:08:16.736200 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-12-03 03:08:52.017788 | etl/etl/cdm_observation.sql         | Done.
+2020-12-03 03:09:37.194630 | etl/etl/cdm_observation_period.sql  | Done.
+2020-12-03 03:09:57.319868 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-12-03 03:10:33.953524 | etl/etl/cdm_condition_era.sql       | Done.
+2020-12-03 03:12:07.044815 | etl/etl/cdm_drug_era.sql            | Done.
+2020-12-03 03:12:56.178168 | etl/etl/cdm_dose_era.sql            | Done.
+2020-12-03 03:13:01.103325 | etl/etl/cdm_cdm_source.sql          | Done.
+(~11 min)
+
+-- Demo, Metrics
+
+Scripts executed:
+2020-12-03 01:54:33.301789 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-12-03 01:55:08.820033 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-12-03 02:09:22.140762 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-12-03 02:14:45.236543 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-12-03 02:16:04.834676 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(all ~20 min, top100 ~14min, MR ~5 min)
+
+-- Demo, UT
+
+Scripts executed:
+2020-12-03 01:43:50.844507 | test/ut/ut_start.sql                | Done.
+2020-12-03 01:44:03.484421 | test/ut/ut_care_site.sql            | Done.
+2020-12-03 01:44:31.221541 | test/ut/ut_person.sql               | Done.
+2020-12-03 01:44:52.240972 | test/ut/ut_cdm_visit_occurrence.sql | Done.
+2020-12-03 01:45:33.193454 | test/ut/ut_cdm_visit_detail.sql     | Done.
+(~2 min)
+
+-- Demo, ETL
+
+Scripts executed:
+2020-12-03 01:00:33.027013 | etl/etl/cdm_location.sql            | Done.
+2020-12-03 01:00:45.261413 | etl/etl/cdm_care_site.sql           | Done.
+2020-12-03 01:01:02.677052 | etl/etl/cdm_person.sql              | Done.
+2020-12-03 01:01:11.577053 | etl/etl/cdm_death.sql               | Done.
+2020-12-03 01:01:40.154344 | etl/etl/lk_vis_adm_transfers.sql    | Done.
+2020-12-03 01:01:46.854374 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-12-03 01:01:56.577294 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-12-03 01:02:21.799467 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-12-03 01:03:21.746930 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-12-03 01:03:54.032926 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-12-03 01:04:23.530683 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-12-03 01:04:32.450700 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-12-03 01:04:40.632715 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-12-03 01:04:45.848219 | etl/etl/cdm_specimen.sql            | Done.
+2020-12-03 01:05:07.072320 | etl/etl/cdm_measurement.sql         | Done.
+2020-12-03 01:05:42.877597 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-03 01:05:48.015787 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-12-03 01:06:16.146768 | etl/etl/cdm_observation.sql         | Done.
+2020-12-03 01:06:53.344285 | etl/etl/cdm_observation_period.sql  | Done.
+2020-12-03 01:07:08.280825 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-12-03 01:07:41.522680 | etl/etl/cdm_condition_era.sql       | Done.
+2020-12-03 01:09:03.753540 | etl/etl/cdm_drug_era.sql            | Done.
+2020-12-03 01:09:54.246213 | etl/etl/cdm_dose_era.sql            | Done.
+2020-12-03 01:09:59.468184 | etl/etl/cdm_cdm_source.sql          | Done.
+(10 min)
+
+
+
+-- Demo, Metrics_gen
+
+Scripts executed:
+2020-12-02 14:49:46.186673 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-12-02 14:50:21.889959 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-12-02 15:05:28.521098 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-12-02 15:12:24.960984 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-12-02 15:14:05.699537 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(all ~30 min, top100 ~15 min, MR ~7 min)
+
+-- Demo, UT
+
+Scripts executed:
+2020-12-02 08:09:04.388096 | test/ut/ut_start.sql                | Done.
+2020-12-02 08:09:18.507882 | test/ut/ut_care_site.sql            | Done.
+2020-12-02 08:09:46.419874 | test/ut/ut_person.sql               | Done.
+2020-12-02 08:10:07.920790 | test/ut/ut_cdm_visit_occurrence.sql | Done.
+2020-12-02 08:10:53.145396 | test/ut/ut_cdm_visit_detail.sql     | Done.
+report_id	report_starttime	table_id	test_type	field_name	criteria_json	test_passed
+	2020-12-02 05:10:48	cdm_visit_detail	foreign key	preceding_visit_detail_id		false
+
+-- Demo, ETL
+
+Scripts executed:
+2020-12-02 07:54:54.068203 | etl/etl/cdm_location.sql            | Done.
+2020-12-02 07:55:05.784760 | etl/etl/cdm_care_site.sql           | Done.
+2020-12-02 07:55:23.970933 | etl/etl/cdm_person.sql              | Done.
+2020-12-02 07:55:33.514225 | etl/etl/cdm_death.sql               | Done.
+2020-12-02 07:56:04.442111 | etl/etl/lk_vis_adm_transfers.sql    | Done.
+2020-12-02 07:56:10.719905 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-12-02 07:56:20.393553 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-12-02 07:56:48.236077 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-12-02 07:57:52.411296 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-12-02 07:58:19.155634 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-12-02 07:58:51.348281 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-12-02 07:59:00.016570 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-12-02 07:59:06.852441 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-12-02 07:59:11.589604 | etl/etl/cdm_specimen.sql            | Done.
+2020-12-02 07:59:35.236726 | etl/etl/cdm_measurement.sql         | Done.
+2020-12-02 08:00:12.786783 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-12-02 08:00:19.161196 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-12-02 08:00:49.208805 | etl/etl/cdm_observation.sql         | Done.
+2020-12-02 08:01:33.683648 | etl/etl/cdm_observation_period.sql  | Done.
+2020-12-02 08:01:50.625117 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-12-02 08:02:28.271282 | etl/etl/cdm_condition_era.sql       | Done.
+2020-12-02 08:04:01.810171 | etl/etl/cdm_drug_era.sql            | Done.
+2020-12-02 08:04:53.399940 | etl/etl/cdm_dose_era.sql            | Done.
+2020-12-02 08:04:59.578403 | etl/etl/cdm_cdm_source.sql          | Done.
+(10 min)
+
+
+-- 2020-11-30
+
+-- Full, Metrics
+
+2020-11-30 14:05:19.695627 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-11-30 14:05:55.159937 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-11-30 17:08:09.586477 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-11-30 17:15:18.937162 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-11-30 17:17:08.466653 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(3:20:00)
+(top 100 - 3 hours!)
+
+-- Full, Unload 
+
+Scripts executed:
+2020-11-30 11:38:24.708656 | etl/unload/unload_to_atlas_gen.sql  | Done.
+(~20 min)
+
+-- Full, ETL (expected: 45 min)
+
+Scripts executed:
+2020-11-30 11:04:25.865613 | etl/etl/cdm_observation.sql         | Done.
+2020-11-30 11:06:09.984182 | etl/etl/cdm_observation_period.sql  | Done.
+2020-11-30 11:06:43.140302 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-11-30 11:09:45.147232 | etl/etl/cdm_condition_era.sql       | Done.
+2020-11-30 11:17:18.616060 | etl/etl/cdm_drug_era.sql            | Done.
+2020-11-30 11:19:24.438191 | etl/etl/cdm_dose_era.sql            | Done.
+2020-11-30 11:19:30.984810 | etl/etl/cdm_cdm_source.sql          | Done.
+(~18 min)
+
+Scripts executed:
+2020-11-30 10:20:26.583522 | etl/etl/cdm_location.sql            | Done.
+2020-11-30 10:20:39.571305 | etl/etl/cdm_care_site.sql           | Done.
+2020-11-30 10:21:04.990988 | etl/etl/cdm_person.sql              | Done.
+2020-11-30 10:21:49.907182 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-11-30 10:24:43.326156 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-11-30 10:24:52.622860 | etl/etl/cdm_death.sql               | Done.
+2020-11-30 10:27:09.602383 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-11-30 10:31:23.872452 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-11-30 10:35:26.047448 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-11-30 10:36:55.978183 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-11-30 10:38:40.898001 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-11-30 10:38:59.608780 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-11-30 10:39:08.135171 | etl/etl/cdm_specimen.sql            | Done.
+2020-11-30 10:41:48.884722 | etl/etl/cdm_measurement.sql         | Done.
+2020-11-30 10:44:48.025826 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-11-30 10:44:55.263334 | etl/etl/cdm_device_exposure.sql     | Error: See query No 2
+(24 min)
+    wrong quantity = '0.1667'
+    target_concept_id = 44940675
+    code = '00019481604', 'MD-GASTROVIEW 66%-10% SOLN', 'Device'
+    SKIP DEVICE_EXPOSURE
+
+Scripts executed:
+2020-11-30 09:40:49.064112 | etl/etl/cdm_location.sql            | Done.
+2020-11-30 09:41:02.050333 | etl/etl/cdm_care_site.sql           | Done.
+2020-11-30 09:41:30.427342 | etl/etl/cdm_person.sql              | Done.
+2020-11-30 09:42:12.130665 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-11-30 09:45:22.188970 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-11-30 09:45:32.742107 | etl/etl/cdm_death.sql               | Done.
+2020-11-30 09:47:50.550622 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-11-30 09:51:06.959922 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-11-30 09:55:11.691765 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-11-30 09:56:57.958007 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-11-30 09:58:28.736297 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-11-30 09:58:36.657840 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-11-30 09:58:45.218805 | etl/etl/cdm_specimen.sql            | Done.
+2020-11-30 10:00:52.573962 | etl/etl/cdm_measurement.sql         | Done.
+2020-11-30 10:03:52.637403 | etl/etl/cdm_drug_exposure.sql       | Error: See query No 7
+(23 min)
+
+-- Full, Staging
+
+Scripts executed:
+2020-11-30 09:17:32.083983 | etl/staging/st_core.sql             | Done.
+2020-11-30 09:22:11.445505 | etl/staging/st_hosp.sql             | Done.
+2020-11-30 09:27:02.183644 | etl/staging/st_icu.sql              | Done.
+2020-11-30 09:27:19.817566 | etl/staging/st_waveform.sql         | Done.
+2020-11-30 09:30:10.870924 | etl/staging/voc_copy_to_target_dataset.sql | Error: See query No 10
+.......................... | etl/staging/voc_copy_to_target_dataset.sql | Done (minus stcm)
+(~15 minutes)
+
+
+-- 2020-11-30
+
+-- Demo, Unload
+
+Scripts executed:
+2020-11-30 13:12:23.159183 | etl/unload/unload_to_atlas_gen.sql  | Done.
+
+-- Demo, Metrics
+
+Scripts executed:
+2020-11-30 12:44:54.756028 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-11-30 12:45:27.944277 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-11-30 13:02:54.934130 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-11-30 13:11:02.973057 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-11-30 13:12:56.539557 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(~30 min)
+
+-- Demo, ETL
+
+Scripts executed:
+2020-11-30 12:27:22.521201 | etl/etl/cdm_location.sql            | Done.
+2020-11-30 12:27:35.511346 | etl/etl/cdm_care_site.sql           | Done.
+2020-11-30 12:27:55.526172 | etl/etl/cdm_person.sql              | Done.
+2020-11-30 12:28:21.499040 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-11-30 12:29:00.924581 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-11-30 12:29:08.909711 | etl/etl/cdm_death.sql               | Done.
+2020-11-30 12:29:34.355589 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-11-30 12:30:52.441593 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-11-30 12:31:21.131420 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-11-30 12:31:55.754988 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-11-30 12:32:05.642919 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-11-30 12:32:17.253812 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-11-30 12:32:22.314991 | etl/etl/cdm_specimen.sql            | Done.
+2020-11-30 12:32:48.269325 | etl/etl/cdm_measurement.sql         | Done.
+2020-11-30 12:33:33.297546 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-11-30 12:33:39.647618 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-11-30 12:34:13.408479 | etl/etl/cdm_observation.sql         | Done.
+2020-11-30 12:35:00.867018 | etl/etl/cdm_observation_period.sql  | Done.
+2020-11-30 12:35:21.563853 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-11-30 12:36:02.975324 | etl/etl/cdm_condition_era.sql       | Done.
+2020-11-30 12:37:53.395985 | etl/etl/cdm_drug_era.sql            | Done.
+2020-11-30 12:38:49.111865 | etl/etl/cdm_dose_era.sql            | Done.
+2020-11-30 12:38:55.683362 | etl/etl/cdm_cdm_source.sql          | Done.
+(11 min)
+
+-- Demo, Staging
+
+Scripts executed:
+2020-11-30 12:20:11.267449 | etl/staging/st_core.sql             | Done.
+2020-11-30 12:20:46.636200 | etl/staging/st_hosp.sql             | Done.
+2020-11-30 12:21:11.061613 | etl/staging/st_icu.sql              | Done.
+2020-11-30 12:21:30.457229 | etl/staging/st_waveform.sql         | Done.
+2020-11-30 12:24:22.644376 | etl/staging/voc_copy_to_target_dataset.sql | Done.
+(~17 min)
+
+-- Demo, metrics_gen
+
+Scripts executed:
+2020-11-30 11:28:31.399800 | test/metrics_gen/me_persons_visits.sql | Done.
+2020-11-30 11:30:14.071521 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2020-11-30 11:45:15.524515 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2020-11-30 11:51:47.020595 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2020-11-30 11:53:21.401308 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+(~30 min)
+
+Scripts executed:
+2020-11-30 11:03:27.811561 | me_top100_from_conf.sql             | Done.
+
+
+Scripts executed:
+2020-11-30 10:03:22.938078 | me_totals_from_conf.sql             | Done.
+
++--------------------------------------+-------+-------+
+|               category               | name  | count |
++--------------------------------------+-------+-------+
+| Number of persons                    | Total |   100 |
+| Number of persons by Ethnicity       | NULL  |   100 |
+| Number of persons by Race            | NULL  |   100 |
+| Number of visits                     | Total |   275 |
+| Number of visits by visit_concept_id | NULL  |   275 |
++--------------------------------------+-------+-------+
+
+Scripts executed:
+2020-11-30 09:58:14.589598 | me_persons_visits.sql               | Done.
+
+
+-- Demo ETL
+Scripts executed:
+2020-11-30 08:21:50.771434 | etl/etl/cdm_location.sql            | Done.
+2020-11-30 08:21:58.662773 | etl/etl/cdm_care_site.sql           | Done.
+2020-11-30 08:22:16.048542 | etl/etl/cdm_person.sql              | Done.
+2020-11-30 08:22:34.075105 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-11-30 08:23:17.691201 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-11-30 08:23:27.054452 | etl/etl/cdm_death.sql               | Done.
+2020-11-30 08:23:48.981310 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-11-30 08:24:32.272272 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-11-30 08:24:51.865046 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-11-30 08:25:15.977499 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-11-30 08:25:25.484967 | etl/etl/lk_meas_chartevents.sql     | Done.
+2020-11-30 08:25:29.477739 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-11-30 08:25:34.167512 | etl/etl/cdm_specimen.sql            | Done.
+2020-11-30 08:25:56.497927 | etl/etl/cdm_measurement.sql         | Done.
+2020-11-30 08:26:23.597644 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-11-30 08:26:28.285715 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-11-30 08:26:50.541554 | etl/etl/cdm_observation.sql         | Done.
+2020-11-30 08:27:24.306771 | etl/etl/cdm_observation_period.sql  | Done.
+2020-11-30 08:27:39.202912 | etl/etl/cdm_fact_relationship.sql   | Done.
+2020-11-30 08:28:11.729508 | etl/etl/cdm_condition_era.sql       | Done.
+2020-11-30 08:29:19.867220 | etl/etl/cdm_drug_era.sql            | Done.
+2020-11-30 08:30:03.310365 | etl/etl/cdm_dose_era.sql            | Done.
+2020-11-30 08:30:08.057818 | etl/etl/cdm_cdm_source.sql          | Done.
+
+
+-- 2020-11-24
+
+-- Demo ETL
+Scripts executed:
+2020-11-24 18:51:52.278224 | etl/etl/cdm_location.sql            | Done.
+2020-11-24 18:52:01.165001 | etl/etl/cdm_care_site.sql           | Done.
+2020-11-24 18:52:14.519685 | etl/etl/cdm_person.sql              | Done.
+2020-11-24 18:52:30.658725 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2020-11-24 18:53:08.290012 | etl/etl/cdm_visit_detail.sql        | Done.
+2020-11-24 18:53:17.141000 | etl/etl/cdm_death.sql               | Done.
+2020-11-24 18:53:33.705937 | etl/etl/cdm_condition_occurrence.sql | Done.
+2020-11-24 18:54:21.332463 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2020-11-24 18:54:39.365473 | etl/etl/lk_meas_labevents.sql       | Done.
+2020-11-24 18:55:03.427177 | etl/etl/lk_meas_specimen.sql        | Done.
+2020-11-24 18:55:07.629952 | etl/etl/lk_meas_waveform.sql        | Done.
+2020-11-24 18:55:13.774623 | etl/etl/cdm_specimen.sql            | Done.
+2020-11-24 18:55:30.961223 | etl/etl/cdm_measurement.sql         | Done.
+2020-11-24 18:55:54.412075 | etl/etl/cdm_drug_exposure.sql       | Done.
+2020-11-24 18:55:59.426987 | etl/etl/cdm_device_exposure.sql     | Done.
+2020-11-24 18:56:22.355180 | etl/etl/cdm_observation.sql         | Done.
+2020-11-24 18:56:54.803470 | etl/etl/cdm_observation_period.sql  | Done.
+2020-11-24 18:57:26.286481 | etl/etl/cdm_condition_era.sql       | Done.
+2020-11-24 18:58:34.693624 | etl/etl/cdm_drug_era.sql            | Done.
+2020-11-24 18:59:17.750609 | etl/etl/cdm_dose_era.sql            | Done.
+2020-11-24 18:59:23.728694 | etl/etl/cdm_cdm_source.sql          | Done.
+
 
 -- 2020-11-12
 
@@ -29,7 +555,7 @@ Scripts executed:
 2020-11-13 01:08:49.396504 | etl/etl/cdm_visit_detail.sql   | Done.
 2020-11-13 01:08:59.101201 | etl/etl/cdm_death.sql          | Done.
 2020-11-13 01:09:11.192721 | etl/etl/cdm_condition_occurrence.sql | Done.
-	Name icd_code not found inside src at [22:65]
+    Name icd_code not found inside src at [22:65]
 2020-11-13 01:10:23.300039 | etl/etl/cdm_procedure_occurrence.sql | Done.
 2020-11-13 01:10:30.684015 | etl/etl/lk_meas_labevents.sql  | Done.
 2020-11-13 01:10:39.211141 | etl/etl/lk_meas_specimen.sql   | Done.

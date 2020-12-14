@@ -452,12 +452,13 @@ SELECT
     src.trace_id                    AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_procedure_mapped src
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
-LEFT JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
-        ON CAST(src.hadm_id AS STRING) = vis.visit_source_value
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 WHERE
     src.target_domain_id = 'Procedure'
 ;

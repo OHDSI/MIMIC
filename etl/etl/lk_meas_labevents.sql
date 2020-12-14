@@ -24,7 +24,8 @@
 --      and if we need to use more complicated parsing.
 --      see `@etl_project`.@etl_dataset.an_labevents_full
 --      see a possibility to use 'Maps to value'
--- implement custom mapping using custom mapping from III
+-- custom mapping:
+--      gcpt_lab_label_to_concept -> mimiciv_meas_lab_loinc
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -72,8 +73,10 @@ SELECT
     dlab.itemid             AS itemid, -- PK
     COALESCE(dlab.loinc_code, dlab.label)   AS source_code,
     vc.domain_id            AS source_domain_id,
+    vc.vocabulary_id        AS source_vocabulary_id,
     vc.concept_id           AS source_concept_id,
     vc2.domain_id           AS target_domain_id,
+    vc2.vocabulary_id       AS target_vocabulary_id,
     vc2.concept_id          AS target_concept_id,
     dlab.fluid              AS fluid,   -- 
     dlab.category           AS category -- 'Blood Gas', 'Chemistry', 'Hematology'
@@ -86,7 +89,7 @@ LEFT JOIN
         ON  vc.concept_code = COALESCE(dlab.loinc_code, dlab.label)
         AND (
             vc.vocabulary_id = 'LOINC' AND vc.domain_id = 'Measurement'
-            OR vc.vocabulary_id = 'mimiciv_me_lab_loinc'
+            OR vc.vocabulary_id = 'mimiciv_meas_lab_loinc'
         )
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
@@ -120,10 +123,23 @@ WHERE
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_unit_concept AS
 SELECT
-    vc.concept_name     AS source_code, -- operator_name,
-    vc.concept_id       AS target_concept_id -- operator_concept_id
+    vc.concept_code         AS source_code,
+    vc.vocabulary_id        AS source_vocabulary_id,
+    vc.domain_id            AS source_domain_id,
+    vc.concept_id           AS source_concept_id,
+    vc2.domain_id           AS target_domain_id,
+    vc2.concept_id          AS target_concept_id
 FROM
     `@etl_project`.@etl_dataset.voc_concept vc
+LEFT JOIN
+    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+        ON  vc.concept_id = vcr.concept_id_1
+        AND vcr.relationship_id = 'Maps to'
+LEFT JOIN
+    `@etl_project`.@etl_dataset.voc_concept vc2
+        ON vc2.concept_id = vcr.concept_id_2
+        AND vc2.standard_concept = 'S'
+        AND vc2.invalid_reason IS NULL
 WHERE
     -- gcpt_lab_unit_to_concept -> mimiciv_meas_unit
     vc.vocabulary_id IN ('UCUM', 'mimiciv_meas_unit')
@@ -134,7 +150,7 @@ WHERE
 -- lk_meas_labevents_mapped
 -- Rule 1 (LABS from labevents)
 -- rule for measurement_source_value:
---      CONCAT(labc.source_code, ' | ', src.itemid)
+--      CONCAT(labc.source_code, '|', src.itemid)
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_labevents_mapped AS
@@ -143,20 +159,19 @@ SELECT
     src.subject_id                          AS subject_id,
     src.hadm_id                             AS hadm_id,
     COALESCE(labc.target_concept_id, 0)     AS target_concept_id,
-    COALESCE(labc.target_domain_id, 'Measurement')  AS target_domain_id,
+    COALESCE(labc.target_domain_id, labc.source_domain_id, 'Measurement')  AS target_domain_id,
     src.charttime                           AS start_datetime,
     labc.category                           AS category,
     opc.target_concept_id                   AS operator_concept_id,
     src.value_number                        AS value_as_number,
-    CASE
-        WHEN src.valueuom IS NOT NULL THEN COALESCE(uc.target_concept_id, 0)
-        ELSE NULL
-    END                                     AS unit_concept_id,
+    IF(src.valueuom IS NOT NULL, 
+        COALESCE(uc.target_concept_id, 0), NULL)    AS unit_concept_id,
     src.ref_range_lower                     AS range_low,
     src.ref_range_upper                     AS range_high,
-    labc.source_code                        AS labc_source_code,
+    labc.source_code                        AS source_code,
     src.itemid                              AS itemid,
     labc.source_concept_id                  AS source_concept_id,
+    labc.source_vocabulary_id
     src.valueuom                            AS unit_source_value,
     src.value                               AS value_source_value,
     --

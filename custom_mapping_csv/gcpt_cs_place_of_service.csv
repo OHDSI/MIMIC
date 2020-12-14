@@ -1,0 +1,6 @@
+concept_name,source_concept_id,source_vocabulary_id,source_domain_id,source_concept_class_id,standard_concept,concept_code,valid_start_date,valid_end_date,invalid_reason,target_concept_id,relationship_id,reverese_relationship_id,relationship_valid_start_date,relationship_end_date,invalid_reason_cr
+Emergency Department,2000001901,mimiciv_cs_place_of_service,Visit,Visit,,Emergency Department,1970-01-01,2099-12-31,,8870,Maps to,Mapped from,1970-01-01,2099-12-31,
+Medicine,2000001902,mimiciv_cs_place_of_service,Visit,Visit,,Medicine,1970-01-01,2099-12-31,,38004515,Maps to,Mapped from,1970-01-01,2099-12-31,
+Emergency Department Observation,2000001903,mimiciv_cs_place_of_service,Visit,Visit,,Emergency Department Observation,1970-01-01,2099-12-31,,8870,Maps to,Mapped from,1970-01-01,2099-12-31,
+Nursery - Well Babies,2000001904,mimiciv_cs_place_of_service,Visit,Visit,,Nursery - Well Babies,1970-01-01,2099-12-31,,4160140,Maps to,Mapped from,1970-01-01,2099-12-31,
+Medicine/Cardiology,2000001905,mimiciv_cs_place_of_service,Visit,Visit,,Medicine/Cardiology,1970-01-01,2099-12-31,,581383,Maps to,Mapped from,1970-01-01,2099-12-31,

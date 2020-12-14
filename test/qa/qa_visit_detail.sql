@@ -103,10 +103,11 @@ FROM
         'visit_detail.services'     AS unit_id,
         COUNT(*)                    AS row_count
     FROM 
-        `@etl_project`.@etl_dataset.src_services serv
+        `@etl_project`.@etl_dataset.src_services src
     INNER JOIN 
-        `@target_project`.@target_dataset.cdm_visit_occurrence vis 
-            ON CAST(serv.hadm_id AS STRING) = vis.visit_source_value
+        `@etl_project`.@etl_dataset.cdm_visit_occurrence vis 
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 ) src
 LEFT JOIN
 (

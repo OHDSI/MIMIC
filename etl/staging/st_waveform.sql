@@ -4,6 +4,11 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
+-- dependency, run after:
+--      st_core.sql
+-- -------------------------------------------------------------------
+
+-- -------------------------------------------------------------------
 -- A draft to apply Wave Forms
 
 -- (Manlik) Regardless of what format we end up with - is to take the meta data and map them into:
@@ -41,6 +46,11 @@
 -- -------------------------------------------------------------------
 -- open points:
 --      parse XML to create src_* or raw_* tables
+--
+-- POC source table:
+/*
+ bq --location=US load --replace --source_format=CSV  --allow_quoted_newlines=True --skip_leading_rows=1 --autodetect waveform_source_poc.raw_case055_ecg_lines3 z_more/raw_case055_ecg_lines3.csv
+*/
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -51,7 +61,7 @@
 -- src_waveform_header
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_waveform_header
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header
 (       
     reference_id            STRING,
     raw_files_path          STRING,
@@ -72,7 +82,7 @@ CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_waveform_header
 -- src_waveform_header
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_waveform_dx
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_dx
 (       
     reference_id            STRING,  -- FK to the header
     waveform_id             STRING,  -- row number inside the reference_id
@@ -92,9 +102,9 @@ CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_waveform_dx
 
 -- parsed codes to be targeted to table cdm_measurement
 
-CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_waveform_mx
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx
 (
-    subject_id              STRING,
+    subject_id              INT64,
     reference_id            STRING,  -- FK to the header
     waveform_id             STRING,  -- row number inside the reference_id 
                                      -- (to concat with reference_id like stay_id)
@@ -129,37 +139,48 @@ CREATE OR REPLACE TABLE `@target_project`.@target_dataset.src_waveform_mx
 -- (start with Manlik's proposal)
 
 
+-- select random existing subject_id and hadm_id
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_subject AS
+SELECT
+    subject_id,
+    hadm_id
+FROM
+    `@etl_project`.@etl_dataset.src_admissions
+LIMIT 1
+;
+
 -- -------------------------------------------------------------------
 -- insert sample data
 -- -------------------------------------------------------------------
 
-INSERT INTO `@target_project`.@target_dataset.src_waveform_header
+
+INSERT INTO `@etl_project`.@etl_dataset.src_waveform_header
 SELECT
     '3700002_0011.CCSIMxv1' AS reference_id,
     'gs://waveform_storage/3700002/0011.wfdb' AS raw_files_path,
-    10018328 AS subject_id,
-    26706939 AS hadm_id,
+    subj.subject_id AS subject_id,
+    subj.hadm_id AS hadm_id,
     PARSE_DATETIME('%F', '1990-01-01') AS start_datetime,
     DATETIME_ADD(PARSE_DATETIME('%F', '1990-01-01'), INTERVAL src.row_count + 1 MILLISECOND) AS end_datetime,
     --
-    '3700002_0011.CCSIMxv1.xml' load_table_id,
-    0 AS load_row_id,
+    '3700002_0011.CCSIMxv1.xml'                                 AS load_table_id,
+    0                                                           AS load_row_id,
     '{"reference_id":"3700002_0011","algorithm_id":"CCSIMxv1"}' AS trace_id
 FROM
 (
     SELECT COUNT(*) AS row_count 
-    FROM `@target_project`.@target_dataset.raw_case055_ecg_lines3
+    FROM `@wf_project`.@wf_dataset.raw_case055_ecg_lines3
 ) src
+CROSS JOIN
+    `@etl_project`.@etl_dataset.src_waveform_subject subj
 ;
 
-/*
- bq --location=US load --replace --source_format=CSV  --allow_quoted_newlines=True --skip_leading_rows=1 --autodetect mimiciv_cdm_tuf_10_ant_2020_09_11.raw_case055_ecg_lines3 z_more/raw_case055_ecg_lines3.csv
-*/
-
 -- line_1
-INSERT INTO `@target_project`.@target_dataset.src_waveform_mx
+INSERT INTO `@etl_project`.@etl_dataset.src_waveform_mx
 -- line_1
 SELECT
+    subj.subject_id AS subject_id,
     '3700002_0011.CCSIMxv1' AS reference_id,  -- FK to the header
     CONCAT('3700002_0011.CCSIMxv1', '.', CAST(src.row_id AS STRING)) AS waveform_id,  -- row number inside the reference_id
     DATETIME_ADD(PARSE_DATETIME('%F', '1990-01-01'), INTERVAL src.row_id MILLISECOND) AS mx_datetime,
@@ -176,10 +197,13 @@ SELECT
             src.row_id AS row_id
         )) AS trace_id -- 
 FROM
-    `@target_project`.@target_dataset.raw_case055_ecg_lines3 src
+    `@wf_project`.@wf_dataset.raw_case055_ecg_lines3 src
+CROSS JOIN
+    `@etl_project`.@etl_dataset.src_waveform_subject subj
 UNION ALL
 -- line_2
 SELECT
+    subj.subject_id AS subject_id,
     '3700002_0011.CCSIMxv1' AS reference_id,  -- FK to the header
     CONCAT('3700002_0011.CCSIMxv1', '.', CAST(src.row_id AS STRING)) AS waveform_id,  -- row number inside the reference_id
     DATETIME_ADD(PARSE_DATETIME('%F', '1990-01-01'), INTERVAL src.row_id MILLISECOND) AS mx_datetime,
@@ -196,10 +220,13 @@ SELECT
             src.row_id AS row_id
         )) AS trace_id -- 
 FROM
-    `@target_project`.@target_dataset.raw_case055_ecg_lines3 src
+    `@wf_project`.@wf_dataset.raw_case055_ecg_lines3 src
+CROSS JOIN
+    `@etl_project`.@etl_dataset.src_waveform_subject subj
 UNION ALL
 -- line_3
 SELECT
+    subj.subject_id AS subject_id,
     '3700002_0011.CCSIMxv1' AS reference_id,  -- FK to the header
     CONCAT('3700002_0011.CCSIMxv1', '.', CAST(src.row_id AS STRING)) AS waveform_id,  -- row number inside the reference_id
     DATETIME_ADD(PARSE_DATETIME('%F', '1990-01-01'), INTERVAL src.row_id MILLISECOND) AS mx_datetime,
@@ -216,5 +243,7 @@ SELECT
             src.row_id AS row_id
         )) AS trace_id -- 
 FROM
-    `@target_project`.@target_dataset.raw_case055_ecg_lines3 src
+    `@wf_project`.@wf_dataset.raw_case055_ecg_lines3 src
+CROSS JOIN
+    `@etl_project`.@etl_dataset.src_waveform_subject subj
 ;

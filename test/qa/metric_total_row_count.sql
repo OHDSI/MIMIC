@@ -58,7 +58,7 @@ SELECT
     'person.patients'                   AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `@target_project`.@target_dataset.cdm_person
+    `@etl_project`.@etl_dataset.cdm_person
 ;
 
 -- -------------------------------------------------------------------
@@ -90,7 +90,7 @@ SELECT
     'care_site.transfers'               AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `@target_project`.@target_dataset.cdm_care_site
+    `@etl_project`.@etl_dataset.cdm_care_site
 ;
 
 -- -------------------------------------------------------------------
@@ -106,7 +106,7 @@ SELECT
     'visit.admissions'                  AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `@target_project`.@target_dataset.cdm_visit_occurrence
+    `@etl_project`.@etl_dataset.cdm_visit_occurrence
 ;
 
 -- -------------------------------------------------------------------
@@ -138,7 +138,7 @@ SELECT
     unit_id                             AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `@target_project`.@target_dataset.cdm_visit_detail
+    `@etl_project`.@etl_dataset.cdm_visit_detail
 GROUP BY
     unit_id
 ;
@@ -172,7 +172,7 @@ SELECT
     unit_id                             AS unit_id,
     COUNT(*)                            AS row_count
 FROM
-    `@target_project`.@target_dataset.cdm_condition_occurrence
+    `@etl_project`.@etl_dataset.cdm_condition_occurrence
 GROUP BY
     unit_id
 ;

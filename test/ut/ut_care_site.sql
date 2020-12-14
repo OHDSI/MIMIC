@@ -21,7 +21,7 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(care_site_id) - COUNT(DISTINCT care_site_id) = 0) AS test_passed
 FROM
-    `@target_project`.@target_dataset.cdm_care_site
+    `@etl_project`.@etl_dataset.cdm_care_site
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
@@ -34,7 +34,7 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(care_site_source_value) - COUNT(DISTINCT care_site_source_value) = 0) AS test_passed
 FROM
-    `@target_project`.@target_dataset.cdm_care_site
+    `@etl_project`.@etl_dataset.cdm_care_site
 ;
 
 -- -------------------------------------------------------------------
@@ -56,7 +56,7 @@ SELECT
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(*) > 0 AND COUNT(*) - COUNT(vc.concept_id) = 0) AS test_passed
 FROM
-    `@target_project`.@target_dataset.cdm_care_site cdm
+    `@etl_project`.@etl_dataset.cdm_care_site cdm
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
         ON cdm.place_of_service_concept_id = vc.concept_id
