@@ -1,0 +1,8 @@
+[
+  {"name": "concept_id_1", "type": "INT64", "mode": "REQUIRED"},
+  {"name": "concept_id_2", "type": "INT64", "mode": "REQUIRED"},
+  {"name": "relationship_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "valid_start_date", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "valid_end_date", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "invalid_reason", "type": "STRING"}
+]

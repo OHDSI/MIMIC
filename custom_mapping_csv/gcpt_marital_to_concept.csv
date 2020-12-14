@@ -1,0 +1,8 @@
+"concept_name","source_concept_id","source_vocabulary_id","source_domain_id","source_concept_class_id","standard_concept","concept_code","valid_start_date","valid_end_date","invalid_reason","target_concept_id","relationship_id","reverese_relationship_id","relationship_valid_start_date","relationship_end_date","invalid_reason_cr"
+"DIVORCED",2000001501,"mimiciv_obs_marital","Meas Value","Answer",,"DIVORCED","1970-01-01","2099-12-31",,45883375,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"LIFE PARTNER",2000001502,"mimiciv_obs_marital","Meas Value","Answer",,"LIFE PARTNER","1970-01-01","2099-12-31",,45883710,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"MARRIED",2000001503,"mimiciv_obs_marital","Meas Value","Answer",,"MARRIED","1970-01-01","2099-12-31",,45876756,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"SEPARATED",2000001504,"mimiciv_obs_marital","Meas Value","Answer",,"SEPARATED","1970-01-01","2099-12-31",,45884459,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"SINGLE",2000001505,"mimiciv_obs_marital","Meas Value","Answer",,"SINGLE","1970-01-01","2099-12-31",,45881671,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"UNKNOWN (DEFAULT)",2000001506,"mimiciv_obs_marital","Meas Value","Answer",,"UNKNOWN (DEFAULT)","1970-01-01","2099-12-31",,45876636,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"WIDOWED",2000001507,"mimiciv_obs_marital","Meas Value","Answer",,"WIDOWED","1970-01-01","2099-12-31",,45883711,"Maps to","Mapped from","1970-01-01","2099-12-31",
