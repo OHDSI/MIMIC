@@ -10,8 +10,10 @@
 --      st_hosp.sql,
 --      cdm_person.sql,
 --      cdm_visit_occurrence,
---      cdm_visit_detail(?)
---      cdm_procedure_occurrence
+--      cdm_visit_detail(?),
+--      cdm_procedure_occurrence,
+--      lk_meas_chartevents,
+--      lk_cond_diagnoses
 --
 -- -------------------------------------------------------------------
 
@@ -278,6 +280,49 @@ INNER JOIN
 ;
 
 -- -------------------------------------------------------------------
+-- Rule 5
+-- chartevents
+-- -------------------------------------------------------------------
+
+INSERT INTO `@etl_project`.@etl_dataset.cdm_observation
+SELECT
+    src.measurement_id                          AS observation_id, -- id is generated already
+    per.person_id                               AS person_id,
+    src.target_concept_id                       AS observation_concept_id,
+    CAST(src.start_datetime AS DATE)            AS observation_date,
+    src.start_datetime                          AS observation_datetime,
+    32817                                       AS observation_type_concept_id, -- EHR  Type Concept    Type Concept
+    CAST(NULL AS FLOAT64)                       AS value_as_number,
+    CAST(NULL AS STRING)                        AS value_as_string,
+    CAST(NULL AS INT64)                         AS value_as_concept_id,
+    CAST(NULL AS INT64)                         AS qualifier_concept_id,
+    CAST(NULL AS INT64)                         AS unit_concept_id,
+    CAST(NULL AS INT64)                         AS provider_id,
+    vis.visit_occurrence_id                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                         AS visit_detail_id,
+    src.source_code                             AS observation_source_value,
+    src.source_concept_id                       AS observation_source_concept_id,
+    CAST(NULL AS STRING)                        AS unit_source_value,
+    CAST(NULL AS STRING)                        AS qualifier_source_value,
+    -- 
+    CONCAT('observation.', src.unit_id)         AS unit_id,
+    src.load_table_id               AS load_table_id,
+    src.load_row_id                 AS load_row_id,
+    src.trace_id                    AS trace_id
+FROM
+    `@etl_project`.@etl_dataset.lk_chartevents_mapped src
+INNER JOIN
+    `@etl_project`.@etl_dataset.cdm_person per
+        ON CAST(src.subject_id AS STRING) = per.person_source_value
+INNER JOIN
+    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+WHERE
+    src.target_domain_id = 'Observation'
+;
+
+-- -------------------------------------------------------------------
 -- from lk_procedure_mapped
 -- Rule 6
 -- -------------------------------------------------------------------
@@ -286,7 +331,7 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_observation
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())           AS observation_id,
     per.person_id                               AS person_id,
-    src.target_concept_id                       AS observation_concept_id, -- to rename fields in *_mapped
+    src.target_concept_id                       AS observation_concept_id,
     CAST(src.start_datetime AS DATE)            AS observation_date,
     src.start_datetime                          AS observation_datetime,
     src.type_concept_id                         AS observation_type_concept_id,
@@ -320,66 +365,46 @@ WHERE
     src.target_domain_id = 'Observation'
 ;
 
-
 -- -------------------------------------------------------------------
--- chartevents
--- Rule 5
+-- Rule 7
+-- diagnoses
 -- -------------------------------------------------------------------
 
+INSERT INTO `@etl_project`.@etl_dataset.cdm_observation
+SELECT
+    FARM_FINGERPRINT(GENERATE_UUID())           AS observation_id,
+    per.person_id                               AS person_id,
+    src.target_concept_id                       AS observation_concept_id, -- to rename fields in *_mapped
+    CAST(src.start_datetime AS DATE)            AS observation_date,
+    src.start_datetime                          AS observation_datetime,
+    src.type_concept_id                         AS observation_type_concept_id,
+    CAST(NULL AS FLOAT64)                       AS value_as_number,
+    CAST(NULL AS STRING)                        AS value_as_string,
+    CAST(NULL AS INT64)                         AS value_as_concept_id,
+    CAST(NULL AS INT64)                         AS qualifier_concept_id,
+    CAST(NULL AS INT64)                         AS unit_concept_id,
+    CAST(NULL AS INT64)                         AS provider_id,
+    vis.visit_occurrence_id                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                         AS visit_detail_id,
+    src.source_code                             AS observation_source_value,
+    src.source_concept_id                       AS observation_source_concept_id,
+    CAST(NULL AS STRING)                        AS unit_source_value,
+    CAST(NULL AS STRING)                        AS qualifier_source_value,
+    -- 
+    CONCAT('observation.', src.unit_id)         AS unit_id,
+    src.load_table_id               AS load_table_id,
+    src.load_row_id                 AS load_row_id,
+    src.trace_id                    AS trace_id
+FROM
+    `@etl_project`.@etl_dataset.lk_diagnoses_icd_mapped src
+INNER JOIN
+    `@etl_project`.@etl_dataset.cdm_person per
+        ON CAST(src.subject_id AS STRING) = per.person_source_value
+INNER JOIN
+    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
+        ON  vis.visit_source_value = 
+            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+WHERE
+    src.target_domain_id = 'Observation'
+;
 
--- -- Chartevents.text
--- WITH
--- "chartevents_text" AS (
--- SELECT
---     chartevents.mimic_id AS observation_id,
---     subject_id,
---     hadm_id,
---     charttime AS observation_datetime,
---     value AS value_as_string,
---     valuenum AS value_as_number,
---     concept.concept_id AS observation_source_concept_id,
---     concept.concept_code AS observation_source_value
--- FROM chartevents
--- JOIN :OMOP_SCHEMA.concept ON  -- concept driven dispatcher
--- (           concept_code  = itemid
--- AND domain_id     = 'Observation'
--- AND vocabulary_id = 'MIMIC d_items'
--- )
--- WHERE
---     error IS NULL OR error= 0
--- ),
--- "row_to_insert" AS (
--- SELECT
---     observation_id,
---     person_id,
---     0 AS observation_concept_id,
---     observation_datetime::date observation_date,
---     observation_datetime,
---     581413 AS observation_type_concept_id -- Observation from Measurement,
---     value_as_number,
---     value_as_string,
---     null value_as_concept_id,
---     null qualifier_concept_id,
---     null unit_concept_id,
---     provider_id,
---     visit_occurrence_id,
---     null visit_detail_id,
---     observation_source_value,
---     observation_source_concept_id,
---     null unit_source_value,
---     null qualifier_source_value
--- FROM chartevents_text
--- LEFT JOIN admissions USING (hadm_id))
--- LEFT JOIN :OMOP_SCHEMA.visit_detail_ASsign
--- ON row_to_insert.visit_occurrence_id = visit_detail_ASsign.visit_occurrence_id
--- AND
--- (--only one visit_detail
--- (is_first IS TRUE AND is_lASt IS TRUE)
--- OR -- first
--- (is_first IS TRUE AND is_lASt IS FALSE AND row_to_insert.observation_datetime <= visit_detail_ASsign.visit_end_datetime)
--- OR -- lASt
--- (is_lASt IS TRUE AND is_first IS FALSE AND row_to_insert.observation_datetime > visit_detail_ASsign.visit_start_datetime)
--- OR -- middle
--- (is_lASt IS FALSE AND is_first IS FALSE AND row_to_insert.observation_datetime > visit_detail_ASsign.visit_start_datetime AND row_to_insert.observation_datetime <= visit_detail_ASsign.visit_end_datetime)
--- )
--- ;

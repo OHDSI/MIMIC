@@ -1,0 +1,17 @@
+[
+  {"name": "specimen_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "person_id", "type": "INTEGER","mode": "REQUIRED"},
+  {"name": "specimen_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "specimen_type_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "specimen_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "specimen_datetime", "type": "DATETIME"},
+  {"name": "quantity", "type": "FLOAT"},
+  {"name": "unit_concept_id", "type": "INTEGER"},
+  {"name": "anatomic_site_concept_id", "type": "INTEGER"},
+  {"name": "disease_status_concept_id", "type": "INTEGER"},
+  {"name": "specimen_source_id", "type": "STRING"},
+  {"name": "specimen_source_value", "type": "STRING"},
+  {"name": "unit_source_value", "type": "STRING"},
+  {"name": "anatomic_site_source_value", "type": "STRING"},
+  {"name": "disease_status_source_value", "type": "STRING"}
+]

@@ -1,0 +1,9 @@
+[
+  {"name": "metadata_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "metadata_type_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "name", "type": "STRING", "mode": "REQUIRED" },
+  {"name": "value_as_string", "type": "STRING"},
+  {"name": "value_as_concept_id", "type": "INTEGER"},
+  {"name": "metadata_date", "type": "DATE"},
+  {"name": "metadata_datetime", "type": "DATETIME"}
+]

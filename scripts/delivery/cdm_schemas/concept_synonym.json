@@ -1,0 +1,5 @@
+[
+  {"name": "concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "concept_synonym_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "language_concept_id", "type": "INTEGER", "mode": "REQUIRED"}
+]

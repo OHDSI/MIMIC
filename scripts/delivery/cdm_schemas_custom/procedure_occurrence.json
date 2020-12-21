@@ -1,0 +1,20 @@
+[
+  {"name": "procedure_occurrence_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "procedure_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "procedure_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "procedure_datetime", "type": "DATETIME" },
+  {"name": "procedure_type_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "modifier_concept_id", "type": "INTEGER" },
+  {"name": "quantity", "type": "INTEGER" },
+  {"name": "provider_id", "type": "INTEGER" },
+  {"name": "visit_occurrence_id", "type": "INTEGER" },
+  {"name": "visit_detail_id", "type": "INTEGER" },
+  {"name": "procedure_source_value", "type": "STRING" },
+  {"name": "procedure_source_concept_id", "type": "INTEGER" },
+  {"name": "modifier_source_value", "type": "STRING"},
+  {"name": "unit_id", "type": "STRING"},
+  {"name": "load_table_id", "type": "STRING"},
+  {"name": "load_row_id", "type": "INTEGER"},
+  {"name": "trace_id", "type": "STRING"}
+]

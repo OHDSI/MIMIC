@@ -1,0 +1,11 @@
+[
+  {"name": "source_code", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "source_concept_id", "type": "INT64", "mode": "REQUIRED"},
+  {"name": "source_vocabulary_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "source_code_description", "type": "STRING"},
+  {"name": "target_concept_id", "type": "INT64", "mode": "REQUIRED"},
+  {"name": "target_vocabulary_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "valid_start_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "valid_end_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "invalid_reason", "type": "STRING"}
+]

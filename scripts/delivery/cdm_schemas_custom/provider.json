@@ -1,0 +1,15 @@
+[
+  {"name": "provider_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "provider_name", "type": "STRING" },
+  {"name": "npi", "type": "STRING" },
+  {"name": "dea", "type": "STRING" },
+  {"name": "specialty_concept_id", "type": "INTEGER" },
+  {"name": "care_site_id", "type": "INTEGER" },
+  {"name": "year_of_birth", "type": "INTEGER" },
+  {"name": "gender_concept_id", "type": "INTEGER" },
+  {"name": "provider_source_value", "type": "STRING" },
+  {"name": "specialty_source_value", "type": "STRING" },
+  {"name": "specialty_source_concept_id", "type": "INTEGER" },
+  {"name": "gender_source_value", "type": "STRING" },
+  {"name": "gender_source_concept_id", "type": "INTEGER"}
+]

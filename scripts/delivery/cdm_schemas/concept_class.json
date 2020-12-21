@@ -1,0 +1,5 @@
+[
+  {"name": "concept_class_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "concept_class_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "concept_class_concept_id", "type": "INTEGER", "mode": "REQUIRED"}
+]

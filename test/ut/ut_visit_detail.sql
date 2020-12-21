@@ -71,17 +71,17 @@ SELECT
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
     'cdm_visit_detail'                  AS table_id,
     'standard_concept'                  AS test_type, -- unique, not null, concept etc.
-    'visit_deatil_type_concept_id'             AS field_name,
+    'visit_detail_type_concept_id'             AS field_name,
     CAST(NULL AS STRING)                AS condition_json,
     (COUNT(*) > 0 AND COUNT(*) - COUNT(vc.concept_id) = 0) AS test_passed
 FROM
     `@etl_project`.@etl_dataset.cdm_visit_detail cdm
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
-        ON cdm.visit_deatil_type_concept_id = vc.concept_id
+        ON cdm.visit_detail_type_concept_id = vc.concept_id
         AND vc.standard_concept = 'S'
 WHERE
-    cdm.visit_deatil_type_concept_id <> 0
+    cdm.visit_detail_type_concept_id <> 0
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test

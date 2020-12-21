@@ -178,8 +178,7 @@ def generate_unique_test(table_config, config):
         "    (COUNT({source_field}) - COUNT(DISTINCT {source_field}) = 0) AS test_passed\n" + \
         "FROM\n" + \
         "    `{etl_project}`.{etl_dataset}.cdm_{table_name}\n" + \
-        ";\n" + \
-        "\n"
+        ";\n"
 
 
     result_queries = ""
@@ -229,15 +228,20 @@ def generate_fk_test(table_config, config):
         "        ON cdm.{source_field} = fk.{fk_field}\n" + \
         "WHERE\n" + \
         "    fk.{fk_field} IS NULL -- FK target\n" + \
-        ";\n" + \
-        "\n"
+        "{unit_id_clause}" + \
+        ";\n"
+
+    q_by_unit = "    AND cdm.unit_id = '{unit_id}'\n"
 
     result_queries = ""
     test_list = table_config.get('fk')
     if test_list != None:
         for tst in test_list:
             print(tst)
-            result_queries = result_queries + "\n" + \
+
+            uic = q_by_unit.format(unit_id=tst['unit_id']) if tst.get('unit_id') != None else ''
+            
+            result_queries = result_queries + \
                 q_template.format(
                     metrics_project = config['metrics_project'],
                     metrics_dataset = config['metrics_dataset'],
@@ -246,7 +250,8 @@ def generate_fk_test(table_config, config):
                     table_name    = table_config['table'].replace(config['cdm_prefix'], ''),
                     source_field  = tst['source_field'],
                     fk_table      = tst['fk_table'],
-                    fk_field      = tst['fk_field']
+                    fk_field      = tst['fk_field'],
+                    unit_id_clause = uic
                 )
 
     return result_queries 

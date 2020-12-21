@@ -1,0 +1,16 @@
+[
+  {"name": "note_nlp_id", "type": "INTEGER" }, 
+  {"name": "note_id", "type": "INTEGER" }, 
+  {"name": "section_concept_id", "type": "INTEGER" }, 
+  {"name": "snippet", "type": "STRING" }, 
+  {"name": "offset", "type": "STRING" }, 
+  {"name": "lexical_variant", "type": "STRING", "mode": "REQUIRED" }, 
+  {"name": "note_nlp_concept_id", "type": "INTEGER" }, 
+  {"name": "note_nlp_source_concept_id", "type": "INTEGER" }, 
+  {"name": "nlp_system", "type": "STRING" }, 
+  {"name": "nlp_date", "type": "DATE", "mode": "REQUIRED" }, 
+  {"name": "nlp_datetime", "type": "DATETIME" }, 
+  {"name": "term_exists", "type": "STRING" }, 
+  {"name": "term_temporal", "type": "STRING" }, 
+  {"name": "term_modifiers", "type": "STRING"}
+]

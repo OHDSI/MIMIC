@@ -1,0 +1,9 @@
+[
+  {"name": "cohort_definition_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "subject_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "cohort_start_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "cohort_end_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "attribute_definition_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "value_as_number", "type": "FLOAT" },
+  {"name": "value_as_concept_id", "type": "INTEGER"}
+]

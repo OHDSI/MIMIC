@@ -35,17 +35,14 @@ python ../../scripts/bq_run_script.py me_see_result_from_conf.sql
         `python bq_run_script.py me_top100_from_conf.sql`
         2.5)
         `python bq_run_script.py me_tops_together_from_conf.sql`
-
-
 1) View results and copy it to XSLX
     * Update metrics dataset name in the queries below.
     * Run in web BQ:
         3.1)
-        select * from metrics_dataset.me_persons_visits order by category, name;
+        `select * from metrics_dataset.me_persons_visits order by category, name;`
         3.2)
-        select * from metrics_dataset.me_mapping_rate order by table_name, concept_field;
+        `select * from metrics_dataset.me_mapping_rate order by table_name, concept_field;`
         3.3)
+        `select * from metrics_dataset.me_tops_together order by table_name, concept_field, category;`
+        or
         each query in `me_see_totals_from_conf.sql`
-        or all together
-        select * from metrics_dataset.me_tops_together order by table_name, concept_field, category;
-        

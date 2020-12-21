@@ -1,0 +1,10 @@
+[
+  {"name": "concept_id_1", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "concept_id_2", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "relationship_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "valid_start_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "valid_end_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "invalid_reason", "type": "STRING"},
+  {"name": "load_table_id", "type": "STRING"},
+  {"name": "load_row_id", "type": "INTEGER"}
+]

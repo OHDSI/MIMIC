@@ -13,6 +13,8 @@
 --      cdm_visit_occurrence,
 --      cdm_visit_detail,
 --          lk_meas_labevents.sql,
+--          lk_meas_chartevents,
+--          lk_meas_specimen,
 --          lk_meas_waveform.sql
 -- -------------------------------------------------------------------
 
@@ -123,7 +125,7 @@ SELECT
     32817                                   AS measurement_type_concept_id, -- EHR  Type Concept    Type Concept
     CAST(NULL AS INT64)                     AS operator_concept_id,
     src.value_as_number                     AS value_as_number,
-    IF(src.value_source_value IS NOT NULL, 0, NULL)    AS value_as_concept_id,
+    src.value_as_concept_id                 AS value_as_concept_id,
     src.unit_concept_id                     AS unit_concept_id,
     CAST(NULL AS INT64)                     AS range_low,
     CAST(NULL AS INT64)                     AS range_high,
@@ -241,7 +243,6 @@ INNER JOIN
 WHERE
     src.target_domain_id = 'Measurement'
 ;
-
 
 -- -------------------------------------------------------------------
 -- cdm_measurement

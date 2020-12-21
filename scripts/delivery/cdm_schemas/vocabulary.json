@@ -1,0 +1,7 @@
+[
+  {"name": "vocabulary_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "vocabulary_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "vocabulary_reference", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "vocabulary_version", "type": "STRING"},
+  {"name": "vocabulary_concept_id", "type": "INTEGER", "mode": "REQUIRED"}
+]

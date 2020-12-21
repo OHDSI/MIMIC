@@ -1,0 +1,20 @@
+[
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "gender_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "year_of_birth", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "month_of_birth", "type": "INTEGER"},
+  {"name": "day_of_birth", "type": "INTEGER"},
+  {"name": "birth_datetime", "type": "DATETIME"},
+  {"name": "race_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "ethnicity_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "location_id", "type": "INTEGER"},
+  {"name": "provider_id", "type": "INTEGER"},
+  {"name": "care_site_id", "type": "INTEGER"},
+  {"name": "person_source_value", "type": "STRING"},
+  {"name": "gender_source_value", "type": "STRING"},
+  {"name": "gender_source_concept_id", "type": "INTEGER"},
+  {"name": "race_source_value", "type": "STRING"},
+  {"name": "race_source_concept_id", "type": "INTEGER"},
+  {"name": "ethnicity_source_value", "type": "STRING"},
+  {"name": "ethnicity_source_concept_id", "type": "INTEGER"}
+]

@@ -1,0 +1,9 @@
+[
+  {"name": "cohort_definition_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "cohort_definition_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "cohort_definition_description", "type": "STRING"},
+  {"name": "definition_type_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "cohort_definition_syntax", "type": "STRING"},
+  {"name": "subject_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "cohort_initiation_date", "type": "DATE"}
+]

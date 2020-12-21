@@ -1,0 +1,7 @@
+[
+  {"name": "attribute_definition_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "attribute_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "attribute_description", "type": "STRING"},
+  {"name": "attribute_type_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "attribute_syntax", "type": "STRING"}
+]

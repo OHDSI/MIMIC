@@ -1,0 +1,22 @@
+[
+  {"name": "measurement_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "measurement_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "measurement_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "measurement_datetime", "type": "DATETIME" },
+  {"name": "measurement_time", "type": "STRING" },
+  {"name": "measurement_type_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "operator_concept_id", "type": "INTEGER" },
+  {"name": "value_as_number", "type": "FLOAT" },
+  {"name": "value_as_concept_id", "type": "INTEGER" },
+  {"name": "unit_concept_id", "type": "INTEGER" },
+  {"name": "range_low", "type": "FLOAT" },
+  {"name": "range_high", "type": "FLOAT" },
+  {"name": "provider_id", "type": "INTEGER" },
+  {"name": "visit_occurrence_id", "type": "INTEGER" },
+  {"name": "visit_detail_id", "type": "INTEGER" },
+  {"name": "measurement_source_value", "type": "STRING" },
+  {"name": "measurement_source_concept_id", "type": "INTEGER" },
+  {"name": "unit_source_value", "type": "STRING" },
+  {"name": "value_source_value", "type": "STRING"}
+]

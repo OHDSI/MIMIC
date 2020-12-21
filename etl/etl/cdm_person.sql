@@ -105,11 +105,11 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_person
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID()) AS person_id,
     CASE 
-        WHEN p.gender_source_value = 'F' THEN 8532 
-        WHEN p.gender_source_value = 'M' THEN 8507 
+        WHEN p.gender = 'F' THEN 8532 
+        WHEN p.gender = 'M' THEN 8507 
         ELSE 0 
     END                             AS gender_concept_id,
-    p.year_of_birth                 AS year_of_birth,
+    p.anchor_year                   AS year_of_birth,
     CAST(NULL AS INT64)             AS month_of_birth,
     CAST(NULL AS INT64)             AS day_of_birth,
     CAST(NULL AS DATETIME)          AS birth_datetime,
@@ -129,7 +129,7 @@ SELECT
     CAST(NULL AS INT64)             AS provider_id,
     CAST(NULL AS INT64)             AS care_site_id,
     CAST(p.subject_id AS STRING)    AS person_source_value,
-    p.gender_source_value           AS gender_source_value,
+    p.gender                        AS gender_source_value,
     0                               AS gender_source_concept_id,
     CASE
         WHEN map_eth.target_vocabulary_id <> 'Ethnicity'

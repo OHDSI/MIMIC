@@ -1,0 +1,7 @@
+[
+  {"name": "observation_period_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "observation_period_start_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "observation_period_end_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "period_type_concept_id", "type": "INTEGER", "mode": "REQUIRED"}
+]

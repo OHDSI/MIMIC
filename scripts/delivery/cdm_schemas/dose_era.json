@@ -1,0 +1,9 @@
+[
+  {"name": "dose_era_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "drug_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "unit_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "dose_value", "type": "FLOAT", "mode": "REQUIRED" },
+  {"name": "dose_era_start_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "dose_era_end_date", "type": "DATE", "mode": "REQUIRED"}
+]

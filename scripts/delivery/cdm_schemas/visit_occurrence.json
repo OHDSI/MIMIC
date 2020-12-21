@@ -1,0 +1,19 @@
+[
+  {"name": "visit_occurrence_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "visit_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "visit_start_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "visit_start_datetime", "type": "DATETIME"},
+  {"name": "visit_end_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "visit_end_datetime", "type": "DATETIME"},
+  {"name": "visit_type_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "provider_id", "type": "INTEGER"},
+  {"name": "care_site_id", "type": "INTEGER"},
+  {"name": "visit_source_value", "type": "STRING"},
+  {"name": "visit_source_concept_id", "type": "INTEGER"},
+  {"name": "admitting_source_concept_id", "type": "INTEGER"},
+  {"name": "admitting_source_value", "type": "STRING"},
+  {"name": "discharge_to_concept_id", "type": "INTEGER"},
+  {"name": "discharge_to_source_value", "type": "STRING"},
+  {"name": "preceding_visit_occurrence_id", "type": "INTEGER"}
+]

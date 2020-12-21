@@ -1,0 +1,9 @@
+[
+  {"name": "domain_concept_id_1", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "fact_id_1", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "domain_concept_id_2", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "fact_id_2", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "relationship_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "trace_id", "type": "STRING"},
+  {"name": "unit_id", "type": "STRING"}
+]

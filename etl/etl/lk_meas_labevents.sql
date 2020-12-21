@@ -171,7 +171,7 @@ SELECT
     labc.source_code                        AS source_code,
     src.itemid                              AS itemid,
     labc.source_concept_id                  AS source_concept_id,
-    labc.source_vocabulary_id
+    labc.source_vocabulary_id               AS source_vocabulary_id,
     src.valueuom                            AS unit_source_value,
     src.value                               AS value_source_value,
     --

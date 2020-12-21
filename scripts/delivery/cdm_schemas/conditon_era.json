@@ -1,0 +1,8 @@
+[
+  {"name": "condition_era_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "condition_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "condition_era_start_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "condition_era_end_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "condition_occurrence_count", "type": "INTEGER"}
+]

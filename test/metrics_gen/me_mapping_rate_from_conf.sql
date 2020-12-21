@@ -388,27 +388,27 @@ WHERE visit_detail_concept_id IS NOT NULL
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
     'cdm_visit_detail'        AS table_name,
-    'visit_deatil_type_concept_id'     AS concept_field,
-    COUNT(CASE WHEN visit_deatil_type_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
+    'visit_detail_type_concept_id'     AS concept_field,
+    COUNT(CASE WHEN visit_detail_type_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
     IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(visit_deatil_type_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
+        ROUND(CAST(COUNT(IF(visit_detail_type_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_visit_detail ev
-WHERE visit_deatil_type_concept_id IS NOT NULL
+WHERE visit_detail_type_concept_id IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
     'cdm_visit_detail'        AS table_name,
-    'visit_deatil_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN visit_deatil_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
+    'visit_detail_source_concept_id'     AS concept_field,
+    COUNT(CASE WHEN visit_detail_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
     IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(visit_deatil_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
+        ROUND(CAST(COUNT(IF(visit_detail_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_visit_detail ev
-WHERE visit_deatil_source_concept_id IS NOT NULL
+WHERE visit_detail_source_concept_id IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate

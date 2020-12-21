@@ -1,0 +1,13 @@
+[
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "death_date", "type": "DATE", "mode": "REQUIRED"},
+  {"name": "death_datetime", "type": "DATETIME"},
+  {"name": "death_type_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "cause_concept_id", "type": "INTEGER"},
+  {"name": "cause_source_value", "type": "STRING"},
+  {"name": "cause_source_concept_id", "type": "INTEGER"},
+  {"name": "unit_id", "type": "STRING"},
+  {"name": "load_table_id", "type": "STRING"},
+  {"name": "load_row_id", "type": "INTEGER"},
+  {"name": "trace_id", "type": "STRING"}
+]

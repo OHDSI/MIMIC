@@ -22,7 +22,7 @@
         "@metrics_dataset": "mimiciv_metrics_tuf_10_ant_2020_10_21",
 
         "@atlas_project": "odysseus-mimic-dev",
-        "@atlas_dataset": "mimiciv_202010_cdm_531"
+        "@atlas_dataset": "mimiciv_demo_202012_cdm_531"
 
     },
 

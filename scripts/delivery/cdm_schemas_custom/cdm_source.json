@@ -1,0 +1,16 @@
+[
+  {"name": "cdm_source_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "cdm_source_abbreviation", "type": "STRING"},
+  {"name": "cdm_holder", "type": "STRING"},
+  {"name": "source_description", "type": "STRING"},
+  {"name": "source_documentation_reference", "type": "STRING"},
+  {"name": "cdm_etl_reference", "type": "STRING"},
+  {"name": "source_release_date", "type": "DATE"},
+  {"name": "cdm_release_date", "type": "DATE"},
+  {"name": "cdm_version", "type": "STRING"},
+  {"name": "vocabulary_version", "type": "STRING"},
+  {"name": "unit_id", "type": "STRING"},
+  {"name": "load_table_id", "type": "STRING"},
+  {"name": "load_row_id", "type": "INTEGER"},
+  {"name": "trace_id", "type": "STRING"}
+]

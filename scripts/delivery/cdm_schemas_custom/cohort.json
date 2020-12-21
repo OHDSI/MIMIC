@@ -1,0 +1,6 @@
+[
+  {"name": "cohort_definition_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "subject_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "cohort_start_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "cohort_end_date", "type": "DATE", "mode": "REQUIRED"}
+]

@@ -1,0 +1,7 @@
+[
+  {"name": "domain_id", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "domain_name", "type": "STRING", "mode": "REQUIRED"},
+  {"name": "domain_concept_id", "type": "INTEGER", "mode": "REQUIRED"},
+  {"name": "load_table_id", "type": "STRING"},
+  {"name": "load_row_id", "type": "INTEGER"}
+]

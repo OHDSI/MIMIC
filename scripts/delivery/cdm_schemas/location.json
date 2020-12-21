@@ -1,0 +1,10 @@
+[
+  {"name": "location_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "address_1", "type": "STRING" },
+  {"name": "address_2", "type": "STRING" },
+  {"name": "city", "type": "STRING" },
+  {"name": "state", "type": "STRING" },
+  {"name": "zip", "type": "STRING" },
+  {"name": "county", "type": "STRING" },
+  {"name": "location_source_value", "type": "STRING"}
+]

@@ -1198,29 +1198,29 @@ limit 100
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_visit_detail
 SELECT
-    'visit_deatil_type_concept_id'     AS concept_field,
+    'visit_detail_type_concept_id'     AS concept_field,
     'Mapped'              AS category,
-    CAST(ev.visit_deatil_type_concept_id AS STRING)  AS source_value,
+    CAST(ev.visit_detail_type_concept_id AS STRING)  AS source_value,
     vc.concept_id           AS concept_id,
     vc.concept_name         AS concept_name,
     COUNT(*)                AS count,
     ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
 from `@etl_project`.@etl_dataset.cdm_visit_detail ev
 inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.visit_deatil_type_concept_id = vc.concept_id
+    on ev.visit_detail_type_concept_id = vc.concept_id
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_visit_detail'
-where ev.visit_deatil_type_concept_id <> 0
-group by ev.visit_deatil_type_concept_id, vc.concept_id, vc.concept_name, tt.count
+where ev.visit_detail_type_concept_id <> 0
+group by ev.visit_detail_type_concept_id, vc.concept_id, vc.concept_name, tt.count
 order by count desc
 limit 100
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_visit_detail
 SELECT
-    'visit_deatil_type_concept_id'      AS concept_field,
+    'visit_detail_type_concept_id'      AS concept_field,
     'Unmapped'            AS category,
-    CAST(ev.visit_deatil_type_concept_id AS STRING)  AS source_value,
+    CAST(ev.visit_detail_type_concept_id AS STRING)  AS source_value,
     NULL                    AS concept_id,
     CAST(NULL AS STRING)    AS concept_name,
     COUNT(*)                AS count,
@@ -1228,37 +1228,37 @@ SELECT
 from `@etl_project`.@etl_dataset.cdm_visit_detail ev
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_visit_detail'
-where ev.visit_deatil_type_concept_id = 0
-group by ev.visit_deatil_type_concept_id, tt.count
+where ev.visit_detail_type_concept_id = 0
+group by ev.visit_detail_type_concept_id, tt.count
 order by count desc
 limit 100
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_visit_detail
 SELECT
-    'visit_deatil_source_concept_id'     AS concept_field,
+    'visit_detail_source_concept_id'     AS concept_field,
     'Mapped'              AS category,
-    CAST(ev.visit_deatil_source_concept_id AS STRING)  AS source_value,
+    CAST(ev.visit_detail_source_concept_id AS STRING)  AS source_value,
     vc.concept_id           AS concept_id,
     vc.concept_name         AS concept_name,
     COUNT(*)                AS count,
     ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
 from `@etl_project`.@etl_dataset.cdm_visit_detail ev
 inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.visit_deatil_source_concept_id = vc.concept_id
+    on ev.visit_detail_source_concept_id = vc.concept_id
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_visit_detail'
-where ev.visit_deatil_source_concept_id <> 0
-group by ev.visit_deatil_source_concept_id, vc.concept_id, vc.concept_name, tt.count
+where ev.visit_detail_source_concept_id <> 0
+group by ev.visit_detail_source_concept_id, vc.concept_id, vc.concept_name, tt.count
 order by count desc
 limit 100
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_visit_detail
 SELECT
-    'visit_deatil_source_concept_id'      AS concept_field,
+    'visit_detail_source_concept_id'      AS concept_field,
     'Unmapped'            AS category,
-    CAST(ev.visit_deatil_source_concept_id AS STRING)  AS source_value,
+    CAST(ev.visit_detail_source_concept_id AS STRING)  AS source_value,
     NULL                    AS concept_id,
     CAST(NULL AS STRING)    AS concept_name,
     COUNT(*)                AS count,
@@ -1266,8 +1266,8 @@ SELECT
 from `@etl_project`.@etl_dataset.cdm_visit_detail ev
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_visit_detail'
-where ev.visit_deatil_source_concept_id = 0
-group by ev.visit_deatil_source_concept_id, tt.count
+where ev.visit_detail_source_concept_id = 0
+group by ev.visit_detail_source_concept_id, tt.count
 order by count desc
 limit 100
 ;

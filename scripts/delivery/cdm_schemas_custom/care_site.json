@@ -1,0 +1,12 @@
+[
+  {"name": "care_site_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "care_site_name", "type": "STRING" },
+  {"name": "place_of_service_concept_id", "type": "INTEGER" },
+  {"name": "location_id", "type": "INTEGER" },
+  {"name": "care_site_source_value", "type": "STRING" },
+  {"name": "place_of_service_source_value", "type": "STRING"},
+  {"name": "unit_id", "type": "STRING"},
+  {"name": "load_table_id", "type": "STRING"},
+  {"name": "load_row_id", "type": "INTEGER"},
+  {"name": "trace_id", "type": "STRING"}
+]

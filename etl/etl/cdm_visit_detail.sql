@@ -38,14 +38,14 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_visit_detail
     visit_detail_start_datetime        DATETIME           ,
     visit_detail_end_date              DATE      not null ,
     visit_detail_end_datetime          DATETIME           ,
-    visit_deatil_type_concept_id       INT64     not null , -- deatil! -- this typo still exists in v.5.3.1(???)
+    visit_detail_type_concept_id       INT64     not null , -- detail! -- this typo still exists in v.5.3.1(???)
     provider_id                        INT64              ,
     care_site_id                       INT64              ,
     admitting_source_concept_id        INT64              ,
     discharge_to_concept_id            INT64              ,
     preceding_visit_detail_id          INT64              ,
     visit_detail_source_value          STRING             ,
-    visit_deatil_source_concept_id     INT64              , -- deatil! -- this typo still exists in v.5.3.1(???)
+    visit_detail_source_concept_id     INT64              , -- detail! -- this typo still exists in v.5.3.1(???)
     admitting_source_value             STRING             ,
     discharge_to_source_value          STRING             ,
     visit_detail_parent_id             INT64              ,
@@ -73,7 +73,7 @@ SELECT
     src.start_datetime                      AS visit_start_datetime,
     CAST(src.end_datetime AS DATE)          AS visit_end_date,
     src.end_datetime                        AS visit_end_datetime,
-    32817                                   AS visit_deatil_type_concept_id,   -- EHR   Type Concept    Standard                          
+    32817                                   AS visit_detail_type_concept_id,   -- EHR   Type Concept    Standard                          
     CAST(NULL AS INT64)                     AS provider_id,
     cs.care_site_id                         AS care_site_id,
 
@@ -128,7 +128,7 @@ SELECT
     src.start_datetime                  AS visit_start_datetime,
     CAST(src.end_datetime AS DATE)      AS visit_end_date,
     src.end_datetime                    AS visit_end_datetime,
-    2000000006                          AS visit_deatil_type_concept_id,  -- [MIMIC Generated] ward and physical
+    2000000006                          AS visit_detail_type_concept_id,  -- [MIMIC Generated] ward and physical
     CAST(NULL AS INT64)                 AS provider_id,
     0                                   AS care_site_id, -- see if there are info in src
     0                                   AS admitting_source_concept_id,

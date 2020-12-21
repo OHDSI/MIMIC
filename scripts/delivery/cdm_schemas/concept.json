@@ -1,0 +1,12 @@
+[
+  {"name": "concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "concept_name", "type": "STRING", "mode": "REQUIRED" },
+  {"name": "domain_id", "type": "STRING", "mode": "REQUIRED" },
+  {"name": "vocabulary_id", "type": "STRING", "mode": "REQUIRED" },
+  {"name": "concept_class_id", "type": "STRING", "mode": "REQUIRED" },
+  {"name": "standard_concept", "type": "STRING"               },
+  {"name": "concept_code", "type": "STRING", "mode": "REQUIRED" },
+  {"name": "valid_start_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "valid_end_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "invalid_reason", "type": "STRING"}
+]

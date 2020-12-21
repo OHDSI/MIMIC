@@ -1,0 +1,16 @@
+[
+  {"name": "note_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "person_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "note_date", "type": "DATE", "mode": "REQUIRED" },
+  {"name": "note_datetime", "type": "DATETIME" },
+  {"name": "note_type_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "note_class_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "note_title", "type": "STRING" },
+  {"name": "note_text", "type": "STRING" },
+  {"name": "encoding_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "language_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "provider_id", "type": "INTEGER" },
+  {"name": "visit_occurrence_id", "type": "INTEGER" },
+  {"name": "visit_detail_id", "type": "INTEGER" },
+  {"name": "note_source_value", "type": "STRING"}
+]

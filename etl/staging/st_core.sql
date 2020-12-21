@@ -23,8 +23,8 @@
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_patients AS
 SELECT 
     subject_id                          AS subject_id,
-    anchor_year                         AS year_of_birth,
-    gender                              AS gender_source_value,
+    anchor_year                         AS anchor_year,
+    gender                              AS gender,
     --
     'patients'                          AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,

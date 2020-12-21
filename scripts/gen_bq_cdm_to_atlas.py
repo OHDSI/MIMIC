@@ -31,7 +31,7 @@ config_default = {
     "voc_ddl":                  "../etl/ddl_voc_5_3_1.sql",
     "cdm_ddl":                  "../etl/ddl_cdm_5_3_1.sql",
 
-    "output_sql_file":          "../etl/unload_to_atlas_gen.sql"
+    "output_sql_file":          "../etl/output_file.sql"
 }
 
 # ----------------------------------------------------
@@ -113,14 +113,19 @@ def read_ddl(ddl_file, cdm_dataset, prefix):
         s_raw = open(ddl_file).read().split('\n')
         s_ddl = filter(lambda x: x.strip()[0:2] != '--', s_raw)
         pr = cdm_dataset + '.' + prefix
-        print(pr)
+        print('read_ddl.tables_template', pr)
         s_tables = filter(lambda x: pr in x, s_ddl)
 
         # CREATE OR REPLACE TABLE dataset.cdm_cohort_definition (
         for s_t in s_tables:
             t = s_t.partition(pr)[2].partition('(')[0].strip()
             result_tables['tables'].append(t)
-        print(result_tables['tables'][1])
+
+            print('read_ddl.s_t', s_t)
+            print('read_ddl.t', t)
+            break
+
+        # print(result_tables['tables'][1])
 
     return result_tables
 
