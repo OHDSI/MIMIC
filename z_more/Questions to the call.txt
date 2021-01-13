@@ -1,0 +1,20 @@
+questions to the next call
+
+
+
+what is microbiology.micro_specimen_id?
+
+For Dima D:
+
+Answers for antibiotics: "Resistant", "Sensitive" - to link to each suceptibility concept or just keep 4 rows?
+
+
+For Tanya or Dima:
+
+"Pending" concept_id = 1177297 or "Pending investigation" concept_id = 45880430?
+
+
+        * Drug concepts in Condition
+        * Observation value_as fields all null
+        * Event dates before year of birth
+        

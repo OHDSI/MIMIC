@@ -31,6 +31,15 @@
 ### Change Log (latest first) ###
 
 
+**2021-01-13**
+
+* Export and import python scripts:
+    * `scripts/delivery/export_from_bq.py`
+        * the script is adjusted to export BQ tables from Atlas dataset to GS bucket, and optionally to the local storage to CSV files
+    * `scripts/delivery/load_to_bq.py`
+        * the script is adjusted to load the exported CSVs from local storage or from the bucket to the given target BQ dataset, created automatically
+
+
 **2020-12-14**
 
 * TUF-55 Custom mapping derived from MIMIC III

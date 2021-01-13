@@ -9,6 +9,7 @@ import os
 import sys
 import getopt
 import json
+import datetime
 
 # ----------------------------------------------------
 '''
@@ -36,7 +37,7 @@ config_default = {
     "csv_quote":                "\\\"",
     "schemas_dir_all_csv":      "scripts/delivery/cdm_schemas_custom",
 
-    "bq_temp_table_prefix":     "tmp_",
+    "bq_temp_table_prefix":     "",
 
     "bq_tables":
     [
@@ -212,6 +213,25 @@ def load_table(table, files_path, field_delimiter, quote, config):
 
 '''
 ----------------------------------------------------
+    nice output about execution result
+
+    s_filename: script executed (any string actually)
+    status:     0 = ok, !0 = error
+    msg:        additional info if there is any
+----------------------------------------------------
+'''
+def nice_message(s_filename, status, msg):
+    time =    datetime.datetime.now()
+    file =    s_filename.ljust(35, ' ')
+    result =  'Done.' if status==0 else 'Error'
+    message = '' if len(msg)==0 else ': ' + msg if len(msg.split('\n')) == 1 \
+        else '\n' + '\n'.join(map(lambda x: ''.ljust(4) + x, msg.split('\n')))
+
+    return '{0} | {1} | {2}{3}'.format(time, file, result, message)
+
+
+'''
+----------------------------------------------------
     main()
     return code:
         0 = success
@@ -225,6 +245,9 @@ def main():
     config = read_config(params.get('config_file'))
 
     file_path = '{files_path}/{table}-*{ext}'
+
+    s_done = []
+    s_done.append(nice_message('start...', 0, ''))
 
     create_bq_dataset(config['bq_target_dataset'])
 
@@ -240,6 +263,12 @@ def main():
             break
             # rca += 1
             # continue
+
+    s_done.append(nice_message('finish', 0, ''))
+
+    print('\nTables are loaded to {pr}.{ds}'.format(pr=config['bq_target_project'], ds=config['bq_target_dataset']))
+    for a in s_done:
+        print(a)
 
     return rc #rca
 
