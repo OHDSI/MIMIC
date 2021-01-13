@@ -25,13 +25,13 @@ Expected locations for CSVs are:
 
 config_default = {
 
-    "bq_target_project":        "bq_target_project",
-    "bq_target_dataset":        "bq_target_dataset",
+    "bq_target_project":        "odysseus-mimic-dev",
+    "bq_target_dataset":        "mimiciv_delivery_demo",
 
     "overwrite": "no",
 
     "source_format":            "csv",
-    "csv_path":                 "somewhere",
+    "csv_path":                 "gs://mimic_iv_to_omop/export_cdm_demo",
     "csv_delimiter":            ",",
     "csv_quote":                "\\\"",
     "schemas_dir_all_csv":      "scripts/delivery/cdm_schemas_custom",
