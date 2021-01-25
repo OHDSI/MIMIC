@@ -54,9 +54,35 @@ SELECT
             src.spec_itemid
         ORDER BY src.trace_id
     )                                           AS trace_id_spec, -- for specimen
+    subject_id                                  AS subject_id,    -- to pick additional hadm_id from admissions
+    hadm_id                                     AS hadm_id,
     COALESCE(src.charttime, src.chartdate)      AS start_datetime -- just to do coalesce once
 FROM
     `@etl_project`.@etl_dataset.src_microbiologyevents src -- mbe
+;
+
+-- -------------------------------------------------------------------
+-- lk_micro_hadm_id
+-- pick additional hadm_id by event start_datetime
+-- row_num is added to select the earliest if more than one hadm_ids are found
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_micro_hadm_id AS
+SELECT
+    src.trace_id_ab                     AS event_trace_id,
+    adm.hadm_id                         AS hadm_id,
+    ROW_NUMBER() OVER (
+        PARTITION BY src.trace_id_ab
+        ORDER BY adm.start_datetime
+    )                                   AS row_num
+FROM  
+    `@etl_project`.@etl_dataset.lk_micro_cross_ref src
+INNER JOIN 
+    `@etl_project`.@etl_dataset.lk_admissions_clean adm
+        ON adm.subject_id = src.subject_id
+        AND src.start_datetime BETWEEN adm.start_datetime AND adm.end_datetime
+WHERE
+    src.hadm_id IS NULL
 ;
 
 -- -------------------------------------------------------------------
@@ -179,19 +205,6 @@ LEFT JOIN
         AND vc2.invalid_reason IS NULL
 ;
 
--- INSERT INTO `@etl_project`.@etl_dataset.lk_d_micro_concept
--- (resistance mapping)
-
-
--- -------------------------------------------------------------------
--- Rule 2 specimen from labevents (fake?)
--- -------------------------------------------------------------------
-
-
--- -------------------------------------------------------------------
--- Rule 3 specimen from chartevents (fake?)
--- -------------------------------------------------------------------
-
 -- -------------------------------------------------------------------
 -- lk_specimen_mapped
 -- -------------------------------------------------------------------
@@ -224,7 +237,8 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_organism_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
     src.subject_id                              AS subject_id,
-    src.hadm_id                                 AS hadm_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
+    CAST(src.start_datetime AS DATE)            AS date_id,
     0                                           AS type_concept_id,
     src.start_datetime                          AS start_datetime,
     CONCAT(tc.source_code, '|', sc.source_code)   AS source_code, -- test name plus specimen name
@@ -251,6 +265,10 @@ INNER JOIN
 LEFT JOIN
     `@etl_project`.@etl_dataset.lk_d_micro_concept oc
         ON src.org_itemid = oc.itemid
+LEFT JOIN
+    `@etl_project`.@etl_dataset.lk_micro_hadm_id hadm
+        ON hadm.event_trace_id = src.trace_id
+        AND hadm.row_num = 1
 ;
 
 -- -------------------------------------------------------------------
@@ -264,7 +282,8 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_ab_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
     src.subject_id                              AS subject_id,
-    src.hadm_id                                 AS hadm_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)          AS hadm_id,
+    CAST(src.start_datetime AS DATE)            AS date_id,
     0                                           AS type_concept_id,
     src.start_datetime                          AS start_datetime,
     ac.source_code                              AS source_code,
@@ -295,4 +314,8 @@ LEFT JOIN
 LEFT JOIN
     `@etl_project`.@etl_dataset.lk_meas_operator_concept opc -- see lk_meas_labevents.sql
         ON src.dilution_comparison = opc.source_code
+LEFT JOIN
+    `@etl_project`.@etl_dataset.lk_micro_hadm_id hadm
+        ON hadm.event_trace_id = src.trace_id
+        AND hadm.row_num = 1
 ;

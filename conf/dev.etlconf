@@ -16,13 +16,13 @@
         "@wf_dataset": "waveform_source_poc",
 
         "@etl_project": "odysseus-mimic-dev",
-        "@etl_dataset": "mimiciv_cdm_tuf_10_ant_2020_10_21",
+        "@etl_dataset": "mimiciv_demo_cdm_2021_01_20",
 
         "@metrics_project": "odysseus-mimic-dev",
-        "@metrics_dataset": "mimiciv_metrics_tuf_10_ant_2020_10_21",
+        "@metrics_dataset": "mimiciv_demo_metrics_2021_01_20",
 
         "@atlas_project": "odysseus-mimic-dev",
-        "@atlas_dataset": "mimiciv_demo_202012_cdm_531"
+        "@atlas_dataset": "mimiciv_demo_202101_cdm_531"
 
     },
 

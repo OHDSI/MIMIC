@@ -7,7 +7,8 @@
 -- Populate lookups for cdm_measurement table
 -- Rule 10 waveforms
 -- Dependencies: run after 
---      st_waveform.sql
+--      st_waveform.sql,
+--      lk_meas_unit_concept
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -56,6 +57,38 @@
 -- from meas.chart.4: note gcpt_chart_label_to_concept
 
 -- -------------------------------------------------------------------
+-- Use custom mapping:
+--      gcpt_meas_waveforms.csv -> mimiciv_meas_wf
+--      gcpt_meas_unit.csv      -> mimiciv_meas_wf_unit
+-- -------------------------------------------------------------------
+
+
+-- -------------------------------------------------------------------
+-- lk_wf_hadm_id
+-- pick additional hadm_id by event start_datetime
+-- row_num is added to select the earliest if more than one hadm_ids are found
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_wf_hadm_id AS
+SELECT
+    src.trace_id                        AS event_trace_id,
+    adm.hadm_id                         AS hadm_id,
+    ROW_NUMBER() OVER (
+        PARTITION BY src.trace_id
+        ORDER BY adm.start_datetime
+    )                                   AS row_num
+FROM
+    `@etl_project`.@etl_dataset.src_waveform_mx src
+INNER JOIN
+    `@etl_project`.@etl_dataset.src_waveform_header wh
+        ON wh.reference_id = src.reference_id
+INNER JOIN 
+    `@etl_project`.@etl_dataset.lk_admissions_clean adm
+        ON adm.subject_id = wh.subject_id
+        AND src.mx_datetime BETWEEN adm.start_datetime AND adm.end_datetime
+;
+
+-- -------------------------------------------------------------------
 -- lk_meas_waveform_mapped
 -- Rule 10 (waveform)
 -- reference_id = visit_detail_source_value
@@ -66,36 +99,36 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_waveform_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
     wh.subject_id                           AS subject_id,
-    wh.hadm_id                              AS hadm_id,
-    wm.reference_id                         AS reference_id,
+    hadm.hadm_id                            AS hadm_id,     -- get hadm_id by datetime period
+    src.reference_id                        AS reference_id,
     COALESCE(vc2.concept_id, 0)             AS target_concept_id,
     COALESCE(vc2.domain_id, 'Measurement')  AS target_domain_id,
-    wm.mx_datetime                          AS start_datetime,
-    wm.value_as_number                      AS value_as_number,
-    IF(wm.unit_source_value IS NOT NULL, 
+    src.mx_datetime                         AS start_datetime,
+    src.value_as_number                     AS value_as_number,
+    IF(src.unit_source_value IS NOT NULL, 
         COALESCE(uc.target_concept_id, 0), NULL)    AS unit_concept_id,
-    wm.source_code                          AS source_code, 
+    src.source_code                         AS source_code, 
     COALESCE(vc1.concept_id, 0)             AS source_concept_id,
-    wm.unit_source_value                    AS unit_source_value,
+    src.unit_source_value                   AS unit_source_value,
     -- 
-    'waveform_mx'                           AS unit_id,
-    wm.load_table_id                        AS load_table_id,
-    wm.load_row_id                          AS load_row_id,
-    wm.trace_id                             AS trace_id
+    'waveforms'                             AS unit_id,
+    src.load_table_id                       AS load_table_id,
+    src.load_row_id                         AS load_row_id,
+    src.trace_id                            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_waveform_mx wm
+    `@etl_project`.@etl_dataset.src_waveform_mx src -- wm
 INNER JOIN
     `@etl_project`.@etl_dataset.src_waveform_header wh
-        ON wh.reference_id = wm.reference_id
+        ON wh.reference_id = src.reference_id
 -- mapping of the main source code
 -- mapping for measurement unit
 LEFT JOIN
     `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
-        ON uc.source_code = wm.unit_source_value
+        ON uc.source_code = src.unit_source_value
         -- supposing that the standard mapping is supplemented with custom concepts for waveform specific units
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc1
-        ON vc1.concept_code = wm.source_code
+        ON vc1.concept_code = src.source_code
         AND vc1.vocabulary_id = 'mimiciv_meas_waveform_code'
             -- supposing that the standard mapping is supplemented with custom concepts for waveform specific values
 LEFT JOIN
@@ -107,4 +140,9 @@ LEFT JOIN
         ON vc2.concept_id = vr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
+LEFT JOIN 
+    `@etl_project`.@etl_dataset.lk_wf_hadm_id hadm
+        ON hadm.event_trace_id = src.trace_id
+        AND hadm.row_num = 1
 ;
+

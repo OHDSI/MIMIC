@@ -136,82 +136,6 @@ order by count desc
 limit 100
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_provider
-SELECT
-    'specialty_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.specialty_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_provider ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.specialty_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_provider'
-where ev.specialty_source_concept_id <> 0
-group by ev.specialty_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_provider
-SELECT
-    'specialty_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.specialty_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_provider ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_provider'
-where ev.specialty_source_concept_id = 0
-group by ev.specialty_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_provider
-SELECT
-    'gender_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.gender_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_provider ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.gender_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_provider'
-where ev.gender_source_concept_id <> 0
-group by ev.gender_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_provider
-SELECT
-    'gender_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.gender_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_provider ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_provider'
-where ev.gender_source_concept_id = 0
-group by ev.gender_source_value, tt.count
-order by count desc
-limit 100
-;
-
 DROP TABLE IF EXISTS `@metrics_project`.@metrics_dataset.me_top_cdm_person;
 CREATE TABLE `@metrics_project`.@metrics_dataset.me_top_cdm_person
 (
@@ -338,120 +262,6 @@ order by count desc
 limit 100
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_person
-SELECT
-    'gender_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.gender_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_person ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.gender_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_person'
-where ev.gender_source_concept_id <> 0
-group by ev.gender_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_person
-SELECT
-    'gender_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.gender_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_person ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_person'
-where ev.gender_source_concept_id = 0
-group by ev.gender_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_person
-SELECT
-    'race_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.race_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_person ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.race_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_person'
-where ev.race_source_concept_id <> 0
-group by ev.race_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_person
-SELECT
-    'race_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.race_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_person ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_person'
-where ev.race_source_concept_id = 0
-group by ev.race_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_person
-SELECT
-    'ethnicity_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.ethnicity_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_person ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.ethnicity_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_person'
-where ev.ethnicity_source_concept_id <> 0
-group by ev.ethnicity_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_person
-SELECT
-    'ethnicity_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.ethnicity_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_person ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_person'
-where ev.ethnicity_source_concept_id = 0
-group by ev.ethnicity_source_value, tt.count
-order by count desc
-limit 100
-;
-
 DROP TABLE IF EXISTS `@metrics_project`.@metrics_dataset.me_top_cdm_death;
 CREATE TABLE `@metrics_project`.@metrics_dataset.me_top_cdm_death
 (
@@ -535,44 +345,6 @@ from `@etl_project`.@etl_dataset.cdm_death ev
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_death'
 where ev.cause_concept_id = 0
-group by ev.cause_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_death
-SELECT
-    'cause_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.cause_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_death ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.cause_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_death'
-where ev.cause_source_concept_id <> 0
-group by ev.cause_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_death
-SELECT
-    'cause_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.cause_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_death ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_death'
-where ev.cause_source_concept_id = 0
 group by ev.cause_source_value, tt.count
 order by count desc
 limit 100
@@ -680,44 +452,6 @@ limit 100
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
 SELECT
-    'payer_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.payer_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.payer_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.payer_source_concept_id <> 0
-group by ev.payer_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
-    'payer_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.payer_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.payer_source_concept_id = 0
-group by ev.payer_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
     'plan_concept_id'     AS concept_field,
     'Mapped'              AS category,
     CAST(ev.plan_source_value AS STRING)  AS source_value,
@@ -749,44 +483,6 @@ from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_payer_plan_period'
 where ev.plan_concept_id = 0
-group by ev.plan_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
-    'plan_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.plan_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.plan_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.plan_source_concept_id <> 0
-group by ev.plan_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
-    'plan_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.plan_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.plan_source_concept_id = 0
 group by ev.plan_source_value, tt.count
 order by count desc
 limit 100
@@ -832,44 +528,6 @@ limit 100
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
 SELECT
-    'sponsor_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.sponsor_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.sponsor_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.sponsor_source_concept_id <> 0
-group by ev.sponsor_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
-    'sponsor_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.sponsor_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.sponsor_source_concept_id = 0
-group by ev.sponsor_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
     'stop_reason_concept_id'     AS concept_field,
     'Mapped'              AS category,
     CAST(ev.stop_reason_source_value AS STRING)  AS source_value,
@@ -901,44 +559,6 @@ from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
 inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_payer_plan_period'
 where ev.stop_reason_concept_id = 0
-group by ev.stop_reason_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
-    'stop_reason_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.stop_reason_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.stop_reason_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.stop_reason_source_concept_id <> 0
-group by ev.stop_reason_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_payer_plan_period
-SELECT
-    'stop_reason_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.stop_reason_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_payer_plan_period'
-where ev.stop_reason_source_concept_id = 0
 group by ev.stop_reason_source_value, tt.count
 order by count desc
 limit 100
@@ -1474,44 +1094,6 @@ order by count desc
 limit 100
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_condition_occurrence
-SELECT
-    'condition_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.condition_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_condition_occurrence ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.condition_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_condition_occurrence'
-where ev.condition_source_concept_id <> 0
-group by ev.condition_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_condition_occurrence
-SELECT
-    'condition_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.condition_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_condition_occurrence ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_condition_occurrence'
-where ev.condition_source_concept_id = 0
-group by ev.condition_source_value, tt.count
-order by count desc
-limit 100
-;
-
 DROP TABLE IF EXISTS `@metrics_project`.@metrics_dataset.me_top_cdm_procedure_occurrence;
 CREATE TABLE `@metrics_project`.@metrics_dataset.me_top_cdm_procedure_occurrence
 (
@@ -1634,44 +1216,6 @@ inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_procedure_occurrence'
 where ev.modifier_concept_id = 0
 group by ev.modifier_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_procedure_occurrence
-SELECT
-    'procedure_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.procedure_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_procedure_occurrence ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.procedure_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_procedure_occurrence'
-where ev.procedure_source_concept_id <> 0
-group by ev.procedure_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_procedure_occurrence
-SELECT
-    'procedure_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.procedure_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_procedure_occurrence ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_procedure_occurrence'
-where ev.procedure_source_concept_id = 0
-group by ev.procedure_source_value, tt.count
 order by count desc
 limit 100
 ;
@@ -1878,44 +1422,6 @@ order by count desc
 limit 100
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_observation
-SELECT
-    'observation_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.observation_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_observation ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.observation_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_observation'
-where ev.observation_source_concept_id <> 0
-group by ev.observation_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_observation
-SELECT
-    'observation_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.observation_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_observation ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_observation'
-where ev.observation_source_concept_id = 0
-group by ev.observation_source_value, tt.count
-order by count desc
-limit 100
-;
-
 DROP TABLE IF EXISTS `@metrics_project`.@metrics_dataset.me_top_cdm_measurement;
 CREATE TABLE `@metrics_project`.@metrics_dataset.me_top_cdm_measurement
 (
@@ -2118,44 +1624,6 @@ order by count desc
 limit 100
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_measurement
-SELECT
-    'measurement_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.measurement_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_measurement ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.measurement_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_measurement'
-where ev.measurement_source_concept_id <> 0
-group by ev.measurement_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_measurement
-SELECT
-    'measurement_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.measurement_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_measurement ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_measurement'
-where ev.measurement_source_concept_id = 0
-group by ev.measurement_source_value, tt.count
-order by count desc
-limit 100
-;
-
 DROP TABLE IF EXISTS `@metrics_project`.@metrics_dataset.me_top_cdm_device_exposure;
 CREATE TABLE `@metrics_project`.@metrics_dataset.me_top_cdm_device_exposure
 (
@@ -2240,44 +1708,6 @@ inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_device_exposure'
 where ev.device_type_concept_id = 0
 group by ev.device_type_concept_id, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_device_exposure
-SELECT
-    'device_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.device_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_device_exposure ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.device_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_device_exposure'
-where ev.device_source_concept_id <> 0
-group by ev.device_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_device_exposure
-SELECT
-    'device_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.device_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_device_exposure ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_device_exposure'
-where ev.device_source_concept_id = 0
-group by ev.device_source_value, tt.count
 order by count desc
 limit 100
 ;
@@ -2404,44 +1834,6 @@ inner join `@metrics_project`.@metrics_dataset.me_total tt
     on tt.table_name = 'cdm_drug_exposure'
 where ev.route_concept_id = 0
 group by ev.route_source_value, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_drug_exposure
-SELECT
-    'drug_source_concept_id'     AS concept_field,
-    'Mapped'              AS category,
-    CAST(ev.drug_source_value AS STRING)  AS source_value,
-    vc.concept_id           AS concept_id,
-    vc.concept_name         AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_drug_exposure ev
-inner join `@etl_project`.@etl_dataset.voc_concept vc
-    on ev.drug_source_concept_id = vc.concept_id
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_drug_exposure'
-where ev.drug_source_concept_id <> 0
-group by ev.drug_source_value, vc.concept_id, vc.concept_name, tt.count
-order by count desc
-limit 100
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_top_cdm_drug_exposure
-SELECT
-    'drug_source_concept_id'      AS concept_field,
-    'Unmapped'            AS category,
-    CAST(ev.drug_source_value AS STRING)  AS source_value,
-    NULL                    AS concept_id,
-    CAST(NULL AS STRING)    AS concept_name,
-    COUNT(*)                AS count,
-    ROUND(CAST(count(*) AS FLOAT64) / tt.count * 100, 2) AS percent
-from `@etl_project`.@etl_dataset.cdm_drug_exposure ev
-inner join `@metrics_project`.@metrics_dataset.me_total tt
-    on tt.table_name = 'cdm_drug_exposure'
-where ev.drug_source_concept_id = 0
-group by ev.drug_source_value, tt.count
 order by count desc
 limit 100
 ;

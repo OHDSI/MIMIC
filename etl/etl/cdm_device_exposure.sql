@@ -6,10 +6,9 @@
 -- Populate cdm_device_exposure table
 -- 
 -- Dependencies: run after 
---      cdm_person.sql,
---      cdm_visit_occurrence,
---      cdm_visit_detail(?)
---      cdm_drug_exposure
+--      lk_drug_prescriptions
+--      cdm_person.sql
+--      cdm_visit_occurrence
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------

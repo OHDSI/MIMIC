@@ -92,66 +92,26 @@ SELECT
     src.load_table_id                 AS load_table_id,
     src.load_row_id                   AS load_row_id,
     src.trace_id                      AS trace_id
-FROM 
+FROM
     `@etl_project`.@etl_dataset.lk_visit_detail_prev_next src
-INNER JOIN 
+INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per 
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis 
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
-LEFT JOIN 
+            CONCAT(CAST(src.subject_id AS STRING), '|', 
+                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+LEFT JOIN
     `@etl_project`.@etl_dataset.cdm_care_site cs
         ON cs.care_site_source_value = src.current_location
-LEFT JOIN 
+LEFT JOIN
     `@etl_project`.@etl_dataset.lk_visit_concept vdc
         ON vdc.source_code = src.current_location
-LEFT JOIN 
+LEFT JOIN
     `@etl_project`.@etl_dataset.lk_visit_concept la 
         ON la.source_code = src.admission_location
-LEFT JOIN 
+LEFT JOIN
     `@etl_project`.@etl_dataset.lk_visit_concept ld
         ON ld.source_code = src.discharge_location
-;
-
--- -------------------------------------------------------------------
--- visit_detail for waveforms
--- -------------------------------------------------------------------
-
-INSERT INTO `@etl_project`.@etl_dataset.cdm_visit_detail
-SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())   AS visit_detail_id,
-    per.person_id                       AS person_id,
-    0                                   AS visit_detail_concept_id, -- to find the applicable
-    CAST(src.start_datetime AS DATE)    AS visit_start_date,
-    src.start_datetime                  AS visit_start_datetime,
-    CAST(src.end_datetime AS DATE)      AS visit_end_date,
-    src.end_datetime                    AS visit_end_datetime,
-    2000000006                          AS visit_detail_type_concept_id,  -- [MIMIC Generated] ward and physical
-    CAST(NULL AS INT64)                 AS provider_id,
-    0                                   AS care_site_id, -- see if there are info in src
-    0                                   AS admitting_source_concept_id,
-    0                                   AS discharge_to_concept_id,
-    CAST(NULL AS INT64)                 AS preceding_visit_detail_id,
-    src.reference_id                    AS visit_detail_source_value,
-    CAST(NULL AS INT64)                 AS visit_detail_source_concept_id,
-    CAST(NULL AS STRING)                AS admitting_source_value,
-    CAST(NULL AS STRING)                AS discharge_to_source_value,
-    CAST(NULL AS INT64)                 AS visit_detail_parent_id,
-    vis.visit_occurrence_id,
-    -- 
-    CONCAT('visit_detail.waveform_header')   AS unit_id,
-    src.load_table_id                 AS load_table_id,
-    src.load_row_id                   AS load_row_id,
-    src.trace_id                      AS trace_id
-FROM
-    `@etl_project`.@etl_dataset.src_waveform_header src
-INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per
-        ON CAST(src.subject_id AS STRING) = per.person_source_value
-INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis 
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 ;

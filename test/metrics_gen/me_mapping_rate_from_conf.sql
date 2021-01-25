@@ -49,32 +49,6 @@ WHERE gender_source_value IS NOT NULL
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
-    'cdm_provider'        AS table_name,
-    'specialty_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN specialty_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(specialty_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_provider ev
-WHERE specialty_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_provider'        AS table_name,
-    'gender_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN gender_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(gender_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_provider ev
-WHERE gender_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
     'cdm_person'        AS table_name,
     'gender_concept_id'     AS concept_field,
     COUNT(CASE WHEN gender_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
@@ -114,45 +88,6 @@ WHERE ethnicity_source_value IS NOT NULL
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
-    'cdm_person'        AS table_name,
-    'gender_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN gender_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(gender_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_person ev
-WHERE gender_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_person'        AS table_name,
-    'race_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN race_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(race_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_person ev
-WHERE race_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_person'        AS table_name,
-    'ethnicity_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN ethnicity_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(ethnicity_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_person ev
-WHERE ethnicity_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
     'cdm_death'        AS table_name,
     'death_type_concept_id'     AS concept_field,
     COUNT(CASE WHEN death_type_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
@@ -171,19 +106,6 @@ SELECT
     COUNT(CASE WHEN cause_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
     IF(COUNT(*) > 0,
         ROUND(CAST(COUNT(IF(cause_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_death ev
-WHERE cause_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_death'        AS table_name,
-    'cause_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN cause_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(cause_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_death ev
@@ -219,36 +141,10 @@ WHERE payer_source_value IS NOT NULL
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
     'cdm_payer_plan_period'        AS table_name,
-    'payer_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN payer_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(payer_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE payer_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_payer_plan_period'        AS table_name,
     'plan_concept_id'     AS concept_field,
     COUNT(CASE WHEN plan_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
     IF(COUNT(*) > 0,
         ROUND(CAST(COUNT(IF(plan_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE plan_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_payer_plan_period'        AS table_name,
-    'plan_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN plan_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(plan_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
@@ -271,36 +167,10 @@ WHERE sponsor_source_value IS NOT NULL
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
     'cdm_payer_plan_period'        AS table_name,
-    'sponsor_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN sponsor_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(sponsor_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE sponsor_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_payer_plan_period'        AS table_name,
     'stop_reason_concept_id'     AS concept_field,
     COUNT(CASE WHEN stop_reason_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
     IF(COUNT(*) > 0,
         ROUND(CAST(COUNT(IF(stop_reason_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE stop_reason_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_payer_plan_period'        AS table_name,
-    'stop_reason_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN stop_reason_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(stop_reason_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
@@ -478,19 +348,6 @@ WHERE condition_status_source_value IS NOT NULL
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
-    'cdm_condition_occurrence'        AS table_name,
-    'condition_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN condition_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(condition_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_condition_occurrence ev
-WHERE condition_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
     'cdm_procedure_occurrence'        AS table_name,
     'procedure_concept_id'     AS concept_field,
     COUNT(CASE WHEN procedure_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
@@ -526,19 +383,6 @@ SELECT
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_procedure_occurrence ev
 WHERE modifier_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_procedure_occurrence'        AS table_name,
-    'procedure_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN procedure_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(procedure_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_procedure_occurrence ev
-WHERE procedure_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -608,19 +452,6 @@ WHERE unit_source_value IS NOT NULL
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
-    'cdm_observation'        AS table_name,
-    'observation_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN observation_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(observation_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_observation ev
-WHERE observation_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
     'cdm_measurement'        AS table_name,
     'measurement_concept_id'     AS concept_field,
     COUNT(CASE WHEN measurement_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
@@ -686,19 +517,6 @@ WHERE unit_source_value IS NOT NULL
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
 SELECT
-    'cdm_measurement'        AS table_name,
-    'measurement_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN measurement_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(measurement_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_measurement ev
-WHERE measurement_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
     'cdm_device_exposure'        AS table_name,
     'device_concept_id'     AS concept_field,
     COUNT(CASE WHEN device_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
@@ -721,19 +539,6 @@ SELECT
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_device_exposure ev
 WHERE device_type_concept_id IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_device_exposure'        AS table_name,
-    'device_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN device_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(device_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_device_exposure ev
-WHERE device_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -773,19 +578,6 @@ SELECT
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_drug_exposure ev
 WHERE route_source_value IS NOT NULL
-;
-
-INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
-SELECT
-    'cdm_drug_exposure'        AS table_name,
-    'drug_source_concept_id'     AS concept_field,
-    COUNT(CASE WHEN drug_source_concept_id > 0 THEN 1 ELSE NULL END)      AS count,
-    IF(COUNT(*) > 0,
-        ROUND(CAST(COUNT(IF(drug_source_concept_id > 0, 1, NULL)) AS FLOAT64) / COUNT(*) * 100, 2),
-        0)    AS percent,
-    COUNT(*)                AS total
-FROM `@etl_project`.@etl_dataset.cdm_drug_exposure ev
-WHERE drug_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate

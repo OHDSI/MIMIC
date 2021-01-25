@@ -84,6 +84,8 @@ SELECT
     'transfers'                         AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
         transfer_id AS transfer_id
     ))                                  AS trace_id
 FROM

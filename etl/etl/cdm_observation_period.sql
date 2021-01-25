@@ -97,6 +97,18 @@ GROUP BY
 INSERT INTO `@etl_project`.@etl_dataset.tmp_observation_period_clean
 SELECT
     src.person_id               AS person_id,
+    MIN(src.specimen_date)   AS start_date,
+    MAX(src.specimen_date)     AS end_date,
+    src.unit_id                 AS unit_id
+FROM
+    `@etl_project`.@etl_dataset.cdm_specimen src
+GROUP BY
+    src.person_id, src.unit_id
+;
+
+INSERT INTO `@etl_project`.@etl_dataset.tmp_observation_period_clean
+SELECT
+    src.person_id               AS person_id,
     MIN(src.observation_date)   AS start_date,
     MAX(src.observation_date)     AS end_date,
     src.unit_id                 AS unit_id

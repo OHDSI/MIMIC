@@ -70,38 +70,8 @@ WHERE r.relationship_id = rel.relationship_id
 ;
 
 -- What is check_id = 4?
-
+-- Skip check_id = 5, since its result is part of check_id = 12 (map to non-standard)
 --wrong relationships: 'Maps to' to 'D' or 'U' or replacement relationships to 'D'
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_5;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_5
-AS
-SELECT 
-    5 check_id, 'wrong relationships: Maps to TO "D" OR "U" or replacement relationships TO "D"' AS check_name,
-    r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept c2,
-    `@bq_target_project.@bq_target_dataset`.concept_relationship r
-WHERE c2.concept_id = r.concept_id_2
-    AND (
-        (
-            c2.invalid_reason IN (
-                'D',
-                'U'
-                )
-            AND r.relationship_id = 'Maps to'
-            )
-        OR (
-            c2.invalid_reason = 'D'
-            AND r.relationship_id IN (
-                'Concept replaced by',
-                'Concept same_as to',
-                'Concept alt_to to',
-                'Concept poss_eq to',
-                'Concept was_a to'
-                )
-            )
-        )
-    AND r.invalid_reason IS NULL
-;
 
 
 --direct and reverse mappings are not same
@@ -369,9 +339,6 @@ SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_
     GROUP BY check_id, check_name
 UNION ALL
 SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_3
-    GROUP BY check_id, check_name
-UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_5
     GROUP BY check_id, check_name
 UNION ALL
 SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_6

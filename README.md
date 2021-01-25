@@ -31,6 +31,13 @@
 ### Change Log (latest first) ###
 
 
+**2021-01-25**
+
+* Mapping improvement
+* New visit logic for measurement (picking visits by event datetime)
+* Bugfixes
+
+
 **2021-01-13**
 
 * Export and import python scripts:

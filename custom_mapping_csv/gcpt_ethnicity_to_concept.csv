@@ -1,9 +1,0 @@
-concept_name,source_concept_id,source_vocabulary_id,source_domain_id,source_concept_class_id,standard_concept,concept_code,valid_start_date,valid_end_date,invalid_reason,target_concept_id,relationship_id,reverese_relationship_id,relationship_valid_start_date,relationship_end_date,invalid_reason_cr
-UNKNOWN,2000001401,mimiciv_per_ethnicity,Race,Race,,UNKNOWN,1970-01-01,2099-12-31,,4218674,Maps to,Mapped from,1970-01-01,2099-12-31,
-OTHER,2000001402,mimiciv_per_ethnicity,Race,Race,,OTHER,1970-01-01,2099-12-31,,4087921,Maps to,Mapped from,1970-01-01,2099-12-31,
-ASIAN,2000001403,mimiciv_per_ethnicity,Race,Race,,ASIAN,1970-01-01,2099-12-31,,8515,Maps to,Mapped from,1970-01-01,2099-12-31,
-WHITE,2000001404,mimiciv_per_ethnicity,Race,Race,,WHITE,1970-01-01,2099-12-31,,8527,Maps to,Mapped from,1970-01-01,2099-12-31,
-UNABLE TO OBTAIN,2000001405,mimiciv_per_ethnicity,Race,Race,,UNABLE TO OBTAIN,1970-01-01,2099-12-31,,0,Maps to,Mapped from,1970-01-01,2099-12-31,
-BLACK/AFRICAN AMERICAN,2000001406,mimiciv_per_ethnicity,Race,Race,,BLACK/AFRICAN AMERICAN,1970-01-01,2099-12-31,,8516,Maps to,Mapped from,1970-01-01,2099-12-31,
-AMERICAN INDIAN/ALASKA NATIVE,2000001407,mimiciv_per_ethnicity,Race,Race,,AMERICAN INDIAN/ALASKA NATIVE,1970-01-01,2099-12-31,,8657,Maps to,Mapped from,1970-01-01,2099-12-31,
-HISPANIC/LATINO,2000001408,mimiciv_per_ethnicity,Ethnicity,Ethnicity,,HISPANIC/LATINO,1970-01-01,2099-12-31,,38003563,Maps to,Mapped from,1970-01-01,2099-12-31,

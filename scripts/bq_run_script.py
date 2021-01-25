@@ -186,6 +186,7 @@ def nice_message(s_filename, status, msg):
 def main():
 
     rc = 0
+    duration = datetime.datetime.now()
     params = read_params()
     config = read_config(params['etlconf_file'], params['config_file'])
 
@@ -228,7 +229,9 @@ def main():
         print('\nScripts executed:')
         for a in s_done:
             print(a)
-
+        duration = datetime.datetime.now() - duration
+        print('Run time: {0}'.format(duration)) # timedelta HH:MM:SS.f
+        
     return rc
 
 
@@ -240,4 +243,4 @@ return_code = main()
 print('bq_run_script.exit()', return_code)
 exit(return_code)
 
-# last edit: 2020-12-02
+# last edit: 2021-01-20

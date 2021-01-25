@@ -9,8 +9,9 @@
 -- 
 -- Dependencies: run after 
 --      st_core.sql,
---      cdm_person.sql,
---      cdm_visit_occurrence
+--      st_hosp.sql,
+--      lk_vis_part_1.sql,
+--      lk_meas_unit.sql
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -41,7 +42,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_labevents_clean AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
     src.subject_id                          AS subject_id,
-    src.charttime                           AS charttime, -- measurement_datetime,
+    src.charttime                           AS start_datetime, -- measurement_datetime,
     src.hadm_id                             AS hadm_id,
     src.itemid                              AS itemid, -- dlab.itemid
     src.value                               AS value, -- value_source_value
@@ -103,47 +104,27 @@ LEFT JOIN
 ;
 
 -- -------------------------------------------------------------------
--- lk_meas_operator_concept
--- open point: operators are usually just hard-coded
+-- lk_meas_labevents_hadm_id
+-- pick additional hadm_id by event start_datetime
+-- row_num is added to select the earliest if more than one hadm_ids are found
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_operator_concept AS
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_labevents_hadm_id AS
 SELECT
-    vc.concept_name     AS source_code, -- operator_name,
-    vc.concept_id       AS target_concept_id -- operator_concept_id
-FROM
-    `@etl_project`.@etl_dataset.voc_concept vc
+    src.trace_id                        AS event_trace_id, 
+    adm.hadm_id                         AS hadm_id,
+    ROW_NUMBER() OVER (
+        PARTITION BY src.trace_id
+        ORDER BY adm.start_datetime
+    )                                   AS row_num
+FROM  
+    `@etl_project`.@etl_dataset.lk_meas_labevents_clean src
+INNER JOIN 
+    `@etl_project`.@etl_dataset.lk_admissions_clean adm
+        ON adm.subject_id = src.subject_id
+        AND src.start_datetime BETWEEN adm.start_datetime AND adm.end_datetime
 WHERE
-    vc.domain_id = 'Meas Value Operator'
-;
-
--- -------------------------------------------------------------------
--- lk_meas_unit_concept
--- -------------------------------------------------------------------
-
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_unit_concept AS
-SELECT
-    vc.concept_code         AS source_code,
-    vc.vocabulary_id        AS source_vocabulary_id,
-    vc.domain_id            AS source_domain_id,
-    vc.concept_id           AS source_concept_id,
-    vc2.domain_id           AS target_domain_id,
-    vc2.concept_id          AS target_concept_id
-FROM
-    `@etl_project`.@etl_dataset.voc_concept vc
-LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
-        ON  vc.concept_id = vcr.concept_id_1
-        AND vcr.relationship_id = 'Maps to'
-LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
-        ON vc2.concept_id = vcr.concept_id_2
-        AND vc2.standard_concept = 'S'
-        AND vc2.invalid_reason IS NULL
-WHERE
-    -- gcpt_lab_unit_to_concept -> mimiciv_meas_unit
-    vc.vocabulary_id IN ('UCUM', 'mimiciv_meas_unit')
-    AND vc.domain_id = 'Unit'
+    src.hadm_id IS NULL
 ;
 
 -- -------------------------------------------------------------------
@@ -157,10 +138,11 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_labevents_mapped AS
 SELECT
     src.measurement_id                      AS measurement_id,
     src.subject_id                          AS subject_id,
-    src.hadm_id                             AS hadm_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)     AS hadm_id,
+    CAST(src.start_datetime AS DATE)        AS date_id,
     COALESCE(labc.target_concept_id, 0)     AS target_concept_id,
     COALESCE(labc.target_domain_id, labc.source_domain_id, 'Measurement')  AS target_domain_id,
-    src.charttime                           AS start_datetime,
+    src.start_datetime                      AS start_datetime,
     labc.category                           AS category,
     opc.target_concept_id                   AS operator_concept_id,
     src.value_number                        AS value_as_number,
@@ -190,4 +172,8 @@ LEFT JOIN
 LEFT JOIN 
     `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
         ON uc.source_code = src.valueuom
+LEFT JOIN 
+    `@etl_project`.@etl_dataset.lk_meas_labevents_hadm_id hadm
+        ON hadm.event_trace_id = src.trace_id
+        AND hadm.row_num = 1
 ;

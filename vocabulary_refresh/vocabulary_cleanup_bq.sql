@@ -14,7 +14,6 @@
 DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_1;
 DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_2;
 DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_3;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_5;
 DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_6;
 DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_7;
 DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_8;

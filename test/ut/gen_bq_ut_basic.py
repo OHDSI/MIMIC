@@ -41,7 +41,8 @@ config_default = {
                 {
                     "source_field": "death_date",
                     "fk_table": "`@source_project`.@core_dataset.admissions",
-                    "fk_field": "deathtime"
+                    "fk_field": "deathtime",
+                    "inactive_status": "any text helping you to remember why"
                 }
             ]
         }
@@ -186,15 +187,18 @@ def generate_unique_test(table_config, config):
     if test_list != None:
         for tst in test_list:
             print(tst)
-            result_queries = result_queries + "\n" + \
-                q_template.format(
-                    metrics_project = config['metrics_project'],
-                    metrics_dataset = config['metrics_dataset'],
-                    etl_project   = config['etl_project'],
-                    etl_dataset   = config['etl_dataset'],
-                    table_name    = table_config['table'].replace(config['cdm_prefix'], ''),
-                    source_field  = tst['source_field']
-                )
+    
+            if tst.get('inactive_status') == None:
+
+                result_queries = result_queries + "\n" + \
+                    q_template.format(
+                        metrics_project = config['metrics_project'],
+                        metrics_dataset = config['metrics_dataset'],
+                        etl_project   = config['etl_project'],
+                        etl_dataset   = config['etl_dataset'],
+                        table_name    = table_config['table'].replace(config['cdm_prefix'], ''),
+                        source_field  = tst['source_field']
+                    )
 
     return result_queries 
 
@@ -239,20 +243,22 @@ def generate_fk_test(table_config, config):
         for tst in test_list:
             print(tst)
 
-            uic = q_by_unit.format(unit_id=tst['unit_id']) if tst.get('unit_id') != None else ''
-            
-            result_queries = result_queries + \
-                q_template.format(
-                    metrics_project = config['metrics_project'],
-                    metrics_dataset = config['metrics_dataset'],
-                    etl_project   = config['etl_project'],
-                    etl_dataset   = config['etl_dataset'],
-                    table_name    = table_config['table'].replace(config['cdm_prefix'], ''),
-                    source_field  = tst['source_field'],
-                    fk_table      = tst['fk_table'],
-                    fk_field      = tst['fk_field'],
-                    unit_id_clause = uic
-                )
+            if tst.get('inactive_status') == None:
+
+                uic = q_by_unit.format(unit_id=tst['unit_id']) if tst.get('unit_id') != None else ''
+                
+                result_queries = result_queries + \
+                    q_template.format(
+                        metrics_project = config['metrics_project'],
+                        metrics_dataset = config['metrics_dataset'],
+                        etl_project   = config['etl_project'],
+                        etl_dataset   = config['etl_dataset'],
+                        table_name    = table_config['table'].replace(config['cdm_prefix'], ''),
+                        source_field  = tst['source_field'],
+                        fk_table      = tst['fk_table'],
+                        fk_field      = tst['fk_field'],
+                        unit_id_clause = uic
+                    )
 
     return result_queries 
 

@@ -11,7 +11,7 @@
 --      st_core.sql,
 --      st_hosp.sql,
 --      st_icu.sql,
---      lk_meas_labevents (for unit mapping)
+--      lk_meas_units
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -69,7 +69,6 @@ WHERE
 -- lk_chartevents_concept
 -- brand new custom vocabulary -> mimiciv_meas_chart
 -- brand new custom vocabulary -> mimiciv_meas_chartevents_value
--- brand new custom vocabulary -> mimiciv_cond_chartevents_value
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_chartevents_concept AS
@@ -94,8 +93,7 @@ LEFT JOIN
 WHERE
     vc.vocabulary_id IN (
         'mimiciv_meas_chart',
-        'mimiciv_meas_chartevents_value',
-        'mimiciv_cond_chartevents_value'
+        'mimiciv_meas_chartevents_value' -- both obs values and conditions
     )
 ;
 
@@ -140,6 +138,7 @@ LEFT JOIN
     `@etl_project`.@etl_dataset.lk_chartevents_concept c_value -- values for main
         ON c_value.source_code = src.value
         AND c_value.source_vocabulary_id = 'mimiciv_meas_chartevents_value'
+        AND c_value.target_domain_id = 'Observation'
 LEFT JOIN 
     `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
         ON uc.source_code = src.valueuom
@@ -171,6 +170,7 @@ FROM
 INNER JOIN
     `@etl_project`.@etl_dataset.lk_chartevents_concept c_main -- condition domain from values, mapped
         ON c_main.source_code = src.value
-        AND c_main.source_vocabulary_id = 'mimiciv_cond_chartevents_value'
+        AND c_main.source_vocabulary_id = 'mimiciv_meas_chartevents_value'
+        AND c_main.target_domain_id = 'Condition'
 ;
 

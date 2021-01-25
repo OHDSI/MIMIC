@@ -6,9 +6,6 @@
 -- Populate cdm_measurement table
 -- 
 -- Dependencies: run after 
---      st_core.sql,
---      st_hosp.sql,
---      st_icu.sql, (rule 2)
 --      cdm_person.sql,
 --      cdm_visit_occurrence,
 --      cdm_visit_detail,
@@ -104,7 +101,8 @@ INNER JOIN
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis -- 116,559
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', 
+                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
 WHERE
     src.target_domain_id = 'Measurement' -- 115,272
 ;
@@ -192,9 +190,10 @@ INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
+    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis -- 116,559
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', 
+                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
 WHERE
     src.target_domain_id = 'Measurement'
 ;
@@ -237,9 +236,10 @@ INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
+    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis -- 116,559
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', 
+                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
 WHERE
     src.target_domain_id = 'Measurement'
 ;
@@ -266,9 +266,9 @@ SELECT
     CAST(NULL AS FLOAT64)                   AS range_low,
     CAST(NULL AS FLOAT64)                   AS range_high,
     CAST(NULL AS INT64)                     AS provider_id,
-    vis.visit_occurrence_id                 AS visit_occurrence_id,
+    vd.visit_occurrence_id                  AS visit_occurrence_id,
     vd.visit_detail_id                      AS visit_detail_id,
-    CONCAT(src.reference_id, '|', src.source_code)  AS measurement_source_value, 
+    CONCAT(src.source_code)                 AS measurement_source_value,  -- source value is changed
     src.source_concept_id                           AS measurement_source_concept_id,
     src.unit_source_value                   AS unit_source_value,
     CAST(src.value_as_number AS STRING)     AS value_source_value, -- ?
@@ -283,12 +283,8 @@ INNER JOIN
     `@etl_project`.@etl_dataset.cdm_person per 
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis 
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
-LEFT JOIN
     `@etl_project`.@etl_dataset.cdm_visit_detail vd 
-        ON src.reference_id = vd.visit_detail_source_value -- mandatory or not?
+        ON src.reference_id = vd.visit_detail_source_value
 WHERE
     src.target_domain_id = 'Measurement'
 ;

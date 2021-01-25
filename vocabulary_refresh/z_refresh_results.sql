@@ -103,17 +103,58 @@ ORDER BY c.vocabulary_id
 |       12 | wrong relationships: Maps to/Maps to value not to S                      |        38 |
 +----------+--------------------------------------------------------------------------+-----------+
 
-SELECT 
+-- -----------------------------------------------------------------------------------
+-- 2021-01-20
+-- Load custom mapping added by comments in DQD error report
+-- -----------------------------------------------------------------------------------
+
++----------+--------------------------------------------------------------------------+-----------+
+| check_id |                                check_name                                | row_count |
++----------+--------------------------------------------------------------------------+-----------+
+|        5 | wrong relationships: Maps to TO D OR U or replacement relationships TO D |        57 | +28
+|        7 | wrong valid_start_date, valid_end_date or invalid_reason for the concept |      4271 |
+|       12 | wrong relationships: Maps to/Maps to value not to S                      |        73 | +35
++----------+--------------------------------------------------------------------------+-----------+
+
+-- -----------------------------------------------------------------------------------
+-- 2021-01-21
+-- Fix and load again: custom mapping added by comments in DQD error report
+-- -----------------------------------------------------------------------------------
+
++----------+--------------------------------------------------------------------------+-----------+
+| check_id |                                check_name                                | row_count |
++----------+--------------------------------------------------------------------------+-----------+
+|        5 | wrong relationships: Maps to TO D OR U or replacement relationships TO D |        28 | -1
+|        7 | wrong valid_start_date, valid_end_date or invalid_reason for the concept |      4271 |
+|       12 | wrong relationships: Maps to/Maps to value not to S                      |        36 | -2
++----------+--------------------------------------------------------------------------+-----------+
+
+-- -----------------------------------------------------------------------------------
+-- 2021-01-25
+-- Re-mapped by comments in DQD error report
+-- -----------------------------------------------------------------------------------
+
++----------+--------------------------------------------------------------------------+-----------+
+| check_id |                                check_name                                | row_count |
++----------+--------------------------------------------------------------------------+-----------+
+|        7 | wrong valid_start_date, valid_end_date or invalid_reason for the concept |      4271 |
++----------+--------------------------------------------------------------------------+-----------+
+
+
+-- -----------------------------------------------------------------------------------
+
+SELECT DISTINCT
     12 check_id,
     'wrong relationships: "Maps to"/"Maps to value" not to "S"' AS check_name,
-    c1.concept_id AS source_concept_id,
     c1.vocabulary_id AS source_vocabulary_id,
+    c1.concept_id AS source_concept_id,
     c1.concept_code AS source_concept_code,
-    c1.concept_name AS source_concept_name,
+    r.relationship_id AS relationship_id,
     c2.concept_id AS target_concept_id,
-    c2.vocabulary_id AS target_vocabulary_id,
     c2.concept_code AS target_concept_code,
-    c2.concept_name AS target_concept_name
+    c2.concept_name AS target_concept_name,
+    c2.invalid_reason AS target_invalid_reason,
+    c2.valid_end_date AS target_valid_end_date
 FROM 
     `odysseus-mimic-dev`.vocabulary_2020_09_11.concept c1,
     `odysseus-mimic-dev`.vocabulary_2020_09_11.concept c2,

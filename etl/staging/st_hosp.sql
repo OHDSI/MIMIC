@@ -60,6 +60,7 @@ SELECT
     'services'                          AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
         hadm_id AS hadm_id,
         transfertime AS transfertime
     ))                                  AS trace_id
@@ -73,6 +74,7 @@ FROM
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_labevents AS
 SELECT
+    labevent_id                         AS labevent_id,
     subject_id                          AS subject_id,
     charttime                           AS charttime,
     hadm_id                             AS hadm_id,
@@ -86,8 +88,7 @@ SELECT
     'labevents'                         AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        hadm_id AS hadm_id,
-        charttime AS charttime
+        labevent_id AS labevent_id
     ))                                  AS trace_id
 FROM
     `@source_project`.@hosp_dataset.labevents
@@ -133,6 +134,7 @@ SELECT
     'procedures_icd'                    AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
         hadm_id AS hadm_id,
         icd_code AS icd_code,
         icd_version AS icd_version
@@ -156,6 +158,7 @@ SELECT
     'hcpcsevents'                       AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
         hadm_id AS hadm_id,
         hcpcs_cd AS hcpcs_cd,
         seq_num AS seq_num
@@ -179,6 +182,7 @@ SELECT
     'drgcodes'                       AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
         hadm_id AS hadm_id,
         COALESCE(drg_code, '') AS drg_code
     ))                                  AS trace_id -- this set of fields is not unique.
@@ -213,8 +217,11 @@ SELECT
     'prescriptions'                     AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        pharmacy_id AS pharmacy_id
-    ))                                  AS trace_id -- this set of fields is not unique.
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
+        pharmacy_id AS pharmacy_id,
+        starttime AS starttime
+    ))                                  AS trace_id
 FROM
     `@source_project`.@hosp_dataset.prescriptions
 ;
@@ -246,6 +253,8 @@ SELECT
     'microbiologyevents'                AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
         microevent_id AS microevent_id
     ))                                  AS trace_id
 FROM

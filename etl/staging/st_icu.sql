@@ -31,6 +31,7 @@ SELECT
     'procedureevents'                   AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
         hadm_id AS hadm_id,
         starttime AS starttime
     ))                                  AS trace_id
@@ -80,6 +81,8 @@ SELECT
     'datetimeevents'                    AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
@@ -102,6 +105,8 @@ SELECT
     'chartevents'                       AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
