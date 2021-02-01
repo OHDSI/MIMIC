@@ -262,6 +262,54 @@ def generate_fk_test(table_config, config):
 
     return result_queries 
 
+''' 
+----------------------------------------------------
+    generate_required_test()
+    returns test query for the given table
+----------------------------------------------------
+'''
+def generate_required_test(table_config, config):
+
+    q_template = "\n" + \
+        "-- -------------------------------------------------------------------\n" + \
+        "-- required\n" + \
+        "-- -------------------------------------------------------------------\n" + \
+        "\n" + \
+        "INSERT INTO `{metrics_project}`.{metrics_dataset}.report_unit_test\n" + \
+        "SELECT\n" + \
+        "    CAST(NULL AS STRING)                AS report_id,\n" + \
+        "    FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS\n" + \
+        "    'cdm_{table_name}'          AS table_id,\n" + \
+        "    'required'                            AS test_type, -- unique, not null, concept etc.\n" + \
+        "    '{source_field}'            AS field_name,\n" + \
+        "    CAST(NULL AS STRING)                AS criteria_json,\n" + \
+        "    (COUNT(*) - COUNT({source_field}) = 0) AS test_passed\n" + \
+        "FROM\n" + \
+        "    `{etl_project}`.{etl_dataset}.cdm_{table_name}\n" + \
+        ";\n"
+
+
+    result_queries = ""
+    test_list = table_config.get('required')
+    if test_list != None:
+        for tst in test_list:
+            print(tst)
+    
+            if tst.get('inactive_status') == None:
+
+                result_queries = result_queries + "\n" + \
+                    q_template.format(
+                        metrics_project = config['metrics_project'],
+                        metrics_dataset = config['metrics_dataset'],
+                        etl_project   = config['etl_project'],
+                        etl_dataset   = config['etl_dataset'],
+                        table_name    = table_config['table'].replace(config['cdm_prefix'], ''),
+                        source_field  = tst['source_field']
+                    )
+
+    return result_queries 
+
+
 
 ''' 
 ----------------------------------------------------
@@ -278,6 +326,7 @@ def generate_queries(header, config):
         s_queries.append(q_header.format(header=t['table']))
         s_queries.append(generate_unique_test(t, config))
         s_queries.append(generate_fk_test(t, config))
+        s_queries.append(generate_required_test(t, config))
 
     return s_queries
 

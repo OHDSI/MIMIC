@@ -33,6 +33,13 @@
 
 ### Change Log (latest first) ###
 
+
+**2021-01-26**
+
+* generate_required_test() function is added
+* inactivation flag for fields is added (see .conf)
+
+
 **2021-01-19**
 
 * This README is created

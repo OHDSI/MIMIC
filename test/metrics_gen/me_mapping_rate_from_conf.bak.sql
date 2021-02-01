@@ -18,7 +18,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_care_site ev
-WHERE place_of_service_concept_id IS NOT NULL
+WHERE place_of_service_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -31,7 +31,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_provider ev
-WHERE specialty_concept_id IS NOT NULL
+WHERE specialty_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -44,7 +44,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_provider ev
-WHERE gender_concept_id IS NOT NULL
+WHERE gender_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -57,7 +57,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_person ev
-WHERE gender_concept_id IS NOT NULL
+WHERE gender_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -70,7 +70,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_person ev
-WHERE race_concept_id IS NOT NULL
+WHERE race_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -83,7 +83,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_person ev
-WHERE ethnicity_concept_id IS NOT NULL
+WHERE ethnicity_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -109,7 +109,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_death ev
-WHERE cause_concept_id IS NOT NULL
+WHERE cause_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -135,7 +135,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE payer_concept_id IS NOT NULL
+WHERE payer_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -148,7 +148,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE plan_concept_id IS NOT NULL
+WHERE plan_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -161,7 +161,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE sponsor_concept_id IS NOT NULL
+WHERE sponsor_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -174,7 +174,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period ev
-WHERE stop_reason_concept_id IS NOT NULL
+WHERE stop_reason_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -226,7 +226,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_visit_occurrence ev
-WHERE admitting_source_concept_id IS NOT NULL
+WHERE admitting_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -239,7 +239,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_visit_occurrence ev
-WHERE discharge_to_concept_id IS NOT NULL
+WHERE discharge_to_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -291,7 +291,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_visit_detail ev
-WHERE admitting_source_concept_id IS NOT NULL
+WHERE admitting_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -304,7 +304,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_visit_detail ev
-WHERE discharge_to_concept_id IS NOT NULL
+WHERE discharge_to_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -317,7 +317,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_condition_occurrence ev
-WHERE condition_concept_id IS NOT NULL
+WHERE condition_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -343,7 +343,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_condition_occurrence ev
-WHERE condition_status_concept_id IS NOT NULL
+WHERE condition_status_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -356,7 +356,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_procedure_occurrence ev
-WHERE procedure_concept_id IS NOT NULL
+WHERE procedure_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -382,7 +382,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_procedure_occurrence ev
-WHERE modifier_concept_id IS NOT NULL
+WHERE modifier_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -395,7 +395,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_observation ev
-WHERE observation_concept_id IS NOT NULL
+WHERE observation_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -421,7 +421,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_observation ev
-WHERE value_as_concept_id IS NOT NULL
+WHERE value_as_string IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -434,7 +434,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_observation ev
-WHERE qualifier_concept_id IS NOT NULL
+WHERE qualifier_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -447,7 +447,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_observation ev
-WHERE unit_concept_id IS NOT NULL
+WHERE unit_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -460,7 +460,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_measurement ev
-WHERE measurement_concept_id IS NOT NULL
+WHERE measurement_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -499,7 +499,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_measurement ev
-WHERE value_as_concept_id IS NOT NULL
+WHERE value_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -512,7 +512,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_measurement ev
-WHERE unit_concept_id IS NOT NULL
+WHERE unit_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -525,7 +525,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_device_exposure ev
-WHERE device_concept_id IS NOT NULL
+WHERE device_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -551,7 +551,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_drug_exposure ev
-WHERE drug_concept_id IS NOT NULL
+WHERE drug_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -577,7 +577,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_drug_exposure ev
-WHERE route_concept_id IS NOT NULL
+WHERE route_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -616,7 +616,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_cost ev
-WHERE revenue_code_concept_id IS NOT NULL
+WHERE revenue_code_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -629,7 +629,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_cost ev
-WHERE drg_concept_id IS NOT NULL
+WHERE drg_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -694,7 +694,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_specimen ev
-WHERE specimen_concept_id IS NOT NULL
+WHERE specimen_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -720,7 +720,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_specimen ev
-WHERE unit_concept_id IS NOT NULL
+WHERE unit_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -733,7 +733,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_specimen ev
-WHERE anatomic_site_concept_id IS NOT NULL
+WHERE anatomic_site_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate
@@ -746,7 +746,7 @@ SELECT
         0)    AS percent,
     COUNT(*)                AS total
 FROM `@etl_project`.@etl_dataset.cdm_specimen ev
-WHERE disease_status_concept_id IS NOT NULL
+WHERE disease_status_source_value IS NOT NULL
 ;
 
 INSERT INTO `@metrics_project`.@metrics_dataset.me_mapping_rate

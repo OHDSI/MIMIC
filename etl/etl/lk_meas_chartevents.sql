@@ -138,7 +138,7 @@ LEFT JOIN
     `@etl_project`.@etl_dataset.lk_chartevents_concept c_value -- values for main
         ON c_value.source_code = src.value
         AND c_value.source_vocabulary_id = 'mimiciv_meas_chartevents_value'
-        AND c_value.target_domain_id = 'Observation'
+        AND c_value.target_domain_id = 'Meas Value'
 LEFT JOIN 
     `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
         ON uc.source_code = src.valueuom

@@ -83,8 +83,10 @@ bq_mapping_rate_insert = \
     '        0)    AS percent,\n' + \
     '    COUNT(*)                AS total\n' + \
     'FROM {omop_db}.{omop_prefix}{omop_table} ev\n' + \
-    'WHERE {source_value_field} IS NOT NULL\n' + \
+    'WHERE {concept_field} IS NOT NULL\n' + \
     ';\n\n'
+# to calculate value_as_concept_id etc MR right, consider only not null concept_id
+#    'WHERE {source_value_field} IS NOT NULL\n' + \
 
 # # with totals_table
 # bq_mapping_rate_insert = \

@@ -7,7 +7,7 @@
 -- Populate lookups for cdm_measurement table
 -- Rule 10 waveforms
 -- Dependencies: run after 
---      st_waveform.sql,
+--      st_waveform_poc2.sql,
 --      lk_meas_unit_concept
 -- -------------------------------------------------------------------
 
@@ -100,7 +100,10 @@ SELECT
     FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
     wh.subject_id                           AS subject_id,
     hadm.hadm_id                            AS hadm_id,     -- get hadm_id by datetime period
-    src.reference_id                        AS reference_id,
+    CONCAT(
+        src.reference_id, '.', src.segment_name,
+        '.', src.source_code
+    )                                       AS reference_id, -- add segment name and source code to make the field unique
     COALESCE(vc2.concept_id, 0)             AS target_concept_id,
     COALESCE(vc2.domain_id, 'Measurement')  AS target_domain_id,
     src.mx_datetime                         AS start_datetime,
@@ -129,7 +132,7 @@ LEFT JOIN
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc1
         ON vc1.concept_code = src.source_code
-        AND vc1.vocabulary_id = 'mimiciv_meas_waveform_code'
+        AND vc1.vocabulary_id = 'mimiciv_meas_wf'
             -- supposing that the standard mapping is supplemented with custom concepts for waveform specific values
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vr

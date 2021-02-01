@@ -53,6 +53,7 @@ SELECT
         src.drug, '')
         || ' ' || COALESCE(src.prod_strength, '')               AS gcpt_source_code,
     'mimiciv_drug_ndc'                                          AS gcpt_source_vocabulary, -- source_code = label
+    src.pharmacy_id                                             AS pharmacy_id,
     -- 
     'prescriptions'                 AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -173,6 +174,7 @@ SELECT
     src.route_source_code                                               AS route_source_code,
     src.dose_unit_source_code                       AS dose_unit_source_code,
     src.form_val_disp                               AS quantity_source_value,
+    src.pharmacy_id                                 AS pharmacy_id, -- to investigate pharmacy.medication
     -- 
     CONCAT('drug.', src.unit_id)    AS unit_id,
     src.load_table_id               AS load_table_id,

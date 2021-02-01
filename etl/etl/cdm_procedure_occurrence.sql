@@ -89,7 +89,7 @@ WHERE
 
 -- -------------------------------------------------------------------
 -- Rule 5
--- lk_observation_mapped
+-- lk_observation_mapped, possible DRG codes
 -- -------------------------------------------------------------------
 
 INSERT INTO `@etl_project`.@etl_dataset.cdm_procedure_occurrence

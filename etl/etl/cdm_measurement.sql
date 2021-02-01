@@ -24,7 +24,6 @@
 -- src_labevents.value: 
 --      investigate if there are formatted values with thousand separators,
 --      and if we need to use more complicated parsing.
---      see `@etl_project`.@etl_dataset.an_labevents_full
 -- -------------------------------------------------------------------
 
 
@@ -261,7 +260,7 @@ SELECT
     44807951                            AS measurement_type_concept_id, -- ECG - electrocardiograph -- ???
     CAST(NULL AS INT64)                     AS operator_concept_id,
     src.value_as_number                     AS value_as_number,
-    CAST(NULL AS INT64)                     AS value_as_concept_id,
+    CAST(NULL AS INT64)                     AS value_as_concept_id, -- to add values
     src.unit_concept_id                     AS unit_concept_id,
     CAST(NULL AS FLOAT64)                   AS range_low,
     CAST(NULL AS FLOAT64)                   AS range_high,

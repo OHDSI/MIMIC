@@ -31,6 +31,12 @@
 ### Change Log (latest first) ###
 
 
+**2021-02-01**
+
+* Waveforms POC-2 (load from folders tree and csv files)
+* Bugfixes
+
+
 **2021-01-25**
 
 * Mapping improvement
