@@ -22,7 +22,9 @@
         "@metrics_dataset": "mimiciv_demo_metrics_2021_01_20",
 
         "@atlas_project": "odysseus-mimic-dev",
-        "@atlas_dataset": "mimiciv_demo_202101_cdm_531"
+        "@atlas_dataset": "mimiciv_demo_202101_cdm_531",
+
+        "@waveforms_csv_path":  "gs://mimic_iv_to_omop/waveforms/source_data/csv"
 
     },
 
