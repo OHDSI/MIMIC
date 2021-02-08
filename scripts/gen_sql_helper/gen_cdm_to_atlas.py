@@ -7,11 +7,10 @@ import sys
 import getopt
 import json
 import re
-# import bq_run_script
 
 # ----------------------------------------------------
 '''
-    python gen_bq_cdm_to_atlas.py
+    python gen_cdm_to_atlas.py
     To create config file, copy the config_default content to a .conf file and set the desired values
     ATLAS dataset name template: name_dateref_cdm_version (i.e. synpuf_2018q3_cdm_53)
 '''
@@ -19,19 +18,21 @@ import re
 
 config_default = {
 
-    "bq_cdm_project":           "a_project",
-    "bq_cdm_dataset":           "a_dataset",
+    "bq_cdm_project":           "@etl_project",
+    "bq_cdm_dataset":           "@etl_dataset",
 
-    "bq_atlas_project":         "a_project",
-    "bq_atlas_dataset":         "name_dateref_cdm_version",
+    "bq_atlas_project":         "@atlas_project",
+    "bq_atlas_dataset":         "@atlas_dataset",
 
     "cdm_prefix":               "cdm_",
     "voc_prefix":               "voc_",
 
-    "voc_ddl":                  "../etl/ddl_voc_5_3_1.sql",
-    "cdm_ddl":                  "../etl/ddl_cdm_5_3_1.sql",
+    "voc_ddl":                  "etl/ddl/ddl_voc_5_3_1.sql",
+    "cdm_ddl":                  "etl/ddl/ddl_cdm_5_3_1.sql",
 
-    "output_sql_file":          "../etl/output_file.sql"
+    "fields_to_remove":         ["unit_id", "load_table_id", "load_row_id", "trace_id"],
+
+    "output_sql_file":          "etl/unload/unload_to_atlas_gen.sql"
 }
 
 # ----------------------------------------------------
@@ -53,7 +54,7 @@ def read_params():
     except getopt.GetoptError:
         print("Please indicate correct params:")
         print(params)
-        print("for example:\npython gen_bq_cdm_to_atlas.py --config gen_bq_cdm_to_atlas.conf")
+        print("for example:\npython gen_cdm_to_atlas.py --config gen_cdm_to_atlas.conf")
         sys.exit(2)
 
     st = []
@@ -108,26 +109,57 @@ def read_ddl(ddl_file, cdm_dataset, prefix):
         "tables": []
     }
 
+    print('\nread structure for {0} tables...'.format(prefix))
+
     if os.path.isfile(ddl_file):
 
-        s_raw = open(ddl_file).read().split('\n')
-        s_ddl = filter(lambda x: x.strip()[0:2] != '--', s_raw)
+        s_text = open(ddl_file).read()
         pr = cdm_dataset + '.' + prefix
-        print('read_ddl.tables_template', pr)
-        s_tables = filter(lambda x: pr in x, s_ddl)
 
+        s_raw_lines = s_text.split('\n')
+        s_comments_removed = filter(lambda x: x.strip()[0:2] != '--', s_raw_lines)
+        s_raw_tables = filter(lambda x: pr in x, s_comments_removed)
+
+        # iterate through raw lines like
         # CREATE OR REPLACE TABLE dataset.cdm_cohort_definition (
-        for s_t in s_tables:
-            t = s_t.partition(pr)[2].partition('(')[0].strip()
-            result_tables['tables'].append(t)
+        for raw_table in s_raw_tables:
 
-            print('read_ddl.s_t', s_t)
-            print('read_ddl.t', t)
-            break
+            table_name = raw_table.partition(pr)[2].partition('(')[0].strip()
 
-        # print(result_tables['tables'][1])
+            flds_str = get_fields_for_table(raw_table, s_text)
+            
+            result_table = {"fields": flds_str, "table_name": table_name}
+            result_tables['tables'].append(result_table)
+            print(table_name)
 
     return result_tables
+
+'''
+------------------------------------------------------------------------
+    Get fields list from DDL
+    raw_table   - starting mark
+    s_text      - ddl text
+------------------------------------------------------------------------
+'''
+def get_fields_for_table(raw_table, s_text):
+
+    search_pattern = '(?:{mark1}\\n)([\\S\\s\\n]+?)(?:{mark2})'.format(mark1=raw_table.replace('(', '\\('), mark2 = '\\)\\n;')
+
+    flds_raw = re.search(search_pattern, s_text).group(1).split('\n')
+    
+    flds_list = [x.strip().partition(' ')[0] for x in flds_raw]
+
+    fields_to_remove = ['unit_id', 'load_table_id', 'load_row_id', 'trace_id']
+    fields_to_remove.append('')
+    fields_to_remove.append('(') # quick bugfix
+    for f in flds_list: 
+        if f in fields_to_remove: flds_list.remove(f)
+
+    flds_str = '    ' + ',\n    '.join(flds_list)
+    
+    return flds_str
+
+
 
 ''' 
 ----------------------------------------------------
@@ -144,7 +176,7 @@ def generate_queries(header, result_tables, config):
 
     # to add list of fields and exclude not standard fields
     s_query = 'CREATE OR REPLACE TABLE `{atlas_project}`.{atlas_dataset}.{table} AS \n' + \
-        'SELECT * FROM `{cdm_project}`.{cdm_dataset}.{prefix}{table};\n'
+        'SELECT\n{fields}\nFROM `{cdm_project}`.{cdm_dataset}.{prefix}{table};\n\n'
 
     for t in result_tables['tables']:
         s_queries.append(s_query.format(
@@ -153,7 +185,8 @@ def generate_queries(header, result_tables, config):
             cdm_project   = config['bq_cdm_project'],
             cdm_dataset   = config['bq_cdm_dataset'],
             prefix        = result_tables['prefix'],
-            table         = t
+            table         = t['table_name'],
+            fields        = t['fields']
             ))
 
     return s_queries
@@ -196,7 +229,7 @@ def main():
             f.write(s)
 
         f.close()
-        print('Generated', f.name)
+        print('\nGenerated', f.name)
 
     # for s in s_cdm_queries:
     #     rc = bq_run_script.run_query(s)

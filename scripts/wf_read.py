@@ -36,14 +36,6 @@ config_default = {
 }
 
 
-##################################################################################
-
-# gsutil ls gs://mimic_iv_to_omop/waveforms/source_data/csv/
-
-# subprocess.check_output('gsutil ls gs://mimic_iv_to_omop/waveforms/source_data/csv/', shell=True)
-
-##################################################################################
-
 # ----------------------------------------------------
 # read_params()
 # ----------------------------------------------------
@@ -258,6 +250,4 @@ def main():
 # -------------
 
 if __name__ == '__main__':
-    # test1.py executed as script
-    # do something
     main()

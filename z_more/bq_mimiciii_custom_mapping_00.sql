@@ -3,7 +3,7 @@
 -- mimic-omop/etl/StandardizedVocabularies/CONCEPT/etl.sql
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `odysseus-mimic-dev`.mimiciii_extras_concept.concept_iii
+CREATE OR REPLACE TABLE `project...`.dataset....concept_iii
 (
     concept_id          INT64, 
     concept_name        STRING, 
@@ -15,7 +15,7 @@ CREATE OR REPLACE TABLE `odysseus-mimic-dev`.mimiciii_extras_concept.concept_iii
     valid_end_date      DATE
 );
 
-INSERT INTO `odysseus-mimic-dev`.mimiciii_extras_concept.concept_iii
+INSERT INTO `project...`.dataset....concept_iii
 (
     concept_id, 
     concept_name, 

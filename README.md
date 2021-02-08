@@ -1,39 +1,119 @@
 # MIMIC IV to OMOP CDM Conversion #
 
-### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP CDM format.
 
-### Who do I talk to? ###
+* Version 1.0
 
-* Repo owner or admin
-* Other community or team contact
+
+### Concepts / Phylosophy ###
+
+The ETL is based on the five steps.
+* Create a snapshot of the source data. The snapshot data is stored in staging source tables with prefix "src_".
+* Clean source data: filter out rows to be not used, format values, apply some business rules. Create intermediate tables with prefix "lk_" and postfix "clean".
+* Map distinct source codes to concepts in vocabulary tables. Create intermediate tables with prefix "lk_" and postfix "concept".
+    * Custom mapping is implemented in custom concepts generated in vocabulary tables beforehand.
+* Join cleaned data and mapped codes. Create intermediate tables with prefix "lk_" and postfix "mapped".
+* Distribute mapped data by target cdm tables according to target_domain_id values.
+
+Intermediate and staging CDM tables have additional working fields like unit_id. Field unit_id is composed during the ETL steps. From right to left: source table name, initial target table name abbreviation, final target table name or abbreviation. For example: unit_id = 'drug.cond.diagnoses_icd' means that the rows in this unit_id belong to Drug_exposure table, inially were prepared for Condition_occurrence table, and its original is source table diagnoses_icd.
+
+Vocabularies are kept in a separate dataset, and are copied as a part of the snapshot data too.
+
 
 ### How to run the conversion ###
 
-* Workflows: ddl, vocabulary_refresh, staging, etl, ut, qa, unload
-* It is supposed that the project root (location of this file) is current directory.
+* The ETL process encapsulates the following workflows: ddl, vocabulary_refresh, staging, etl, ut, unload.
+* The unload workflow results in creating a final OMOP CDM dataset, which can be analysed with OHDSI tools as Atlas or DQD.
 
-* Run a workflow:
-    * with local variables: `python scripts/run_workflow.py -c conf/workflow_etl.conf`
-        * copy "variables" section from file.etlconf
-    * with global variables: `python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf`
-* Run explicitly named scripts (space delimited):
-    `python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf etl/etl/cdm_drug_era.sql`
-* Run in background:
-    `nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf > ../out_full_etl.out &`
-* Continue after an error:
-    `nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf etl/etl/cdm_observation.sql etl/etl/cdm_observation_period.sql etl/etl/cdm_fact_relationship.sql etl/etl/cdm_condition_era.sql etl/etl/cdm_drug_era.sql etl/etl/cdm_dose_era.sql etl/etl/cdm_cdm_source.sql >> ../out_full_etl.out &`
+* How to run ETL end-to-end:
+    * update config files accordingly
+    * perform vocabulary_refresh steps if needed (see vocabulary_refresh/README.md)
+    * set the project root (location of this file) as the current directory
+
+    `
+    cd vocabulary_refresh
+    python vocabulary_refresh.py -s10
+    python vocabulary_refresh.py -s20
+    python vocabulary_refresh.py -s30
+    cd ../
+    python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_ddl.conf
+    python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_staging.conf
+    python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf
+    python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_ut.conf
+    python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_metrics.conf
+    `
+* How to look at UT and Metrics reports
+    * see metrics dataset name in the corresponding .etlconf file
+
+    `
+    -- UT report
+    SELECT report_starttime, table_id, test_type, field_name
+    FROM metrics_dataset.report_unit_test
+    WHERE NOT test_passed 
+    ;
+    -- Metrics - row count
+    SELECT * FROM metrics_dataset.me_total ORDER BY table_name;
+    -- Metrics - person and visit summary
+    SELECT
+        category, name, count AS row_count
+    FROM metrics_dataset.me_persons_visits ORDER BY category, name;
+    -- Metrics - Mapping rates
+    SELECT
+        table_name, concept_field, 
+        count   AS rows_mapped, 
+        percent AS percent_mapped,
+        total   AS rows_total
+    FROM metrics_dataset.me_mapping_rate 
+    ORDER BY table_name, concept_field
+    ;
+    -- Metrics - Top 100 Mapped and Unmapped
+    SELECT 
+        table_name, concept_field, category, source_value, concept_id, concept_name,
+        count       AS row_count,
+        percent     AS rows_percent
+    FROM metrics_dataset.me_tops_together 
+    ORDER BY table_name, concept_field, category, count DESC;
+    `
+
+* More option to run ETL parts:
+    * Run a workflow:
+        * with local variables: `python scripts/run_workflow.py -c conf/workflow_etl.conf`
+            * copy "variables" section from file.etlconf
+        * with global variables: `python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf`
+    * Run explicitly named scripts (space delimited):
+        `python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf etl/etl/cdm_drug_era.sql`
+    * Run in background:
+        `nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf > ../out_full_etl.out &`
+    * Continue after an error:
+        `nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf etl/etl/cdm_observation.sql etl/etl/cdm_observation_period.sql etl/etl/cdm_fact_relationship.sql etl/etl/cdm_condition_era.sql etl/etl/cdm_drug_era.sql etl/etl/cdm_dose_era.sql etl/etl/cdm_cdm_source.sql >> ../out_full_etl.out &`
 
 
 ### Change Log (latest first) ###
 
 
+**2021-02-08**
+
+* Set version v.1.0
+
+* Drug_exposure table
+    * pharmacy.medication is replacing particular values of prescription.drug
+    * source value format is changed to COALESCE(pharmacy.medication.selected, prescription.drug) || prescription.prod_strength
+* Labevents mapping is replaced with new reviewed version
+    * vocabulary affected: mimiciv_meas_lab_loinc
+    * lk_meas_labevents_clean and lk_meas_labevents_mapped are changed accordingly
+* Unload for Atlas
+    * Technical fields unit_id, load_row_id, load_table_id, trace_id are removed from Atlas devoted tables
+* Delivery export script
+    * tables are exported to a single directory and single files. If a table is too large, it is exported to multiple files
+* Bugfixes and cleanup
+* Real environmental names are replaced with placeholders
+
+
 **2021-02-01**
 
-* Waveforms POC-2 (load from folders tree and csv files)
+* Waveform POC-2 is created for 4 MIMIC III Waveform files uploaded to the bucket
+    * iterate through the folders tree, capture metadata and load the CSVs
 * Bugfixes
 
 

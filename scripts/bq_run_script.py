@@ -17,9 +17,9 @@ import datetime
 config_default = {
 
     "variables": {
-            
-        "bq_target_project":      "No project replacement by default",
-        "bq_target_dataset":      "No dataset replacement by default"
+
+        "@variable_1":      "No project replacement by default",
+        "@variable_2":      "No dataset replacement by default"
     }
     
 }
@@ -243,4 +243,4 @@ return_code = main()
 print('bq_run_script.exit()', return_code)
 exit(return_code)
 
-# last edit: 2021-01-20
+# last edit: 2021-02-07

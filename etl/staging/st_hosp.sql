@@ -279,3 +279,27 @@ SELECT
 FROM
     `@source_project`.@hosp_dataset.d_micro
 ;
+
+-- -------------------------------------------------------------------
+-- src_pharmacy
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_pharmacy AS
+SELECT
+    pharmacy_id                         AS pharmacy_id,
+    medication                          AS medication,
+    -- hadm_id                             AS hadm_id,
+    -- subject_id                          AS subject_id,
+    -- starttime                           AS starttime,
+    -- stoptime                            AS stoptime,
+    -- route                               AS route,
+    --
+    'pharmacy'                          AS load_table_id,
+    FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        pharmacy_id AS pharmacy_id
+    ))                                  AS trace_id
+FROM
+    `@source_project`.@hosp_dataset.pharmacy
+;
+

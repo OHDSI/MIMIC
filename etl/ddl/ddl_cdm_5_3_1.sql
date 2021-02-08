@@ -13,7 +13,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_cohort_definition (
   definition_type_concept_id      INT64       not null,
   cohort_definition_syntax        STRING              ,
   subject_concept_id              INT64       not null,
-  cohort_initiation_DATE          DATE
+  cohort_initiation_date          DATE
 )
 ;
 

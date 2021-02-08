@@ -17,8 +17,8 @@ import json
 
 config_default = {
 
-    "bq_target_project":        "odysseus-mimic-dev",
-    "bq_target_dataset":        "mimiciii_extras_concept",
+    "bq_target_project":        "project...",
+    "bq_target_dataset":        "dataset...",
 
     "local_mapping_csv_path":   "../../mimic-omop/extras/concept",
     "files_extension":          ".csv",

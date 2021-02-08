@@ -6,6 +6,7 @@ import os
 import getopt
 import sys
 import json
+import datetime
 
 # export_cmd = 'bq --location=US extract --destination_format=CSV --compression=NONE --field_delimiter=\t --print_header=TRUE \
 #                 {proj}:{db}.{table} gs://{bucket}/csv/{table}/*{ext}'
@@ -20,14 +21,14 @@ import json
 config_default = {
 
             
-    "bq_project":      "odysseus-mimic-dev",
-    "bq_dataset":      "mimiciv_demo_202012_cdm_531",
+    "bq_project":      "...",
+    "bq_dataset":      "...",
 
     "destination_format":       "csv",
-    "destination_type":         "gs",
+    "destination_type":         "local",
 
-    "gs_bucket_path":   "gs://mimic_iv_to_omop/export_cdm_demo",
-    "local_path":       "../export_cdm",
+    "gs_bucket_path":   "gs://...",
+    "local_path":       "../...",
 
 
     "destination_formats": [
@@ -47,45 +48,56 @@ config_default = {
     ],
 
     "bq_tables": [
-        "observation",
-        "drug_era",
-        "fact_relationship",
-        "observation_period",
-        "cohort",
-        "visit_occurrence",
-        "drug_strength",
-        "condition_era",
-        "cdm_source",
-        "measurement",
-        "domain",
-        "note_nlp",
-        "metadata",
+
+        # dimension tables
+        "location",
+        "care_site",
         "provider",
         "person",
-        "concept_relationship",
-        "cohort_attribute",
-        "procedure_occurrence",
-        "care_site",
-        "vocabulary",
-        "specimen",
+
+        # event tables
         "death",
-        "source_to_concept_map",
-        "device_exposure",
-        "relationship",
-        "payer_plan_period",
-        "concept",
-        "location",
+        "visit_occurrence",
+        "visit_detail",
         "condition_occurrence",
-        "concept_synonym",
+        "procedure_occurrence",
+        "specimen",
+        "measurement",
+        "observation",
+        "drug_exposure",
+        "device_exposure",
+        "fact_relationship",
+        "observation_period",
+
+        # tables which are not populated
+        "cohort",
+        "cohort_attribute",
         "cohort_definition",
         "attribute_definition",
-        "drug_exposure",
-        "note",
-        "concept_ancestor",
         "cost",
+        "note",
+        "note_nlp",
+        "metadata",
+        "payer_plan_period",
+
+        # eras and cdm_source
+        "condition_era",
+        "drug_era",
         "dose_era",
+        "cdm_source",
+        
+        # vocabulary tables
+        "source_to_concept_map",
         "concept_class",
-        "visit_detail"
+        "domain",
+        "relationship",
+        "vocabulary",
+        "concept",
+        "concept_relationship", # to shard
+        "concept_ancestor", # to shard
+        "concept_synonym",
+        "drug_strength"
+
     ]
 
 }
@@ -131,7 +143,7 @@ def read_params():
         if opt == '-f' or opt == '--format':
             params['destination_format'] = arg
 
-    print('the params given', params)
+    print('\nthe params given', params)
     return params
 
 # ----------------------------------------------------
@@ -149,6 +161,8 @@ def read_config(params):
     if os.path.isfile(config_file):
         with open(config_file) as f:
             config_read = json.load(f)
+    else:
+        print('Config file is not found:', config_file)
 
     # config has lower priority
     for k in config_default:
@@ -168,11 +182,14 @@ def read_config(params):
 # commands
 
 # gs destination - always required step
+# export_cmd_onedir = 'bq --location=US extract --destination_format={format_u} --compression=NONE {more_params} \
+#                 {proj}:{db}.{table} {bucket_path}/{format_l}/{table}{ext}'
 export_cmd_onedir = 'bq --location=US extract --destination_format={format_u} --compression=NONE {more_params} \
-                {proj}:{db}.{table} {bucket_path}/{format_l}/{table}-*{ext}'
+                {proj}:{db}.{table} {bucket_path}/{table}{shard_mark}{ext}'
 
 # final destination - optional step
-copy_cmd_onedir = 'gsutil cp {bucket_path}/{format_l}/{table}-*{ext} {local_path}/{format_l}/'
+# copy_cmd_onedir = 'gsutil cp {bucket_path}/{format_l}/{table}{ext} {local_path}/{format_l}/'
+copy_cmd_onedir = 'gsutil cp {bucket_path}/{table}*{ext} {local_path}/'
 
 # func
 
@@ -189,6 +206,7 @@ def mkdir_if_needed(p):
 def main():
 
     rc = 0
+    duration = datetime.datetime.now()
     params = read_params()
     config = read_config(params)
 
@@ -209,33 +227,40 @@ def main():
     bq_dataset = config["bq_dataset"]
 
 
-    # gs destination - required step always
     for bq_table in bq_tables:
 
+        # gs destination - required step always
         bqc = export_cmd_onedir.format(
                 format_u = destination_format.upper(), format_l = destination_format.lower(),
                 more_params = more_params,
                 proj = bq_project, db = bq_dataset, table = bq_table,
                 bucket_path = gs_bucket_path,
-                ext = '.' + destination_format
+                ext = '.' + destination_format,
+                shard_mark = ''
             )
         print(bqc)
         rc = os.system(bqc)
+        
+
+        if rc != 0: # a possible obstacle is when a table is too large. Then try to shard export.
+            bqc = export_cmd_onedir.format(
+                    format_u = destination_format.upper(), format_l = destination_format.lower(),
+                    more_params = more_params,
+                    proj = bq_project, db = bq_dataset, table = bq_table,
+                    bucket_path = gs_bucket_path,
+                    ext = '.' + destination_format,
+                    shard_mark = '*'
+                )
+            print(bqc)
+            rc = os.system(bqc)
+
         if rc != 0: break
 
-    # final destination - if this type of export is selected
-
-    if destination_type == 'local' and rc == 0:
-
-        # create path if not exists
-        mkdir_if_needed(local_destination_path)
-        mkdir_if_needed('{0}/{1}'.format(local_destination_path, destination_format))
-
-        for bq_table in bq_tables:
-
-            mkdir_if_needed('{0}/{1}/{2}'.format(
-                local_destination_path, destination_format, bq_table))
-
+        # final destination - if this type of export is selected
+        if destination_type == 'local' and rc == 0:
+            # create path if not exists
+            mkdir_if_needed(local_destination_path)
+            # mkdir_if_needed('{0}/{1}'.format(local_destination_path, destination_format))
             bqc = copy_cmd_onedir.format(
                     format_l = destination_format.lower(),
                     table = bq_table,
@@ -247,6 +272,9 @@ def main():
             rc = os.system(bqc)
             if rc != 0: break
 
+    duration = datetime.datetime.now() - duration
+    print('Run time: {0}'.format(duration)) # timedelta HH:MM:SS.f
+
     return rc
 
 # go
@@ -254,4 +282,4 @@ def main():
 rc = main()
 exit(rc)
 
-# last edit: 2020-12-21
+# last edit: 2021-02-07

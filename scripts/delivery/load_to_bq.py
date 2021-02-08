@@ -26,13 +26,11 @@ Expected locations for CSVs are:
 
 config_default = {
 
-    "bq_target_project":        "odysseus-mimic-dev",
+    "bq_target_project":        "project...",
     "bq_target_dataset":        "mimiciv_delivery_demo",
 
-    "overwrite": "no",
-
     "source_format":            "csv",
-    "csv_path":                 "gs://mimic_iv_to_omop/export_cdm_demo",
+    "csv_path":                 "gs://...",
     "csv_delimiter":            ",",
     "csv_quote":                "\\\"",
     "schemas_dir_all_csv":      "scripts/delivery/cdm_schemas_custom",
@@ -41,45 +39,56 @@ config_default = {
 
     "bq_tables":
     [
-        "observation",
-        "drug_era",
-        "fact_relationship",
-        "observation_period",
-        "cohort",
-        "visit_occurrence",
-        "drug_strength",
-        "condition_era",
-        "cdm_source",
-        "measurement",
-        "domain",
-        "note_nlp",
-        "metadata",
+
+        # dimension tables
+        "location",
+        "care_site",
         "provider",
         "person",
-        "concept_relationship",
-        "cohort_attribute",
-        "procedure_occurrence",
-        "care_site",
-        "vocabulary",
-        "specimen",
+
+        # event tables
         "death",
-        "source_to_concept_map",
-        "device_exposure",
-        "relationship",
-        "payer_plan_period",
-        "concept",
-        "location",
+        "visit_occurrence",
+        "visit_detail",
         "condition_occurrence",
-        "concept_synonym",
+        "procedure_occurrence",
+        "specimen",
+        "measurement",
+        "observation",
+        "drug_exposure",
+        "device_exposure",
+        "fact_relationship",
+        "observation_period",
+
+        # tables which are not populated
+        "cohort",
+        "cohort_attribute",
         "cohort_definition",
         "attribute_definition",
-        "drug_exposure",
-        "note",
-        "concept_ancestor",
         "cost",
+        "note",
+        "note_nlp",
+        "metadata",
+        "payer_plan_period",
+
+        # eras and cdm_source
+        "condition_era",
+        "drug_era",
         "dose_era",
+        "cdm_source",
+        
+        # vocabulary tables
+        "source_to_concept_map",
         "concept_class",
-        "visit_detail"
+        "domain",
+        "relationship",
+        "vocabulary",
+        "concept",
+        "concept_relationship", # to shard
+        "concept_ancestor", # to shard
+        "concept_synonym",
+        "drug_strength"
+
     ]
 
 
@@ -166,12 +175,14 @@ def create_bq_dataset(ds_name):
 '''
 def load_table(table, files_path, field_delimiter, quote, config):
 
+    print('Try to load: {0}'.format(table))
+
     return_code = 0
 
     schema_path = '{dir}/{table}.json'
 
-    bq_load_command = 'bq --location=US load {replace} --source_format={format_u} {more_params} \
-                    {dataset}.{prefix}{table} {files_path}/{format_l}/{table}-*{ext} {schema_path}'
+    bq_load_command = 'bq --location=US load --replace --source_format={format_u} {more_params} \
+                    {dataset}.{prefix}{table} {files_path}/{table}{shard_mark}{ext} {schema_path}'
 
     more_params_csv = "" + \
             " --allow_quoted_newlines=True " + \
@@ -187,8 +198,9 @@ def load_table(table, files_path, field_delimiter, quote, config):
     table_schema = schema_path.format(dir=config['schemas_dir_all_csv'], table=table)
     
     if os.path.isfile(table_schema):
+
+        # try to load single file
         bqc = bq_load_command.format( \
-            replace     = '--replace' if config["overwrite"] == 'yes' else '', \
             format_u    = config["source_format"].upper(), \
             more_params = more_params, \
             dataset     = config['bq_target_dataset'], \
@@ -197,11 +209,30 @@ def load_table(table, files_path, field_delimiter, quote, config):
             files_path  = files_path, \
             format_l    = config["source_format"].lower(), \
             ext         = '.' + config["source_format"], \
-            schema_path = table_schema
+            schema_path = table_schema,
+            shard_mark  = ''
         )
         print('To BQ: ' + bqc)
-
         rc = os.system(bqc)
+
+        # if failed (URI not found), try to load multiple files
+        if rc != 0:
+            bqc = bq_load_command.format( \
+                format_u    = config["source_format"].upper(), \
+                more_params = more_params, \
+                dataset     = config['bq_target_dataset'], \
+                prefix      = config['bq_temp_table_prefix'], \
+                table       = table, \
+                files_path  = files_path, \
+                format_l    = config["source_format"].lower(), \
+                ext         = '.' + config["source_format"], \
+                schema_path = table_schema,
+                shard_mark  = '*'
+            )
+            print('To BQ: ' + bqc)
+            rc = os.system(bqc)
+
+
         if rc != 0:
             return_code = 2 # error during execution of the command
 
@@ -240,37 +271,33 @@ def nice_message(s_filename, status, msg):
 '''
 
 def main():
+
+    rc = 0
+    duration = datetime.datetime.now()
     params = read_params()
-
     config = read_config(params.get('config_file'))
-
-    file_path = '{files_path}/{table}-*{ext}'
 
     s_done = []
     s_done.append(nice_message('start...', 0, ''))
 
     create_bq_dataset(config['bq_target_dataset'])
 
-    rca = 0
     for table in config['bq_tables']:
-
-        # files_path = file_path.format(
-        #     files_path=config['csv_path'], table=table, ext='.csv')
 
         rc = load_table(table, config['csv_path'], config['csv_delimiter'], \
             config['csv_quote'], config)
         if rc != 0:
             break
-            # rca += 1
-            # continue
 
     s_done.append(nice_message('finish', 0, ''))
 
     print('\nTables are loaded to {pr}.{ds}'.format(pr=config['bq_target_project'], ds=config['bq_target_dataset']))
     for a in s_done:
         print(a)
+    duration = datetime.datetime.now() - duration
+    print('Run time: {0}'.format(duration)) # timedelta HH:MM:SS.f
 
-    return rc #rca
+    return rc
 
 # ----------------------------------------------------
 # go
@@ -280,4 +307,4 @@ print('load_to_bq.exit()', return_code)
 
 exit(return_code)
 
-# last edit: 2020-12-21
+# last edit: 2021-02-07

@@ -46,7 +46,6 @@ SELECT
     'MIMIC IV'                              AS cdm_source_name,
     'mimiciv'                               AS cdm_source_abbreviation,
     'PhysioNet'                             AS cdm_holder,          
-                    -- PhysioNet as data owner or Odysseus as who implemented the conversion?
     CONCAT('MIMIC-IV is a publicly available database of patients ',
         'admitted to the Beth Israel Deaconess Medical Center in Boston, MA, USA.') AS source_description,
     'https://mimic-iv.mit.edu/docs/'        AS source_documentation_reference,

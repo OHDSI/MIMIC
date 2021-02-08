@@ -29,13 +29,13 @@
 -- -------------------------------------------------------------------
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_prescriptions_clean AS
 SELECT
-    -- 'drug:['                || COALESCE(drug, drug_name_poe, drug_name_generic,'') || ']'||
-    'drug:['                || COALESCE(drug,'') || ']'||
-    'prod_strength:['       || COALESCE(prod_strength,'') || ']'||
-    'drug_type:['           || COALESCE(drug_type,'') || ']'||
-    -- 'formulary_drug_cd:['   || COALESCE(formulary_drug_cd,'') || ']' ||
-     'dose_unit_rx:['       || COALESCE(dose_unit_rx,'') || ']' 
-                                                                        AS concept_name,
+    -- -- 'drug:['                || COALESCE(drug, drug_name_poe, drug_name_generic,'') || ']'||
+    -- 'drug:['                || COALESCE(drug,'') || ']'||
+    -- 'prod_strength:['       || COALESCE(prod_strength,'') || ']'||
+    -- 'drug_type:['           || COALESCE(drug_type,'') || ']'||
+    -- -- 'formulary_drug_cd:['   || COALESCE(formulary_drug_cd,'') || ']' ||
+    --  'dose_unit_rx:['       || COALESCE(dose_unit_rx,'') || ']' 
+    --                                                                     AS concept_name,
     src.subject_id              AS subject_id,
     src.hadm_id                 AS hadm_id,
     src.dose_val_rx             AS dose_val_rx,
@@ -48,10 +48,15 @@ SELECT
     'NDC'                       AS ndc_source_vocabulary,
     src.form_val_disp           AS form_val_disp,
     CAST(REGEXP_EXTRACT(src.form_val_disp, r'[-]?[\d]+[.]?[\d]*') AS FLOAT64)  AS quantity,
-    COALESCE(
-        -- src.drug, src.drug_name_poe, src.drug_name_generic,'')
-        src.drug, '')
-        || ' ' || COALESCE(src.prod_strength, '')               AS gcpt_source_code,
+    -- COALESCE(
+    --     -- src.drug, src.drug_name_poe, src.drug_name_generic,'')
+    --     src.drug, '')
+    --     || ' ' || COALESCE(src.prod_strength, '')               
+    COALESCE(IF(src.drug IN ('Bag', 'Vial', 'Syringe', 'Syringe.', 
+                    'Syringe (Neonatal)', 'Syringe (Chemo)', 'Soln', 'Soln.',
+                    'Sodium Chloride 0.9%  Flush'), 
+            pharm.medication, src.drug), '') || 
+        ' ' || COALESCE(src.prod_strength, '')                  AS gcpt_source_code, -- medication/drug + prod_strength
     'mimiciv_drug_ndc'                                          AS gcpt_source_vocabulary, -- source_code = label
     src.pharmacy_id                                             AS pharmacy_id,
     -- 
@@ -62,8 +67,12 @@ SELECT
 
 FROM
     `@etl_project`.@etl_dataset.src_prescriptions src -- pr
+LEFT JOIN 
+    `@etl_project`.@etl_dataset.src_pharmacy pharm
+        ON src.pharmacy_id = pharm.pharmacy_id
 WHERE
     src.starttime IS NOT NULL
+    AND src.drug IS NOT NULL
 ;
 
 -- -------------------------------------------------------------------
@@ -111,7 +120,7 @@ FROM
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
         ON  vc.concept_code = src.gcpt_source_code
-        AND vc.vocabulary_id = src.gcpt_source_vocabulary
+        AND vc.vocabulary_id = src.gcpt_source_vocabulary -- mimiciv_drug_ndc
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1 
@@ -169,7 +178,7 @@ SELECT
     38000177                                        AS type_concept_id,
     src.quantity                                    AS quantity,
     COALESCE(vc_route.target_concept_id, 0)                             AS route_concept_id,
-    COALESCE(vc_ndc.source_code, vc_gcpt.source_code, src.concept_name) AS source_code,
+    COALESCE(vc_ndc.source_code, vc_gcpt.source_code, src.gcpt_source_code) AS source_code,
     COALESCE(vc_ndc.source_concept_id, vc_gcpt.source_concept_id, 0)    AS source_concept_id,
     src.route_source_code                                               AS route_source_code,
     src.dose_unit_source_code                       AS dose_unit_source_code,

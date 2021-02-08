@@ -36,6 +36,7 @@
 
 -- -------------------------------------------------------------------
 -- lk_meas_labevents_clean
+-- source_code: label|fluid|category
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_labevents_clean AS
@@ -45,6 +46,13 @@ SELECT
     src.charttime                           AS start_datetime, -- measurement_datetime,
     src.hadm_id                             AS hadm_id,
     src.itemid                              AS itemid, -- dlab.itemid
+    COALESCE(dlab.loinc_code, 
+        CONCAT(dlab.label, '|', dlab.fluid, '|', dlab.category)
+    )                                       AS source_code,
+    IF(dlab.loinc_code IS NOT NULL, 
+        'LOINC', 
+        'mimiciv_meas_lab_loinc'
+    )                                       AS source_vocabulary_id,
     src.value                               AS value, -- value_source_value
     REGEXP_EXTRACT(src.value, r'^(\<=|\>=|\>|\<|=|)')   AS value_operator,
     REGEXP_EXTRACT(src.value, r'[-]?[\d]+[.]?[\d]*')    AS value_number, -- assume "-0.34 etc"
@@ -58,6 +66,9 @@ SELECT
     src.trace_id            AS trace_id
 FROM
     `@etl_project`.@etl_dataset.src_labevents src
+LEFT JOIN
+    `@etl_project`.@etl_dataset.src_d_labitems dlab
+        ON src.itemid = dlab.itemid
 ;
 
 -- -------------------------------------------------------------------
@@ -68,30 +79,31 @@ FROM
 --      a) see the joins, 
 --      b) all dlab.itemid, all available concepts from LOINC and custom mapped dlab.label
 -- -------------------------------------------------------------------
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_labevents_source_code AS
+SELECT DISTINCT
+    source_code, source_vocabulary_id
+FROM
+    `@etl_project`.@etl_dataset.lk_meas_labevents_clean
+;
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_d_labitems_concept AS
 SELECT
-    dlab.itemid             AS itemid, -- PK
-    COALESCE(dlab.loinc_code, dlab.label)   AS source_code,
-    vc.domain_id            AS source_domain_id,
-    vc.vocabulary_id        AS source_vocabulary_id,
-    vc.concept_id           AS source_concept_id,
-    vc2.domain_id           AS target_domain_id,
-    vc2.vocabulary_id       AS target_vocabulary_id,
-    vc2.concept_id          AS target_concept_id,
-    dlab.fluid              AS fluid,   -- 
-    dlab.category           AS category -- 'Blood Gas', 'Chemistry', 'Hematology'
+    dlab.source_code            AS source_code,
+    dlab.source_vocabulary_id   AS source_vocabulary_id,
+    vc.domain_id                AS source_domain_id,
+    vc.concept_id               AS source_concept_id,
+    vc2.vocabulary_id           AS target_vocabulary_id,
+    vc2.domain_id               AS target_domain_id,
+    vc2.concept_id              AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.src_d_labitems dlab
+    `@etl_project`.@etl_dataset.tmp_labevents_source_code dlab
         -- double check loinc codes: do we need to use event dates in join?
         -- and do we need to do any parsing/replacement to match codes?
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
-        ON  vc.concept_code = COALESCE(dlab.loinc_code, dlab.label)
-        AND (
-            vc.vocabulary_id = 'LOINC' AND vc.domain_id = 'Measurement'
-            OR vc.vocabulary_id = 'mimiciv_meas_lab_loinc'
-        )
+        ON  vc.concept_code = dlab.source_code
+        AND vc.vocabulary_id = dlab.source_vocabulary_id
+        AND vc.domain_id = 'Measurement'
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
@@ -102,6 +114,8 @@ LEFT JOIN
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
 ;
+
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_labevents_source_code;
 
 -- -------------------------------------------------------------------
 -- lk_meas_labevents_hadm_id
@@ -143,7 +157,6 @@ SELECT
     COALESCE(labc.target_concept_id, 0)     AS target_concept_id,
     COALESCE(labc.target_domain_id, labc.source_domain_id, 'Measurement')  AS target_domain_id,
     src.start_datetime                      AS start_datetime,
-    labc.category                           AS category,
     opc.target_concept_id                   AS operator_concept_id,
     src.value_number                        AS value_as_number,
     IF(src.valueuom IS NOT NULL, 
@@ -165,7 +178,8 @@ FROM
     `@etl_project`.@etl_dataset.lk_meas_labevents_clean src
 INNER JOIN 
     `@etl_project`.@etl_dataset.lk_meas_d_labitems_concept labc
-        ON labc.itemid = src.itemid
+        ON labc.source_code = src.source_code
+        AND labc.source_vocabulary_id = src.source_vocabulary_id
 LEFT JOIN 
     `@etl_project`.@etl_dataset.lk_meas_operator_concept opc
         ON opc.source_code = src.value_operator

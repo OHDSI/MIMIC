@@ -7,12 +7,12 @@
   {"name": "condition_end_date", "type": "DATE" },
   {"name": "condition_end_datetime", "type": "DATETIME" },
   {"name": "condition_type_concept_id", "type": "INTEGER", "mode": "REQUIRED" },
+  {"name": "condition_status_concept_id", "type": "INTEGER"},
   {"name": "stop_reason", "type": "STRING" },
   {"name": "provider_id", "type": "INTEGER" },
   {"name": "visit_occurrence_id", "type": "INTEGER" },
   {"name": "visit_detail_id", "type": "INTEGER" },
   {"name": "condition_source_value", "type": "STRING" },
   {"name": "condition_source_concept_id", "type": "INTEGER" },
-  {"name": "condition_status_source_value", "type": "STRING"},
-  {"name": "condition_status_concept_id", "type": "INTEGER"}
+  {"name": "condition_status_source_value", "type": "STRING"}
 ]

@@ -3,28 +3,28 @@
 
     "variables": 
     {
-        "@source_project":   "physionet-data",
-        "@core_dataset":     "mimic_core",
-        "@hosp_dataset":     "mimic_hosp",
-        "@icu_dataset":      "mimic_icu",
-        "@ed_dataset":       "mimic_ed",
+        "@source_project":   "source_project...",
+        "@core_dataset":     "core...",
+        "@hosp_dataset":     "hosp...",
+        "@icu_dataset":      "icu...",
+        "@ed_dataset":       "ed...",
 
-        "@voc_project": "odysseus-mimic-dev",
-        "@voc_dataset": "vocabulary_2020_09_11",
+        "@voc_project": "etl_project...",
+        "@voc_dataset": "voc...",
 
-        "@wf_project": "odysseus-mimic-dev",
-        "@wf_dataset": "waveform_source_poc",
+        "@wf_project": "etl_project...",
+        "@wf_dataset": "wf...",
 
-        "@etl_project": "odysseus-mimic-dev",
-        "@etl_dataset": "mimiciv_full_cdm_2021_01_31",
+        "@etl_project": "etl_project...",
+        "@etl_dataset": "etl...",
 
-        "@metrics_project": "odysseus-mimic-dev",
-        "@metrics_dataset": "mimiciv_full_metrics_2021_01_31",
+        "@metrics_project": "etl_project...",
+        "@metrics_dataset": "metrics...",
 
-        "@atlas_project": "odysseus-mimic-dev",
-        "@atlas_dataset": "mimiciv_full_202101_cdm_531",
+        "@atlas_project": "etl_project...",
+        "@atlas_dataset": "atlas...",
 
-        "@waveforms_csv_path":  "gs://mimic_iv_to_omop/waveforms/source_data/csv"
+        "@waveforms_csv_path":  "gs://bucket..."
 
     },
 
@@ -68,6 +68,12 @@
             "conf": "workflow_qa.conf"
         },
 
+        {
+            "workflow": "metrics",
+            "comment": "build metrics with metrics_gen scripts",
+            "type": "sql",
+            "conf": "workflow_metrics.conf"
+        },
         {
             "workflow": "gen_scripts",
             "comment": "automation to generate similar queries for some tasks",
