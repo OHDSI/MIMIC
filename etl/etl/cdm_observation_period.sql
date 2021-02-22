@@ -173,7 +173,7 @@ SELECT
     src.person_id                               AS person_id,
     MIN(src.start_date)                         AS observation_period_start_date,
     MAX(src.end_date)                           AS observation_period_end_date,
-    44814724                                    AS period_type_concept_id,  --  Period covering healthcare encounters
+    32828                                       AS period_type_concept_id,  -- 32828    OMOP4976901 EHR episode record
     --
     'observation_period'                        AS unit_id,
     'event tables'                              AS load_table_id,
@@ -190,3 +190,4 @@ GROUP BY
 -- -------------------------------------------------------------------
 
 DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_observation_period_clean;
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_observation_period;

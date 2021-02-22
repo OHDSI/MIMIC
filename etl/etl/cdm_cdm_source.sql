@@ -13,12 +13,11 @@
 -- Known issues / Open points:
 --
 -- TRUNCATE TABLE is not supported, organize create or replace
---
--- src_labevents: look closer to fields priority and specimen_id
--- src_labevents.value: 
---      investigate if there are formatted values with thousand separators,
---      and if we need to use more complicated parsing.
---      see `@etl_project`.@etl_dataset.an_labevents_full
+-- 
+-- To define source release date as (?)
+--      SELECT MAX(creation_time)
+--      FROM (loop through source datasets).INFORMATION_SCHEMA.TABLES
+-- Add second row for Waveform POC?
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_cdm_source

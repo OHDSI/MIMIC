@@ -62,6 +62,67 @@
 --      gcpt_meas_unit.csv      -> mimiciv_meas_wf_unit
 -- -------------------------------------------------------------------
 
+-- -------------------------------------------------------------------
+-- lk_waveform_clean
+-- put together poc_2 and poc_3
+-- -------------------------------------------------------------------
+
+-- poc_2
+
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.lk_wf_clean;
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_waveform_clean AS
+SELECT
+    wh.subject_id                           AS subject_id,
+    CONCAT(
+        src.reference_id, '.', src.segment_name,
+        '.', src.source_code
+    )                                       AS reference_id, -- add segment name and source code to make the field unique
+    src. mx_datetime                         AS start_datetime,
+    src.value_as_number                     AS value_as_number,
+    src.source_code                         AS source_code, 
+    src.unit_source_value                   AS unit_source_value,
+    -- 
+    'waveforms.poc_2'                       AS unit_id,
+    src.load_table_id                       AS load_table_id,
+    src.load_row_id                         AS load_row_id,
+    src.trace_id                            AS trace_id
+FROM
+    `@etl_project`.@etl_dataset.src_waveform_mx src -- wm
+INNER JOIN
+    `@etl_project`.@etl_dataset.src_waveform_header wh
+        ON wh.reference_id = src.reference_id
+;
+
+-- poc_3
+
+INSERT INTO `@etl_project`.@etl_dataset.lk_waveform_clean
+SELECT
+    wh.subject_id                           AS subject_id,
+    CONCAT(
+        wh.reference_id, '.', 
+        COALESCE(src.Visit_Detail___Source, 'Unknown'), '.', 
+        CAST(COALESCE(src.Visit_Detail___Start_from_minutes, -1) AS STRING), '.',
+        CAST(COALESCE(src.Visit_Detail___Report_minutes, -1) AS STRING), '.', 
+        CAST(COALESCE(src.Visit_Detail___Sumarize_minutes, -1) AS STRING), '.', 
+        COALESCE(src.Visit_Detail___Method, 'UNKNOWN'), '.', 
+        src.source_code
+    )                                       AS reference_id, -- make the field unique for Visit_detail_source_value
+    src.mx_datetime                         AS start_datetime,
+    src.value_as_number                     AS value_as_number,
+    src.source_code                         AS source_code, 
+    src.unit_source_value                   AS unit_source_value,
+    -- 
+    'waveforms.poc_3'                       AS unit_id,
+    src.load_table_id                       AS load_table_id,
+    src.load_row_id                         AS load_row_id,
+    src.trace_id                            AS trace_id
+FROM
+    `@etl_project`.@etl_dataset.src_waveform_mx_3 src -- wm
+INNER JOIN
+    `@etl_project`.@etl_dataset.src_waveform_header_3 wh
+        ON wh.case_id = src.case_id
+;
 
 -- -------------------------------------------------------------------
 -- lk_wf_hadm_id
@@ -78,14 +139,11 @@ SELECT
         ORDER BY adm.start_datetime
     )                                   AS row_num
 FROM
-    `@etl_project`.@etl_dataset.src_waveform_mx src
-INNER JOIN
-    `@etl_project`.@etl_dataset.src_waveform_header wh
-        ON wh.reference_id = src.reference_id
+    `@etl_project`.@etl_dataset.lk_waveform_clean src
 INNER JOIN 
     `@etl_project`.@etl_dataset.lk_admissions_clean adm
-        ON adm.subject_id = wh.subject_id
-        AND src.mx_datetime BETWEEN adm.start_datetime AND adm.end_datetime
+        ON adm.subject_id = src.subject_id
+        AND src.start_datetime BETWEEN adm.start_datetime AND adm.end_datetime
 ;
 
 -- -------------------------------------------------------------------
@@ -98,15 +156,12 @@ INNER JOIN
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_waveform_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
-    wh.subject_id                           AS subject_id,
+    src.subject_id                          AS subject_id,
     hadm.hadm_id                            AS hadm_id,     -- get hadm_id by datetime period
-    CONCAT(
-        src.reference_id, '.', src.segment_name,
-        '.', src.source_code
-    )                                       AS reference_id, -- add segment name and source code to make the field unique
+    src.reference_id                        AS reference_id, -- make field unique for visit_detail_source_value
     COALESCE(vc2.concept_id, 0)             AS target_concept_id,
     COALESCE(vc2.domain_id, 'Measurement')  AS target_domain_id,
-    src.mx_datetime                         AS start_datetime,
+    src.start_datetime                      AS start_datetime,
     src.value_as_number                     AS value_as_number,
     IF(src.unit_source_value IS NOT NULL, 
         COALESCE(uc.target_concept_id, 0), NULL)    AS unit_concept_id,
@@ -114,15 +169,12 @@ SELECT
     COALESCE(vc1.concept_id, 0)             AS source_concept_id,
     src.unit_source_value                   AS unit_source_value,
     -- 
-    'waveforms'                             AS unit_id,
+    src.unit_id                             AS unit_id,
     src.load_table_id                       AS load_table_id,
     src.load_row_id                         AS load_row_id,
     src.trace_id                            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_waveform_mx src -- wm
-INNER JOIN
-    `@etl_project`.@etl_dataset.src_waveform_header wh
-        ON wh.reference_id = src.reference_id
+    `@etl_project`.@etl_dataset.lk_waveform_clean src
 -- mapping of the main source code
 -- mapping for measurement unit
 LEFT JOIN

@@ -20,30 +20,13 @@
 -- Why not mimic_id as in III? 
 --      Because source rows can be multiplied during the ETL.
 -- seq_num in custom mapping (seq_num_to_concept): 
---      There is no need of custom mapping because we can just parse target concept name
+--      Replace deprecated detailed type concepts with standard: 32821    OMOP4976894 EHR billing record
+--      TODO in later interations: investigate a possibility to prioritize diagnoses according to seq_num
 -- condition_status_source_value / concept_id
 --      investigate if there is data for conditons status
 -- -------------------------------------------------------------------
 
 -- 4,520 rows on demo
-
--- -------------------------------------------------------------------
--- tmp_gcpt_seq_num_to_concept
--- seq_num -> condition_type_concept_id
--- -------------------------------------------------------------------
-
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_seq_num_to_concept AS
-SELECT
-    CAST(REGEXP_EXTRACT(c1.concept_name, r"[\d]+") AS INT64) AS seq_num,
-    c1.concept_id       AS target_concept_id,
-    c1.concept_name     AS target_concept_name
-FROM
-    `@etl_project`.@etl_dataset.voc_concept AS c1
-WHERE
-    c1.concept_name LIKE 'Inpatient detail %'
-    AND c1.vocabulary_id = 'Condition Type'
-    AND REGEXP_CONTAINS(c1.concept_name, r"[\d]+")
-;
 
 -- -------------------------------------------------------------------
 -- lk_diagnoses_icd_clean
@@ -90,7 +73,7 @@ SELECT
     src.seq_num                         AS seq_num,
     src.start_datetime                  AS start_datetime,
     src.end_datetime                    AS end_datetime,
-    COALESCE(ct.target_concept_id, 0)   AS type_concept_id,
+    32821                               AS type_concept_id, -- OMOP4976894 EHR billing record
     --
     src.source_code                     AS source_code,
     src.source_vocabulary_id            AS source_vocabulary_id,
@@ -105,9 +88,6 @@ SELECT
     src.trace_id            AS trace_id  
 FROM
     `@etl_project`.@etl_dataset.lk_diagnoses_icd_clean src
-LEFT JOIN   
-    `@etl_project`.@etl_dataset.tmp_seq_num_to_concept ct
-        ON  src.seq_num = ct.seq_num
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
         ON REPLACE(vc.concept_code, '.', '') = REPLACE(TRIM(src.source_code), '.', '')

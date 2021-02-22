@@ -47,6 +47,21 @@ FROM
 WHERE
     src.hadm_id IS NULL
 UNION ALL
+-- specimen
+SELECT
+    src.subject_id                                  AS subject_id,
+    CAST(src.start_datetime AS DATE)                AS date_id,
+    src.start_datetime                              AS start_datetime,
+    -- 
+    src.unit_id                     AS unit_id,
+    src.load_table_id               AS load_table_id,
+    src.load_row_id                 AS load_row_id,
+    src.trace_id                    AS trace_id
+FROM
+    `@etl_project`.@etl_dataset.lk_specimen_mapped src
+WHERE
+    src.hadm_id IS NULL
+UNION ALL
 -- organism
 SELECT
     src.subject_id                                  AS subject_id,

@@ -78,9 +78,15 @@ SELECT
     cs.care_site_id                         AS care_site_id,
     src.source_value                        AS visit_source_value, -- it should be an ID for visits
     COALESCE(lat.source_concept_id, 0)      AS visit_source_concept_id, -- it is where visit_concept_id comes from
-    COALESCE(la.target_concept_id, 0)       AS admitting_source_concept_id,
+    IF(
+        src.admission_location IS NOT NULL,
+        COALESCE(la.target_concept_id, 0),
+        NULL)                               AS admitting_source_concept_id,
     src.admission_location                  AS admitting_source_value,
-    COALESCE(ld.target_concept_id, 0)       AS discharge_to_concept_id,
+    IF(
+        src.discharge_location IS NOT NULL,
+        COALESCE(ld.target_concept_id, 0),
+        NULL)                               AS discharge_to_concept_id,
     src.discharge_location                  AS discharge_to_source_value,
     LAG(src.visit_occurrence_id) OVER ( 
         PARTITION BY subject_id, hadm_id 

@@ -27,7 +27,7 @@ Expected locations for CSVs are:
 config_default = {
 
     "bq_target_project":        "project...",
-    "bq_target_dataset":        "mimiciv_delivery_demo",
+    "bq_target_dataset":        "dataset...",
 
     "source_format":            "csv",
     "csv_path":                 "gs://...",

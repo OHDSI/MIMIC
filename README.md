@@ -92,6 +92,25 @@ Vocabularies are kept in a separate dataset, and are copied as a part of the sna
 ### Change Log (latest first) ###
 
 
+**2021-02-22**
+
+* All events tables
+    * review and re-map type_concept_id
+* Specimen
+    * due to target domain in custom mapping some specimen are put to Procedure and Observation
+* Procedure
+    * a bug is fixed in lk_hcpcs_concept table. HCPCS procedures are in the target table now
+* Measurement
+    * trim values in chartevents
+    * pick antibiotic resistance custom vocabulary
+* Observation
+    * add 'mimiciv_obs_language' custom vocaulary (just english, but it covers 17% of observation rows)
+* Dose_era
+    * a bug is fixed. Now dose_era is populated properly
+* Custom mapping is added and updated
+    * for visit_detail, specimen, measurement, drug, units, waveforms
+
+
 **2021-02-08**
 
 * Set version v.1.0

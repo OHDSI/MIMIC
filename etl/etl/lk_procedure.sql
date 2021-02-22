@@ -137,8 +137,7 @@ LEFT JOIN
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_hcpcs_concept AS
 SELECT
-    CONCAT(REPLACE(vc.concept_code, '.', ''), '|', 
-        REGEXP_EXTRACT(vc.vocabulary_id, r'[\d]+'))     AS source_code,
+    vc.concept_code         AS source_code,    
     vc.domain_id            AS source_domain_id,
     vc.concept_id           AS source_concept_id,
     vc2.domain_id           AS target_domain_id,
@@ -265,7 +264,7 @@ SELECT
     src.subject_id                          AS subject_id, -- to person
     COALESCE(lc.target_concept_id, 0)       AS target_concept_id,
     src.procedure_datetime                  AS start_datetime,
-    257                                     AS type_concept_id, -- Hospitalization Cost Record
+    32821                                   AS type_concept_id, -- OMOP4976894 EHR billing record
     src.hcpcs_cd                            AS source_code,
     COALESCE(lc.source_concept_id, 0)       AS source_concept_id,
     CAST(1 AS FLOAT64)                      AS quantity,
@@ -290,7 +289,7 @@ SELECT
     src.subject_id                          AS subject_id, -- to person
     COALESCE(lc.target_concept_id, 0)       AS target_concept_id,
     src.procedure_datetime                  AS start_datetime,
-    38000275                                AS type_concept_id, -- EHR order list entry,
+    32833                                   AS type_concept_id, -- OMOP4976906 EHR order
     CAST(src.itemid AS STRING)              AS source_code,
     COALESCE(lc.source_concept_id, 0)       AS source_concept_id,
     src.quantity                            AS quantity,
@@ -315,7 +314,7 @@ SELECT
     src.subject_id                          AS subject_id, -- to person
     COALESCE(lc.target_concept_id, 0)       AS target_concept_id,
     src.procedure_datetime                  AS start_datetime,
-    38003622                                AS type_concept_id,
+    32821                                   AS type_concept_id, -- OMOP4976894 EHR billing record
     src.source_code                         AS source_code,
     COALESCE(lc.source_concept_id, 0)       AS source_concept_id,
     1                                       AS quantity,
@@ -340,7 +339,7 @@ SELECT
     src.subject_id                          AS subject_id, -- to person
     COALESCE(lc.target_concept_id, 0)       AS target_concept_id,
     src.start_datetime                      AS start_datetime,
-    38000275                                AS type_concept_id, -- EHR order list entry
+    32833                                   AS type_concept_id, -- OMOP4976906 EHR order
     src.source_code                         AS source_code, -- add itemid?
     COALESCE(lc.source_concept_id, 0)       AS source_concept_id,
     1                                       AS quantity,

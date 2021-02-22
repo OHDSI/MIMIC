@@ -153,8 +153,9 @@ SELECT
     'wf_details' load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-            src.segment_name AS segment_name,
-            subj.subject_id AS subject_id
+            src.case_id AS case_id,
+            CAST(src.date_time AS STRING) AS date_time,
+            src.src_name AS src_name
         )) AS trace_id -- 
 FROM
     `@wf_project`.@wf_dataset.wf_details src

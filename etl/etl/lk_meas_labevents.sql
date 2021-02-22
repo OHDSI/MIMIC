@@ -56,7 +56,7 @@ SELECT
     src.value                               AS value, -- value_source_value
     REGEXP_EXTRACT(src.value, r'^(\<=|\>=|\>|\<|=|)')   AS value_operator,
     REGEXP_EXTRACT(src.value, r'[-]?[\d]+[.]?[\d]*')    AS value_number, -- assume "-0.34 etc"
-    src.valueuom                            AS valueuom, -- unit_source_value,
+    IF(TRIM(src.valueuom) <> '', src.valueuom, NULL)    AS valueuom, -- unit_source_value,
     src.ref_range_lower                     AS ref_range_lower,
     src.ref_range_upper                     AS ref_range_upper,
     'labevents'                             AS unit_id,

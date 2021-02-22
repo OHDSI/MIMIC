@@ -234,3 +234,5 @@
 "Ventilator|Blood|Blood Gas",2000001233,"mimiciv_meas_lab_loinc","Measurement","Lab Test",,"Ventilator|Blood|Blood Gas","1970-01-01","2099-12-31",,3004921,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "WBC Clumps|Urine|Hematology",2000001234,"mimiciv_meas_lab_loinc","Measurement","Lab Test",,"WBC Clumps|Urine|Hematology","1970-01-01","2099-12-31",,3043728,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "WBC Count|Blood|Hematology",2000001235,"mimiciv_meas_lab_loinc","Measurement","Lab Test",,"WBC Count|Blood|Hematology","1970-01-01","2099-12-31",,3000905,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"Calculated Total CO2|Blood|Blood Gas",2000001236,"mimiciv_meas_lab_loinc","Measurement","Lab Test",,"Calculated Total CO2|Blood|Blood Gas","1970-01-01","2099-12-31",,3031147,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"Lactate|Blood|Blood Gas",2000001237,"mimiciv_meas_lab_loinc","Measurement","Lab Test",,"Lactate|Blood|Blood Gas","1970-01-01","2099-12-31",,3047181,"Maps to","Mapped from","1970-01-01","2099-12-31",

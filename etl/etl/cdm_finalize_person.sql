@@ -35,3 +35,5 @@ SELECT per.*
 FROM
     `@etl_project`.@etl_dataset.tmp_person per
 ;
+
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_person;

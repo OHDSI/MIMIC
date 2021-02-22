@@ -6,3 +6,4 @@
 "SINGLE",2000001505,"mimiciv_obs_marital","Meas Value","Answer",,"SINGLE","1970-01-01","2099-12-31",,45881671,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "UNKNOWN (DEFAULT)",2000001506,"mimiciv_obs_marital","Meas Value","Answer",,"UNKNOWN (DEFAULT)","1970-01-01","2099-12-31",,45876636,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "WIDOWED",2000001507,"mimiciv_obs_marital","Meas Value","Answer",,"WIDOWED","1970-01-01","2099-12-31",,45883711,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"ENGLISH",2000001521,"mimiciv_obs_language","Observation","Qualifier Value",,"ENGLISH","1970-01-01","2099-12-31",,4180186,"Maps to","Mapped from","1970-01-01","2099-12-31",

@@ -117,6 +117,7 @@ INNER JOIN
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_specimen_clean AS
 SELECT DISTINCT
     src.subject_id                              AS subject_id,
+    src.hadm_id                                 AS hadm_id,
     src.start_datetime                          AS start_datetime,
     src.spec_itemid                             AS spec_itemid, -- d_micro.itemid, type of specimen taken
     -- 
@@ -160,6 +161,29 @@ WHERE
 ;
 
 -- -------------------------------------------------------------------
+-- lk_d_micro_clean
+-- add resistance source codes to all microbiology source codes
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_d_micro_clean AS
+SELECT
+    dm.itemid           AS itemid,
+    dm.label            AS source_code, -- gcpt.label
+    CONCAT('mimiciv_micro_', LOWER(dm.category))    AS source_vocabulary_id,
+FROM
+    `@etl_project`.@etl_dataset.src_d_micro dm
+UNION ALL
+SELECT DISTINCT
+    CAST(NULL AS INT64)             AS itemid,
+    src.interpretation              AS source_code,
+    'mimiciv_micro_resistance'      AS source_vocabulary_id
+FROM
+    `@etl_project`.@etl_dataset.lk_meas_ab_clean src
+WHERE
+    src.interpretation IS NOT NULL
+;
+
+-- -------------------------------------------------------------------
 -- lk_d_micro_concept
 --
 --      gcpt_microbiology_specimen_to_concept -> mimiciv_micro_specimen
@@ -178,22 +202,22 @@ WHERE
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_d_micro_concept AS
 SELECT
     dm.itemid           AS itemid,
-    dm.label            AS source_code, -- gcpt.label
-    CONCAT('mimiciv_micro_', LOWER(dm.category))    AS source_vocabulary_id,
+    dm.source_code      AS source_code, -- gcpt.label
+    dm.source_vocabulary_id     AS source_vocabulary_id,
     vc.domain_id        AS source_domain_id,
     vc.concept_id       AS source_concept_id,
     vc2.domain_id       AS target_domain_id,
     vc2.concept_id      AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.src_d_micro dm
+    `@etl_project`.@etl_dataset.lk_d_micro_clean dm
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
-        ON  dm.label = vc.concept_code
+        ON  dm.source_code = vc.concept_code
         -- gcpt_microbiology_specimen_to_concept -> mimiciv_micro_specimen
         -- (gcpt) brand new vocab -> mimiciv_micro_test
         -- gcpt_org_name_to_concept -> mimiciv_micro_organism
         -- (gcpt) brand new vocab -> mimiciv_micro_resistance
-        AND vc.vocabulary_id = CONCAT('mimiciv_micro_', LOWER(dm.category))
+        AND vc.vocabulary_id = dm.source_vocabulary_id
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
@@ -213,6 +237,10 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_specimen_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())           AS specimen_id,
     src.subject_id                              AS subject_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
+    CAST(src.start_datetime AS DATE)            AS date_id,
+    32856                                       AS type_concept_id, -- Lab
+    COALESCE(mc.source_concept_id, 0)           AS source_concept_id,
     COALESCE(mc.target_concept_id, 0)           AS target_concept_id,
     src.start_datetime                          AS start_datetime,
     mc.source_code                              AS source_code,
@@ -227,6 +255,10 @@ FROM
 INNER JOIN
     `@etl_project`.@etl_dataset.lk_d_micro_concept mc
         ON src.spec_itemid = mc.itemid
+LEFT JOIN
+    `@etl_project`.@etl_dataset.lk_micro_hadm_id hadm
+        ON hadm.event_trace_id = src.trace_id
+        AND hadm.row_num = 1
 ;
 
 -- -------------------------------------------------------------------
@@ -239,7 +271,7 @@ SELECT
     src.subject_id                              AS subject_id,
     COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
     CAST(src.start_datetime AS DATE)            AS date_id,
-    0                                           AS type_concept_id,
+    32856                                       AS type_concept_id, -- Lab
     src.start_datetime                          AS start_datetime,
     CONCAT(tc.source_code, '|', sc.source_code)   AS source_code, -- test name plus specimen name
     COALESCE(tc.target_concept_id, 0)           AS target_concept_id,
@@ -282,9 +314,9 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_ab_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
     src.subject_id                              AS subject_id,
-    COALESCE(src.hadm_id, hadm.hadm_id)          AS hadm_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
     CAST(src.start_datetime AS DATE)            AS date_id,
-    0                                           AS type_concept_id,
+    32856                                       AS type_concept_id, -- Lab
     src.start_datetime                          AS start_datetime,
     ac.source_code                              AS source_code,
     COALESCE(ac.target_concept_id, 0)           AS target_concept_id,

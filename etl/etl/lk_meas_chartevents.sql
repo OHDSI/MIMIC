@@ -42,7 +42,7 @@ SELECT
     -- src.itemid                      AS itemid,
     di.label                        AS source_code,
     src.charttime                   AS start_datetime,
-    src.value                       AS value,
+    TRIM(src.value)                 AS value,
     src.valuenum                    AS valuenum,
     src.valueuom                    AS valueuom, -- unit of measurement
     --

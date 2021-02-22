@@ -27,7 +27,7 @@ SELECT DISTINCT
         PARTITION BY src.subject_id 
         ORDER BY src.admittime ASC
     )                                   AS dischtime,
-    38003569                            AS type_concept_id, -- EHR record patient status "Deceased"
+    32817                               AS type_concept_id, -- OMOP4976890 EHR
     --
     'admissions'                        AS unit_id,
     src.load_table_id                   AS load_table_id,

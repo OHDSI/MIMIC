@@ -82,7 +82,7 @@ SELECT
     40758030                        AS target_concept_id, -- Preferred language
     src.admittime                   AS start_datetime,
     src.language                    AS value_as_string,
-    CAST(NULL AS STRING)            AS source_vocabulary_id,
+    'mimiciv_obs_language'          AS source_vocabulary_id,
     --
     'admissions.language'           AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -164,7 +164,7 @@ SELECT
     src.subject_id                          AS subject_id, -- to person
     COALESCE(src.target_concept_id, 0)      AS target_concept_id,
     src.start_datetime                      AS start_datetime,
-    38000280                                AS type_concept_id, -- Observation recorded from EHR, -- Rules 1-4
+    32817                                   AS type_concept_id, -- OMOP4976890 EHR, -- Rules 1-4
     src.source_code                         AS source_code,
     0                                       AS source_concept_id,
     src.value_as_string                     AS value_as_string,

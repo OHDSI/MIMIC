@@ -17,7 +17,7 @@
 "hour",2000029016,"mimiciv_meas_unit","Unit","Unit",,"hour","1970-01-01","2099-12-31",,8505,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "hrs",2000029017,"mimiciv_meas_unit","Unit","Unit",,"hrs","1970-01-01","2099-12-31",,8505,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "Inch",2000029018,"mimiciv_meas_unit","Unit","Unit",,"Inch","1970-01-01","2099-12-31",,9327,"Maps to","Mapped from","1970-01-01","2099-12-31",
-"insp/min",2000029019,"mimiciv_meas_unit","Unit","Unit",,"insp/min","1970-01-01","2099-12-31",,4141207,"Maps to","Mapped from","1970-01-01","2099-12-31",
+"insp/min",2000029019,"mimiciv_meas_unit","Unit","Unit",,"insp/min","1970-01-01","2099-12-31",,8541,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "IU/L",2000029020,"mimiciv_meas_unit","Unit","Unit",,"IU/L","1970-01-01","2099-12-31",,8923,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "IU/mL",2000029021,"mimiciv_meas_unit","Unit","Unit",,"IU/mL","1970-01-01","2099-12-31",,8985,"Maps to","Mapped from","1970-01-01","2099-12-31",
 "K/uL",2000029022,"mimiciv_meas_unit","Unit","Unit",,"K/uL","1970-01-01","2099-12-31",,8848,"Maps to","Mapped from","1970-01-01","2099-12-31",

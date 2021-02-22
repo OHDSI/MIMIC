@@ -212,7 +212,7 @@ SELECT
         -- there is no end_date or INTERVAL for the days_supply
 FROM `@etl_project`.@etl_dataset.tmp_drugWithDose dwd
 WHERE
-    dose_value = -1
+    dose_value <> -1
 ;
 
 -- -------------------------------------------------------------------

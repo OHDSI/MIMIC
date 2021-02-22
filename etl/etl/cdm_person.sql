@@ -105,8 +105,8 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_person
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID()) AS person_id,
     CASE 
-        WHEN p.gender = 'F' THEN 8532 
-        WHEN p.gender = 'M' THEN 8507 
+        WHEN p.gender = 'F' THEN 8532 -- FEMALE
+        WHEN p.gender = 'M' THEN 8507 -- MALE
         ELSE 0 
     END                             AS gender_concept_id,
     p.anchor_year                   AS year_of_birth,

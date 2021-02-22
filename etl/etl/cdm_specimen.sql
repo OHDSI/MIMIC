@@ -58,7 +58,7 @@ SELECT
     src.specimen_id                             AS specimen_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS specimen_concept_id,
-    32817                                       AS specimen_type_concept_id, -- EHR, Type Concept, Standard
+    32856                                       AS specimen_type_concept_id, -- OMOP4976929 Lab
     CAST(src.start_datetime AS DATE)            AS specimen_date,
     src.start_datetime                          AS specimen_datetime,
     CAST(NULL AS FLOAT64)                       AS quantity,

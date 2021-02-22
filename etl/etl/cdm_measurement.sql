@@ -73,7 +73,7 @@ SELECT
     CAST(src.start_datetime AS DATE)        AS measurement_date,
     src.start_datetime                      AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
-    44818702                                AS measurement_type_concept_id, -- Lab result   Meas Type   Meas Type
+    32856                                   AS measurement_type_concept_id, -- OMOP4976929 Lab
     src.operator_concept_id                 AS operator_concept_id,
     CAST(src.value_as_number AS FLOAT64)    AS value_as_number,  -- to move CAST to mapped/clean
     CAST(NULL AS INT64)                     AS value_as_concept_id,
@@ -257,7 +257,7 @@ SELECT
     CAST(src.start_datetime AS DATE)        AS measurement_date,
     src.start_datetime                      AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time, -- deprecated, to be removed in later versions
-    44807951                            AS measurement_type_concept_id, -- ECG - electrocardiograph -- ???
+    32817                                   AS measurement_type_concept_id, -- OMOP4976890 EHR
     CAST(NULL AS INT64)                     AS operator_concept_id,
     src.value_as_number                     AS value_as_number,
     CAST(NULL AS INT64)                     AS value_as_concept_id, -- to add values

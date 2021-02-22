@@ -63,6 +63,9 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_visit_detail
 -- Rule 2. services
 -- -------------------------------------------------------------------
 
+
+
+
 INSERT INTO `@etl_project`.@etl_dataset.cdm_visit_detail
 SELECT
     src.visit_detail_id                     AS visit_detail_id,
@@ -77,8 +80,14 @@ SELECT
     CAST(NULL AS INT64)                     AS provider_id,
     cs.care_site_id                         AS care_site_id,
 
-    COALESCE(la.target_concept_id, 0)       AS admitting_source_concept_id,
-    COALESCE(ld.target_concept_id, 0)       AS discharge_to_concept_id,
+    IF(
+        src.admission_location IS NOT NULL,
+        COALESCE(la.target_concept_id, 0),
+        NULL)                               AS admitting_source_concept_id,
+    IF(
+        src.discharge_location IS NOT NULL,
+        COALESCE(ld.target_concept_id, 0),
+        NULL)                               AS discharge_to_concept_id,
 
     src.preceding_visit_detail_id           AS preceding_visit_detail_id,
     src.source_value                        AS visit_detail_source_value,

@@ -52,13 +52,14 @@ SELECT
     --     -- src.drug, src.drug_name_poe, src.drug_name_generic,'')
     --     src.drug, '')
     --     || ' ' || COALESCE(src.prod_strength, '')               
-    COALESCE(IF(src.drug IN ('Bag', 'Vial', 'Syringe', 'Syringe.', 
-                    'Syringe (Neonatal)', 'Syringe (Chemo)', 'Soln', 'Soln.',
-                    'Sodium Chloride 0.9%  Flush'), 
+    TRIM(COALESCE(
+        IF(src.drug IN ('Bag', 'Vial', 'Syringe', 'Syringe.', 
+                        'Syringe (Neonatal)', 'Syringe (Chemo)', 'Soln', 'Soln.',
+                        'Sodium Chloride 0.9%  Flush'), 
             pharm.medication, src.drug), '') || 
-        ' ' || COALESCE(src.prod_strength, '')                  AS gcpt_source_code, -- medication/drug + prod_strength
-    'mimiciv_drug_ndc'                                          AS gcpt_source_vocabulary, -- source_code = label
-    src.pharmacy_id                                             AS pharmacy_id,
+            ' ' || COALESCE(src.prod_strength, ''))  AS gcpt_source_code, -- medication/drug + prod_strength
+    'mimiciv_drug_ndc'                          AS gcpt_source_vocabulary, -- source_code = label
+    src.pharmacy_id                             AS pharmacy_id,
     -- 
     'prescriptions'                 AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -175,7 +176,7 @@ SELECT
         WHEN src.end_datetime < src.start_datetime THEN src.start_datetime
         ELSE src.end_datetime
     END                                             AS end_datetime,
-    38000177                                        AS type_concept_id,
+    32838                                           AS type_concept_id, -- OMOP4976911 EHR prescription
     src.quantity                                    AS quantity,
     COALESCE(vc_route.target_concept_id, 0)                             AS route_concept_id,
     COALESCE(vc_ndc.source_code, vc_gcpt.source_code, src.gcpt_source_code) AS source_code,
@@ -194,13 +195,13 @@ FROM
 LEFT JOIN
     `@etl_project`.@etl_dataset.lk_pr_ndc_concept vc_ndc
         ON  src.ndc_source_code = vc_ndc.source_code
-        AND vc_ndc.target_concept_id IS NOT NULL -- temporary
+        AND vc_ndc.target_concept_id IS NOT NULL
 LEFT JOIN
     `@etl_project`.@etl_dataset.lk_pr_gcpt_concept vc_gcpt
         ON  src.gcpt_source_code = vc_gcpt.source_code
-        AND vc_gcpt.target_concept_id IS NOT NULL -- temporary
+        AND vc_gcpt.target_concept_id IS NOT NULL
 LEFT JOIN
     `@etl_project`.@etl_dataset.lk_pr_route_concept vc_route
         ON src.route_source_code = vc_route.source_code
-        AND vc_route.target_concept_id IS NOT NULL -- temporary
+        AND vc_route.target_concept_id IS NOT NULL
 ;
