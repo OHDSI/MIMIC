@@ -24,6 +24,8 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_patients AS
 SELECT 
     subject_id                          AS subject_id,
     anchor_year                         AS anchor_year,
+    anchor_age                          AS anchor_age,
+    anchor_year_group                   AS anchor_year_group,
     gender                              AS gender,
     --
     'patients'                          AS load_table_id,
