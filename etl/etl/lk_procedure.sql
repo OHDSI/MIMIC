@@ -109,6 +109,7 @@ INNER JOIN
 -- datetimeevents
 -- Rule 4
 -- custom mapping gcpt_datetimeevents_to_concept -> mimiciv_proc_datetimeevents
+-- filter out 55 rows where the year is earlier than one year before patient's birth
 -- -------------------------------------------------------------------
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_datetimeevents_clean AS
 SELECT
@@ -116,7 +117,7 @@ SELECT
     src.hadm_id              AS hadm_id,
     src.itemid               AS itemid,
     src.value                AS start_datetime,
-    di.label                AS source_code,
+    di.label                 AS source_code,
     --
     src.load_table_id                   AS load_table_id,
     src.load_row_id                     AS load_row_id,
@@ -126,6 +127,11 @@ FROM
 LEFT JOIN
     `@etl_project`.@etl_dataset.src_d_items di
         ON  src.itemid = di.itemid
+INNER JOIN
+    `@etl_project`.@etl_dataset.src_patients pat
+        ON  pat.subject_id = src.subject_id
+WHERE
+    EXTRACT(YEAR FROM src.value) >= pat.anchor_year - pat.anchor_age - 1
 ;
 
 

@@ -78,7 +78,12 @@ SELECT
         src.reference_id, '.', src.segment_name,
         '.', src.source_code
     )                                       AS reference_id, -- add segment name and source code to make the field unique
-    src. mx_datetime                         AS start_datetime,
+    IF(
+        EXTRACT(YEAR FROM src.mx_datetime) < pat.anchor_year,
+        DATETIME(pat.anchor_year, EXTRACT(MONTH FROM src.mx_datetime), EXTRACT(DAY FROM src.mx_datetime),
+            EXTRACT(HOUR FROM src.mx_datetime), EXTRACT(MINUTE FROM src.mx_datetime), EXTRACT(SECOND FROM src.mx_datetime)),
+        src.mx_datetime
+    )                                       AS start_datetime, -- shift date to anchor_year if it is earlier
     src.value_as_number                     AS value_as_number,
     src.source_code                         AS source_code, 
     src.unit_source_value                   AS unit_source_value,
@@ -92,6 +97,9 @@ FROM
 INNER JOIN
     `@etl_project`.@etl_dataset.src_waveform_header wh
         ON wh.reference_id = src.reference_id
+INNER JOIN
+    `@etl_project`.@etl_dataset.src_patients pat
+        ON wh.subject_id = pat.subject_id
 ;
 
 -- poc_3

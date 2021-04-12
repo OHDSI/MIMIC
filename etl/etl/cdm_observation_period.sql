@@ -189,5 +189,5 @@ GROUP BY
 -- cleanup
 -- -------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_observation_period_clean;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_observation_period;
+-- DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_observation_period_clean;
+-- DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_observation_period;

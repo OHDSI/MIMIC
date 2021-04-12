@@ -104,6 +104,12 @@ ORDER BY table_name, concept_field, category, count DESC;
 ### Change Log (latest first) ###
 
 
+**2021-03-08**
+
+* Date shift bugfix
+    * cdm_person - birth_year is updated
+    * lk_procedure - events earlier than one year before birth_year are filtered out
+
 **2021-02-22**
 
 * All events tables
