@@ -69,7 +69,7 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
-    src.target_concept_id                   AS measurement_concept_id,
+    COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
     CAST(src.start_datetime AS DATE)        AS measurement_date,
     src.start_datetime                      AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
@@ -115,11 +115,11 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
-    src.target_concept_id                   AS measurement_concept_id,
+    COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
     CAST(src.start_datetime AS DATE)        AS measurement_date,
     src.start_datetime                      AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
-    32817                                   AS measurement_type_concept_id, -- EHR  Type Concept    Type Concept
+    src.type_concept_id                     AS measurement_type_concept_id,
     CAST(NULL AS INT64)                     AS operator_concept_id,
     src.value_as_number                     AS value_as_number,
     src.value_as_concept_id                 AS value_as_concept_id,
@@ -146,7 +146,7 @@ INNER JOIN
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
     src.target_domain_id = 'Measurement'
 ;
@@ -160,7 +160,7 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
-    src.target_concept_id                   AS measurement_concept_id,
+    COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
     CAST(src.start_datetime AS DATE)        AS measurement_date,
     src.start_datetime                      AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
@@ -206,7 +206,7 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
-    src.target_concept_id                   AS measurement_concept_id,
+    COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
     CAST(src.start_datetime AS DATE)        AS measurement_date,
     src.start_datetime                      AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,

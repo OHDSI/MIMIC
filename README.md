@@ -104,6 +104,13 @@ ORDER BY table_name, concept_field, category, count DESC;
 ### Change Log (latest first) ###
 
 
+**2021-05-17**
+
+* etl/unload/\*extra.sql is added
+* custom mapping review scripts are added to crosswalk_csv folder
+* bugfixes
+
+
 **2021-03-08**
 
 * Date shift bugfix

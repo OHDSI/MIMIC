@@ -103,7 +103,8 @@ INSERT INTO `@etl_project`.@etl_dataset.lk_observation_clean
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
-    'DRG code' AS source_code,
+    -- 'DRG code' AS source_code,
+    src.drg_code                    AS source_code,
     4296248                         AS target_concept_id, -- Cost containment
     COALESCE(adm.edregtime, adm.admittime)  AS start_datetime,
     src.description                 AS value_as_string,
@@ -143,6 +144,8 @@ LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
         ON src.value_as_string = vc.concept_code
         AND src.source_vocabulary_id = vc.vocabulary_id
+        -- valid period should be used to map drg_code, but due to the date shift it is not applicable
+        -- AND src.start_datetime BETWEEN vc.valid_start_date AND vc.valid_end_date
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1

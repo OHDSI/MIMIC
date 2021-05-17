@@ -163,20 +163,23 @@ WHERE
 -- -------------------------------------------------------------------
 -- lk_d_micro_clean
 -- add resistance source codes to all microbiology source codes
+-- source_label for organism: test name plus specimen name
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_d_micro_clean AS
 SELECT
-    dm.itemid           AS itemid,
-    dm.label            AS source_code, -- gcpt.label
+    dm.itemid                                       AS itemid,
+    CAST(dm.itemid AS STRING)                       AS source_code,
+    dm.label                                        AS source_label, -- for organism_mapped: test name plus specimen name
     CONCAT('mimiciv_micro_', LOWER(dm.category))    AS source_vocabulary_id,
 FROM
     `@etl_project`.@etl_dataset.src_d_micro dm
 UNION ALL
 SELECT DISTINCT
-    CAST(NULL AS INT64)             AS itemid,
-    src.interpretation              AS source_code,
-    'mimiciv_micro_resistance'      AS source_vocabulary_id
+    CAST(NULL AS INT64)                             AS itemid,
+    src.interpretation                              AS source_code,
+    src.interpretation                              AS source_label,
+    'mimiciv_micro_resistance'                      AS source_vocabulary_id
 FROM
     `@etl_project`.@etl_dataset.lk_meas_ab_clean src
 WHERE
@@ -201,13 +204,20 @@ WHERE
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_d_micro_concept AS
 SELECT
-    dm.itemid           AS itemid,
-    dm.source_code      AS source_code, -- gcpt.label
+    dm.itemid                   AS itemid,
+    dm.source_code              AS source_code, -- itemid
+    dm.source_label             AS source_label, -- symbolic information in case more mapping is required
     dm.source_vocabulary_id     AS source_vocabulary_id,
-    vc.domain_id        AS source_domain_id,
-    vc.concept_id       AS source_concept_id,
-    vc2.domain_id       AS target_domain_id,
-    vc2.concept_id      AS target_concept_id
+    -- source_concept
+    vc.domain_id                AS source_domain_id,
+    vc.concept_id               AS source_concept_id,
+    vc.concept_name             AS source_concept_name,
+    -- target concept
+    vc2.vocabulary_id           AS target_vocabulary_id,
+    vc2.domain_id               AS target_domain_id,
+    vc2.concept_id              AS target_concept_id,
+    vc2.concept_name            AS target_concept_name,
+    vc2.standard_concept        AS target_standard_concept
 FROM
     `@etl_project`.@etl_dataset.lk_d_micro_clean dm
 LEFT JOIN
@@ -240,11 +250,13 @@ SELECT
     COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
     CAST(src.start_datetime AS DATE)            AS date_id,
     32856                                       AS type_concept_id, -- Lab
-    COALESCE(mc.source_concept_id, 0)           AS source_concept_id,
-    COALESCE(mc.target_concept_id, 0)           AS target_concept_id,
     src.start_datetime                          AS start_datetime,
+    src.spec_itemid                             AS spec_itemid,
     mc.source_code                              AS source_code,
+    mc.source_vocabulary_id                     AS source_vocabulary_id,
+    mc.source_concept_id                        AS source_concept_id,
     COALESCE(mc.target_domain_id, 'Specimen')   AS target_domain_id,
+    mc.target_concept_id                        AS target_concept_id,
     -- 
     src.unit_id                     AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -273,15 +285,19 @@ SELECT
     CAST(src.start_datetime AS DATE)            AS date_id,
     32856                                       AS type_concept_id, -- Lab
     src.start_datetime                          AS start_datetime,
-    CONCAT(tc.source_code, '|', sc.source_code)   AS source_code, -- test name plus specimen name
-    COALESCE(tc.target_concept_id, 0)           AS target_concept_id,
-    COALESCE(tc.source_concept_id, 0)           AS source_concept_id,
+    src.test_itemid                             AS test_itemid,
+    src.spec_itemid                             AS spec_itemid,
+    src.org_itemid                              AS org_itemid,
+    CONCAT(tc.source_code, '|', sc.source_code)     AS source_code, -- test itemid plus specimen itemid
+    tc.source_vocabulary_id                     AS source_vocabulary_id,
+    tc.source_concept_id                        AS source_concept_id,
+    COALESCE(tc.target_domain_id, 'Measurement')    AS target_domain_id,
+    tc.target_concept_id                        AS target_concept_id,
     oc.source_code                              AS value_source_value,
     oc.target_concept_id                        AS value_as_concept_id,
-    COALESCE(tc.target_domain_id, 'Measurement')    AS target_domain_id,
     -- fields to link to specimen and test-organism
     src.trace_id_spec                           AS trace_id_spec,
-    -- 
+    --
     src.unit_id                     AS unit_id,
     src.load_table_id               AS load_table_id,
     src.load_row_id                 AS load_row_id,
@@ -318,6 +334,7 @@ SELECT
     CAST(src.start_datetime AS DATE)            AS date_id,
     32856                                       AS type_concept_id, -- Lab
     src.start_datetime                          AS start_datetime,
+    src.ab_itemid                               AS ab_itemid,
     ac.source_code                              AS source_code,
     COALESCE(ac.target_concept_id, 0)           AS target_concept_id,
     COALESCE(ac.source_concept_id, 0)           AS source_concept_id,

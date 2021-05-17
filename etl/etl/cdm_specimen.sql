@@ -57,7 +57,7 @@ INSERT INTO `@etl_project`.@etl_dataset.cdm_specimen
 SELECT
     src.specimen_id                             AS specimen_id,
     per.person_id                               AS person_id,
-    src.target_concept_id                       AS specimen_concept_id,
+    COALESCE(src.target_concept_id, 0)          AS specimen_concept_id,
     32856                                       AS specimen_type_concept_id, -- OMOP4976929 Lab
     CAST(src.start_datetime AS DATE)            AS specimen_date,
     src.start_datetime                          AS specimen_datetime,

@@ -92,7 +92,7 @@ INNER JOIN
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -109,7 +109,7 @@ SELECT
     src.target_concept_id                       AS observation_concept_id,
     CAST(src.start_datetime AS DATE)            AS observation_date,
     src.start_datetime                          AS observation_datetime,
-    32817                                       AS observation_type_concept_id, -- EHR  Type Concept    Type Concept
+    src.type_concept_id                         AS observation_type_concept_id,
     src.value_as_number                         AS value_as_number,
     src.value_source_value                      AS value_as_string,
     IF(src.value_source_value IS NOT NULL,
@@ -137,7 +137,7 @@ INNER JOIN
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -180,7 +180,7 @@ INNER JOIN
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -223,7 +223,7 @@ INNER JOIN
 INNER JOIN
     `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
         ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
+            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
     src.target_domain_id = 'Observation'
 ;

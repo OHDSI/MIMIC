@@ -39,12 +39,21 @@ SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
     src.stay_id                     AS stay_id,
-    -- src.itemid                      AS itemid,
-    di.label                        AS source_code,
+    src.itemid                      AS itemid,
+    CAST(src.itemid AS STRING)      AS source_code,
+    di.label                        AS source_label,
     src.charttime                   AS start_datetime,
     TRIM(src.value)                 AS value,
-    src.valuenum                    AS valuenum,
-    src.valueuom                    AS valueuom, -- unit of measurement
+    IF(
+        REGEXP_EXTRACT(TRIM(src.value), r'^[-]?[\d]+[.]?[\d]*[ ]*[a-z]+$') IS NOT NULL, -- 7.5 mm etc
+        CAST(REGEXP_EXTRACT(src.value, r'[-]?[\d]+[.]?[\d]*') AS FLOAT64),
+        src.valuenum
+    )                               AS valuenum,
+    IF(
+        REGEXP_EXTRACT(TRIM(src.value), r'^[-]?[\d]+[.]?[\d]*[ ]*[a-z]+$') IS NOT NULL, -- 7.5 mm etc
+        REGEXP_EXTRACT(src.value, r'[a-z]+'),
+        src.valueuom
+    )                               AS valueuom, -- unit of measurement
     --
     'chartevents'           AS unit_id,
     src.load_table_id       AS load_table_id,
@@ -56,31 +65,76 @@ INNER JOIN
     `@etl_project`.@etl_dataset.src_d_items di
         ON  src.itemid = di.itemid
 WHERE
-    di.label IN (
-        'Heart Rate',
-        'Respiratory Rate',
-        'O2 saturation pulseoxymetry',
-        'Heart Rhythm'
-    )
-
+    di.label NOT LIKE '%Temperature'
+    OR di.label LIKE '%Temperature' 
+        AND IF(valueuom LIKE '%F%', (valuenum - 32) * 5 / 9, valuenum) BETWEEN 25 and 44
+    
 ;
 
 -- -------------------------------------------------------------------
--- lk_chartevents_concept
+-- tmp_chartevents_code_dist
+-- it is a temporary table to collect distinct codes to be mapped
+-- we are going to store source_code, source_label, and row_count in the concept lookup table,
+-- to provide enough information for a mapping team for possible future mapping
+--
 -- brand new custom vocabulary -> mimiciv_meas_chart
 -- brand new custom vocabulary -> mimiciv_meas_chartevents_value
 -- -------------------------------------------------------------------
 
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_chartevents_code_dist AS
+-- source codes to be mapped
+SELECT
+    itemid                      AS itemid,
+    source_code                 AS source_code,
+    source_label                AS source_label,
+    'mimiciv_meas_chart'        AS source_vocabulary_id,
+    COUNT(*)                    AS row_count
+FROM
+    `@etl_project`.@etl_dataset.lk_chartevents_clean
+GROUP BY
+    itemid,
+    source_code,
+    source_label
+UNION ALL
+-- values to be mapped
+SELECT
+    CAST(NULL AS INT64)                 AS itemid,
+    value                               AS source_code,
+    value                               AS source_label,
+    'mimiciv_meas_chartevents_value'    AS source_vocabulary_id, -- both obs values and conditions
+    COUNT(*)                            AS row_count
+FROM
+    `@etl_project`.@etl_dataset.lk_chartevents_clean
+GROUP BY
+    source_code,
+    source_label
+;
+
+-- -------------------------------------------------------------------
+-- lk_chartevents_concept
+-- collect the mapping and keep source_code, source_label, and row_count
+-- for possible future mapping
+-- -------------------------------------------------------------------
+
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_chartevents_concept AS
 SELECT
-    vc.concept_code         AS source_code,
-    vc.vocabulary_id        AS source_vocabulary_id,
-    vc.domain_id            AS source_domain_id,
-    vc.concept_id           AS source_concept_id,
-    vc2.domain_id           AS target_domain_id,
-    vc2.concept_id          AS target_concept_id
+    src.itemid                  AS itemid,
+    src.source_code             AS source_code,
+    src.source_label            AS source_label,
+    src.source_vocabulary_id    AS source_vocabulary_id,
+    -- source concept
+    vc.domain_id                AS source_domain_id,
+    vc.concept_id               AS source_concept_id,
+    -- target concept
+    vc2.domain_id               AS target_domain_id,
+    vc2.concept_id              AS target_concept_id,
+    src.row_count               AS row_count
 FROM
+    `@etl_project`.@etl_dataset.tmp_chartevents_code_dist src
+LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept vc
+        ON  vc.concept_code = src.source_code
+        AND vc.vocabulary_id = src.source_vocabulary_id
 LEFT JOIN
     `@etl_project`.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
@@ -90,12 +144,9 @@ LEFT JOIN
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
-WHERE
-    vc.vocabulary_id IN (
-        'mimiciv_meas_chart',
-        'mimiciv_meas_chartevents_value' -- both obs values and conditions
-    )
 ;
+
+DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_chartevents_code_dist;
 
 -- -------------------------------------------------------------------
 -- lk_chartevents_mapped
@@ -109,10 +160,15 @@ SELECT
     src.hadm_id                                 AS hadm_id,
     src.stay_id                                 AS stay_id,
     src.start_datetime                          AS start_datetime,
+    32817                                       AS type_concept_id,  -- OMOP4976890 EHR
+    src.itemid                                  AS itemid,
     src.source_code                             AS source_code,
-    c_main.target_concept_id                    AS target_concept_id,
+    src.source_label                            AS source_label,
+    c_main.source_vocabulary_id                 AS source_vocabulary_id,
+    c_main.source_domain_id                     AS source_domain_id,
     c_main.source_concept_id                    AS source_concept_id,
     c_main.target_domain_id                     AS target_domain_id,
+    c_main.target_concept_id                    AS target_concept_id,
     IF(src.valuenum IS NULL, src.value, NULL)   AS value_source_value,
     IF(
         IF(src.valuenum IS NULL, src.value, NULL) IS NOT NULL,
@@ -157,9 +213,10 @@ SELECT
     src.stay_id                                 AS stay_id,
     src.start_datetime                          AS start_datetime,
     src.value                                   AS source_code,
-    c_main.target_concept_id                    AS target_concept_id,
+    c_main.source_vocabulary_id                 AS source_vocabulary_id,
     c_main.source_concept_id                    AS source_concept_id,
     c_main.target_domain_id                     AS target_domain_id,
+    c_main.target_concept_id                    AS target_concept_id,
     --
     CONCAT('cond.', src.unit_id)                AS unit_id,
     src.load_table_id       AS load_table_id,
