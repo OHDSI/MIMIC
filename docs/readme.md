@@ -1,2 +1,2 @@
-*MIMIC IV to OMOP CDM Conversion
-github pages folder
+#MIMIC IV to OMOP CDM Conversion
+this is the github pages folder 
