@@ -3,6 +3,7 @@
 You can use the [editor on GitHub](https://github.com/OHDSI/MIMIC/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+test [link](https://github.com/OHDSI/Vocabulary-v5.0/wiki/Vocab.-AMT)
 
 ### Markdown
 
