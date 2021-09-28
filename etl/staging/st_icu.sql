@@ -113,3 +113,26 @@ SELECT
 FROM
     `@source_project`.@icu_dataset.chartevents
 ;
+
+CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_outputevents AS
+SELECT
+    subject_id  AS subject_id,
+    hadm_id     AS hadm_id,
+    stay_id     AS stay_id,
+    charttime   AS charttime,
+    storetime   AS storetime,
+    itemid      AS itemid,
+    value       AS value,
+    valueuom    AS valueuom,
+    --
+    'outputevents'                       AS load_table_id,
+    FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
+        stay_id AS stay_id,
+        charttime AS charttime
+    ))                                  AS trace_id
+FROM
+    `@source_project`.@icu_dataset.outputevents
+;
