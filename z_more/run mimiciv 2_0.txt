@@ -1,0 +1,122 @@
+run mimiciv 2_0
+
+-- 2022-07-15
+
+-----------------------
+troubleshooting:
+
+Run DDL - 
+1) change escaping characters to windows-style (see scripts/bq_run_script.py config, "escaping_chars")
+2) remove "--use_legacy_sql=false" from the DDL scripts
+3) add "final formatting" to bqc: remove "\n" to make bq query text a single line. (see scripts/bq_run_script.py main(), troubleshooting_bqc_format())
+
+Adjust to d_micro - 
+4) table d_micro is no longer available in physionet-data. Microbiologyevents.*_itemid is very close to d_micro -> 
+Generate src_d_micro from microbiologyevents. (see "z_more/MIMIC 2.0 affected tables.sql", etl/staging/st_hosp.sql)
+5) extend "final formatting": remove trailing comments from the formatted lines
+
+python scripts/run_workflow.py -e conf/full.etlconf z_more/tmp_src_d_micro.sql
+
+Run staging - 
+6) Unrecognized name: ethnicity in src_admissions (st_core.sql)
+Rename new field race to ethnicity on staging
+7) Unrecognized name: loinc_code in src_d_labitems (st_hosp.sql)
+Keep the field in src_d_labitems, set it to NULL to backward compatibility
+8) Unrecognized name: cancelreason in procedureevents (st_icu.sql)
+Keep the field in src_procedureevents, set it to 0 to backward compatibility
+
+
+-----------------------
+run:
+
+cd home\mimic\mimiciv\mimiciv_20
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ddl.conf
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_staging.conf
+	python scripts/run_workflow.py -e conf/full.etlconf etl/staging/st_icu.sql etl/staging/st_waveform_poc_2.sql etl/staging/st_waveform_poc_3.sql etl/staging/voc_copy_to_target_dataset.sql
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_etl.conf
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ut.conf
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_metrics.conf
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_unload.conf
+
+
+Scripts executed:
+2022-07-15 17:12:28.509830 | start...                            | Done.
+2022-07-15 17:12:55.999094 | etl/ddl/ddl_voc_5_3_1.sql           | Done.
+2022-07-15 17:14:16.000411 | etl/ddl/ddl_cdm_5_3_1.sql           | Done.
+Run time: 0:01:47.506585
+bq_run_script.exit() 0
+run_workflow.exit() 0
+
+Scripts executed:
+2022-07-16 01:30:14.614075 | start...                            | Done.
+2022-07-16 01:31:29.218133 | etl/staging/st_core.sql             | Done.
+2022-07-16 01:36:40.753051 | etl/staging/st_hosp.sql             | Done.
+2022-07-16 01:36:43.524196 | etl/staging/st_icu.sql              | Error: See query No 1
+Run time: 0:06:28.916118
+Scripts executed:
+2022-07-16 01:47:54.575445 | start...                            | Done.
+2022-07-16 01:50:33.555055 | etl/staging/st_icu.sql              | Done.
+2022-07-16 01:50:48.885270 | etl/staging/st_waveform_poc_2.sql   | Done.
+2022-07-16 01:51:10.461850 | etl/staging/st_waveform_poc_3.sql   | Done.
+2022-07-16 01:52:52.141325 | etl/staging/voc_copy_to_target_dataset.sql | Done.
+Run time: 0:04:57.572880
+
+Scripts executed:
+2022-07-16 01:56:45.434571 | start...                            | Done.
+2022-07-16 01:56:53.201953 | etl/etl/cdm_location.sql            | Done.
+2022-07-16 01:57:06.912758 | etl/etl/cdm_care_site.sql           | Done.
+2022-07-16 01:57:30.928220 | etl/etl/cdm_person.sql              | Done.
+2022-07-16 01:57:43.478986 | etl/etl/cdm_death.sql               | Done.
+2022-07-16 01:58:47.197887 | etl/etl/lk_vis_part_1.sql           | Done.
+2022-07-16 01:59:05.253215 | etl/etl/lk_meas_unit.sql            | Done.
+2022-07-16 02:03:43.612282 | etl/etl/lk_meas_chartevents.sql     | Done.
+2022-07-16 02:07:12.660559 | etl/etl/lk_meas_labevents.sql       | Done.
+2022-07-16 02:10:52.728072 | etl/etl/lk_meas_specimen.sql        | Done.
+2022-07-16 02:11:38.851453 | etl/etl/lk_meas_waveform.sql        | Done.
+2022-07-16 02:14:58.989641 | etl/etl/lk_vis_part_2.sql           | Done.
+2022-07-16 02:16:12.919809 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2022-07-16 02:16:35.477038 | etl/etl/cdm_visit_detail.sql        | Done.
+2022-07-16 02:17:51.397768 | etl/etl/lk_cond_diagnoses.sql       | Done.
+2022-07-16 02:20:15.126888 | etl/etl/lk_procedure.sql            | Done.
+2022-07-16 02:21:14.419238 | etl/etl/lk_observation.sql          | Done.
+2022-07-16 02:22:42.515032 | etl/etl/cdm_condition_occurrence.sql | Done.
+2022-07-16 02:23:14.301890 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2022-07-16 02:23:36.803417 | etl/etl/cdm_specimen.sql            | Done.
+2022-07-16 02:25:53.639192 | etl/etl/cdm_measurement.sql         | Done.
+2022-07-16 02:27:57.977806 | etl/etl/lk_drug.sql                 | Done.
+2022-07-16 02:28:40.060321 | etl/etl/cdm_drug_exposure.sql       | Done.
+2022-07-16 02:28:54.993760 | etl/etl/cdm_device_exposure.sql     | Done.
+2022-07-16 02:29:54.268674 | etl/etl/cdm_observation.sql         | Done.
+2022-07-16 02:31:36.994330 | etl/etl/cdm_observation_period.sql  | Done.
+2022-07-16 02:31:58.182152 | etl/etl/cdm_finalize_person.sql     | Done.
+2022-07-16 02:32:53.967131 | etl/etl/cdm_fact_relationship.sql   | Done.
+2022-07-16 02:36:23.677672 | etl/etl/cdm_condition_era.sql       | Done.
+2022-07-16 02:44:56.843493 | etl/etl/cdm_drug_era.sql            | Done.
+2022-07-16 02:46:54.997424 | etl/etl/cdm_dose_era.sql            | Done.
+2022-07-16 02:47:12.552327 | etl/etl/ext_d_itemid_to_concept.sql | Done.
+2022-07-16 02:47:18.789930 | etl/etl/cdm_cdm_source.sql          | Done.
+Run time: 0:50:33.380366
+
+Scripts executed:
+2022-07-16 02:56:41.735095 | start...                            | Done.
+2022-07-16 02:56:45.766851 | test/ut/ut_start.sql                | Done.
+2022-07-16 03:01:19.452287 | test/ut/ut_basic_gen.sql            | Done.
+2022-07-16 03:01:34.276122 | test/ut/ut_care_site.sql            | Done.
+2022-07-16 03:02:02.612379 | test/ut/ut_person.sql               | Done.
+Run time: 0:05:20.886289
+
+Scripts executed:
+2022-07-16 03:12:30.163371 | start...                            | Done.
+2022-07-16 03:14:20.807058 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2022-07-16 03:14:55.592739 | test/metrics_gen/me_persons_visits.sql | Done.
+2022-07-16 03:31:21.875089 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2022-07-16 03:37:31.181566 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2022-07-16 03:39:21.942729 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+Run time: 0:26:51.783358
+
+Scripts executed:
+2022-07-16 03:41:36.483983 | start...                            | Done.
+2022-07-16 03:52:57.228795 | etl/unload/unload_to_atlas_gen.sql  | Done.
+2022-07-16 03:53:13.362913 | etl/unload/unload_to_atlas_extra.sql | Done.
+Run time: 0:11:36.881930
