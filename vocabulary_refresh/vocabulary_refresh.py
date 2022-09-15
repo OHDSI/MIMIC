@@ -113,7 +113,8 @@ def main():
     gsutil_cp_csv = "gsutil cp {source_path}/*.csv {target_path}/"
     dataset_fullname = "`{project}.{dataset}`"
     run_command_load = "python load_to_bq_vocab.py --{step_name} --config {config_file}"
-    run_command_bq_script = "python bq_run_script.py --config {config_file} {script_file}"
+    # run_command_bq_script = "python bq_run_script.py --config {config_file} {script_file}"
+    run_command_bq_script = "python bq_run_script.py -c {config_file} {script_file}"
 
     params = read_params()
     config = read_config(params['config_file'])
@@ -202,7 +203,7 @@ def main():
     # collect the list to clean up
     if return_code == 0 and params['step'] in [32, 30, 0]:
         run_command = run_command_bq_script.format( \
-            config_file=params['config_file'], script_file="vocabulary_cleanup_bq.sql")
+            config_file=params['config_file'], script_file="vocabulary_cleanup_bq_m.sql") # remove only empty check tables
         print(run_command)
         return_code = os.system(run_command)
         print("return_code", return_code)

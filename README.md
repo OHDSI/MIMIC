@@ -104,6 +104,13 @@ ORDER BY table_name, concept_field, category, count DESC;
 
 ### Change Log (latest first) ###
 
+**2022-09-09**
+
+* MIMIC 2.0 is issued: run ETL on MIMIC 2.0.
+* scripts/bq_run_script.py is updated to fit current BQ requirement of single line queries
+* minor changes in the ETL code to match MIMIC 2.0
+    * @core_dataset now points to @hosp_dataset
+    * table d_micro is no longer available in physionet-data. A replacement src_d_micro is generated from microbiologyevents. (see "z_more/MIMIC 2.0 affected tables.sql", etl/staging/st_hosp.sql)
 
 **2021-05-17**
 

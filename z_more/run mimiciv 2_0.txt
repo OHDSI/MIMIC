@@ -1,5 +1,108 @@
 run mimiciv 2_0
 
+
+-- 2022-09-09
+
+load custom mapping
+
+-------------------- bad
+python scripts/wf_read.py -e conf/dev.etlconf
+Run time: 0:00:11.076666
+
+python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_ddl.conf
+2022-09-09 15:44:49.453879 | etl/ddl/ddl_voc_5_3_1.sql           | Done.
+2022-09-09 15:46:21.442062 | etl/ddl/ddl_cdm_5_3_1.sql           | Done.
+Run time: 0:02:00.634203
+
+python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_staging.conf
+-------------- /bad
+
+-- run with right config
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ddl.conf
+2022-09-09 15:50:11.523654 | start...                            | Done.
+2022-09-09 15:50:38.233439 | etl/ddl/ddl_voc_5_3_1.sql           | Done.
+2022-09-09 15:51:58.423503 | etl/ddl/ddl_cdm_5_3_1.sql           | Done.
+Run time: 0:01:46.906848
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_staging.conf
+2022-09-09 15:57:12.102323 | start...                            | Done.
+2022-09-09 15:57:37.877783 | etl/staging/st_core.sql             | Done.
+2022-09-09 15:59:52.866912 | etl/staging/st_hosp.sql             | Done.
+2022-09-09 16:01:17.364038 | etl/staging/st_icu.sql              | Done.
+2022-09-09 16:01:32.884457 | etl/staging/st_waveform_poc_2.sql   | Done.
+2022-09-09 16:01:55.989156 | etl/staging/st_waveform_poc_3.sql   | Done.
+2022-09-09 16:03:06.009770 | etl/staging/voc_copy_to_target_dataset.sql | Done.
+Run time: 0:05:53.919381
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_etl.conf
+2022-09-09 16:05:29.200769 | start...                            | Done.
+2022-09-09 16:05:37.299064 | etl/etl/cdm_location.sql            | Done.
+2022-09-09 16:05:53.244326 | etl/etl/cdm_care_site.sql           | Done.
+2022-09-09 16:06:17.848390 | etl/etl/cdm_person.sql              | Done.
+2022-09-09 16:06:32.801308 | etl/etl/cdm_death.sql               | Done.
+2022-09-09 16:07:10.150950 | etl/etl/lk_vis_part_1.sql           | Done.
+2022-09-09 16:07:29.174883 | etl/etl/lk_meas_unit.sql            | Done.
+2022-09-09 16:08:56.705099 | etl/etl/lk_meas_chartevents.sql     | Done.
+2022-09-09 16:10:08.839351 | etl/etl/lk_meas_labevents.sql       | Done.
+2022-09-09 16:11:48.851402 | etl/etl/lk_meas_specimen.sql        | Done.
+2022-09-09 16:12:15.087244 | etl/etl/lk_meas_waveform.sql        | Done.
+2022-09-09 16:13:42.571534 | etl/etl/lk_vis_part_2.sql           | Done.
+2022-09-09 16:13:56.539134 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2022-09-09 16:14:19.853548 | etl/etl/cdm_visit_detail.sql        | Done.
+2022-09-09 16:14:52.278222 | etl/etl/lk_cond_diagnoses.sql       | Done.
+2022-09-09 16:16:27.191887 | etl/etl/lk_procedure.sql            | Done.
+2022-09-09 16:17:00.276788 | etl/etl/lk_observation.sql          | Done.
+2022-09-09 16:17:44.043888 | etl/etl/cdm_condition_occurrence.sql | Done.
+2022-09-09 16:18:27.572620 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2022-09-09 16:18:39.129384 | etl/etl/cdm_specimen.sql            | Done.
+2022-09-09 16:20:11.458928 | etl/etl/cdm_measurement.sql         | Done.
+2022-09-09 16:21:29.605359 | etl/etl/lk_drug.sql                 | Done.
+2022-09-09 16:22:00.580777 | etl/etl/cdm_drug_exposure.sql       | Done.
+2022-09-09 16:22:24.272573 | etl/etl/cdm_device_exposure.sql     | Done.
+2022-09-09 16:23:18.564083 | etl/etl/cdm_observation.sql         | Done.
+2022-09-09 16:24:39.774539 | etl/etl/cdm_observation_period.sql  | Done.
+2022-09-09 16:25:01.543763 | etl/etl/cdm_finalize_person.sql     | Done.
+2022-09-09 16:25:34.472308 | etl/etl/cdm_fact_relationship.sql   | Done.
+2022-09-09 16:27:17.138946 | etl/etl/cdm_condition_era.sql       | Done.
+2022-09-09 16:31:05.895874 | etl/etl/cdm_drug_era.sql            | Done.
+2022-09-09 16:32:32.634483 | etl/etl/cdm_dose_era.sql            | Done.
+2022-09-09 16:32:49.391194 | etl/etl/ext_d_itemid_to_concept.sql | Done.
+2022-09-09 16:32:55.750242 | etl/etl/cdm_cdm_source.sql          | Done.
+Run time: 0:27:26.555793
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ut.conf
+2022-09-09 17:00:07.986130 | start...                            | Done.
+2022-09-09 17:00:13.697758 | test/ut/ut_start.sql                | Done.
+2022-09-09 17:04:48.232750 | test/ut/ut_basic_gen.sql            | Done.
+2022-09-09 17:05:04.720214 | test/ut/ut_care_site.sql            | Done.
+2022-09-09 17:05:33.717262 | test/ut/ut_person.sql               | Done.
+Run time: 0:05:25.735130
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_metrics.conf
+2022-09-09 17:06:13.034716 | start...                            | Done.
+2022-09-09 17:08:12.406095 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2022-09-09 17:08:47.440074 | test/metrics_gen/me_persons_visits.sql | Done.
+2022-09-09 17:26:04.582597 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2022-09-09 17:31:46.599013 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2022-09-09 17:33:47.600831 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+Run time: 0:27:34.572917
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_unload.conf
+2022-09-09 17:41:49.093167 | start...                            | Done.
+2022-09-09 17:47:17.883491 | etl/unload/unload_to_atlas_gen.sql  | Done.
+2022-09-09 17:47:30.908374 | etl/unload/unload_to_atlas_extra.sql | Done.
+Run time: 0:05:41.819210
+
+-- strange FALSE on ethnicity_concept_id
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ut.conf
+2022-09-12 15:23:41.693741 | start...                            | Done.
+2022-09-12 15:23:48.838638 | test/ut/ut_start.sql                | Done.
+2022-09-12 15:28:23.765208 | test/ut/ut_basic_gen.sql            | Done.
+2022-09-12 15:28:40.632000 | test/ut/ut_care_site.sql            | Done.
+2022-09-12 15:29:10.579841 | test/ut/ut_person.sql               | Done.
+Run time: 0:05:28.891104
+
 -- 2022-07-15
 
 -----------------------
