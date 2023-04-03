@@ -1015,7 +1015,7 @@ Xylose|Urine|Chemistry,2000052013,mimiciv_meas_lab_loinc,Measurement,Lab Test,,5
 "Zinc, Urine|Urine|Chemistry",2000052014,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52017,1970-01-01,2099-12-31,,3041478,Maps to,Mapped from,1970-01-01,2099-12-31,
 "Albumin, Blood|Blood|Blood Gas",2000052015,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52022,1970-01-01,2099-12-31,,3024561,Maps to,Mapped from,1970-01-01,2099-12-31,
 "Creatinine, Whole Blood|Blood|Blood Gas",2000052016,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52024,1970-01-01,2099-12-31,,3051825,Maps to,Mapped from,1970-01-01,2099-12-31,
-Estimated GFR (MDRD equation)|Blood|Blood Gas,2000052017,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52026,1970-01-01,2099-12-31,,46236952,Maps to,Mapped from,1970-01-01,2099-12-31,
+Estimated GFR (MDRD equation)|Blood|Blood Gas,2000052017,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52026,1970-01-01,2099-12-31,,46235172,Maps to,Mapped from,1970-01-01,2099-12-31,
 "Glucose, Whole Blood|Blood|Blood Gas",2000052018,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52027,1970-01-01,2099-12-31,,3000483,Maps to,Mapped from,1970-01-01,2099-12-31,
 Hematocrit|Blood|Blood Gas,2000052019,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52028,1970-01-01,2099-12-31,,3023230,Maps to,Mapped from,1970-01-01,2099-12-31,
 % Ionized Calcium|Blood|Blood Gas,2000052020,mimiciv_meas_lab_loinc,Measurement,Lab Test,,52029,1970-01-01,2099-12-31,,3032710,Maps to,Mapped from,1970-01-01,2099-12-31,
