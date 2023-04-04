@@ -35,36 +35,35 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 ### How to run the conversion ###
 
 ######To run ETL end-to-end:######
-* update config files accordingly
-    * see conf/\*.etlconf to set project level variables
-    * see vocabulary_refresh/README.md to configure vocabulary refresh workflow
-* set the project root (location of this file) as the current directory
-* run the commands given below 
+* load the latest standard OMOP vocabularies from http://athena.ohdsi.org if needed
+    * create a working copy of the loaded vocabularies, where custom mapping data will be added to
+* set variables in vocabulary_refresh/README.md
+    * run vocabulary refresh commands given below from directory "vocabulary_refresh"
+* set the project variables in conf/\*.etlconf
+    * run script "wf_read" to load waveform sample data if needed
+    * run workflow commands below in the given sequence 
+        * in the workflow commands <env> is the "environment" name, which equals "dev" for the demo dataset and "full" for the full set
 
+* set the project root (location of this file) as the current directory
 ```
 cd vocabulary_refresh
 python vocabulary_refresh.py -s10
 python vocabulary_refresh.py -s20
 python vocabulary_refresh.py -s30
 cd ../
-python scripts/wf_read.py -e conf/dev.etlconf
-python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_ddl.conf
-python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_staging.conf
-python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf
-python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_ut.conf
-python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_metrics.conf
-python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_unload.conf
+python scripts/wf_read.py -e conf/<env>.etlconf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ddl.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_staging.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_etl.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ut.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_metrics.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_unload.conf
 ```
 
 ######To look at UT and Metrics reports:######
 * see metrics dataset name in the corresponding .etlconf file
 
 ```SQL
--- UT report
-SELECT report_starttime, table_id, test_type, field_name
-FROM metrics_dataset.report_unit_test
-WHERE NOT test_passed 
-;
 -- Metrics - row count
 SELECT * FROM metrics_dataset.me_total ORDER BY table_name;
 -- Metrics - person and visit summary
@@ -80,13 +79,19 @@ SELECT
 FROM metrics_dataset.me_mapping_rate 
 ORDER BY table_name, concept_field
 ;
--- Metrics - Top 100 Mapped and Unmapped
+-- Metrics - Mapped and Unmapped source values
 SELECT 
     table_name, concept_field, category, source_value, concept_id, concept_name,
     count       AS row_count,
     percent     AS rows_percent
 FROM metrics_dataset.me_tops_together 
 ORDER BY table_name, concept_field, category, count DESC;
+-- UT report
+SELECT report_starttime, table_id, test_type, field_name, test_passed
+FROM mimiciv_full_metrics_2023_02_17.report_unit_test
+order by table_id, report_starttime
+-- WHERE NOT test_passed 
+;
 ```
 
 ######More option to run ETL parts:######
@@ -104,6 +109,26 @@ ORDER BY table_name, concept_field, category, count DESC;
 
 ### Change Log (latest first) ###
 
+**2023-02-17**
+
+* MIMIC 2.2 is issued. Run ETL on MIMIC 2.2.
+* minor change to measurement.value_source_value: 
+    * populate the field always instead of populating only when value_as_number is null
+* minor change to custom mapping vocabularies: 
+    * mimiciv_drug_ndc,
+    * mimiciv_drug_route,
+    * mimiciv_meas_lab_loinc,
+    * mimiciv_obs_drgcodes,
+    * mimiciv_proc_itemid
+* run with OMOP vocabularies v16-JAN-23
+
+**2022-09-09**
+
+* MIMIC 2.0 is issued: run ETL on MIMIC 2.0.
+* scripts/bq_run_script.py is updated to fit current BQ requirement of single line queries
+* minor changes in the ETL code to match MIMIC 2.0
+    * @core_dataset now points to @hosp_dataset
+    * table d_micro is no longer available in physionet-data. A replacement src_d_micro is generated from microbiologyevents. (see "z_more/MIMIC 2.0 affected tables.sql", etl/staging/st_hosp.sql)
 
 **2021-05-17**
 

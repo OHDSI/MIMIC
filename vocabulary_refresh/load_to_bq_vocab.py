@@ -33,9 +33,6 @@ Expected locations for CSVs are:
 
 config_default = {
 
-    "bq_target_project":        "bq_target_project",
-    "bq_target_dataset":        "bq_target_dataset",
-
     "local_athena_csv_path":    "somewhere",
     "gs_athena_csv_path":       "gs://some_path",
     "athena_csv_delimiter":     "\t",
@@ -47,6 +44,12 @@ config_default = {
     "mapping_csv_quote":        "\"",
 
     "schemas_dir_all_csv":      "omop_schemas_vocab_bq",
+
+    "variables": 
+    {
+        "@bq_target_project":        "bq_target_project",
+        "@bq_target_dataset":        "bq_target_dataset"
+    },
 
     "vocabulary_tables":
     [
@@ -160,7 +163,7 @@ def load_table(table, gs_path, field_delimiter, quote, config):
 
     table_path = bq_table.format( \
         # project=config['bq_target_project'], 
-        dataset=config['bq_target_dataset'], \
+        dataset=config['variables']['@bq_target_dataset'], \
         prefix=config['bq_athena_temp_table_prefix'], table=table)
     table_schema = schema_path.format(dir=config['schemas_dir_all_csv'], table=table)
     

@@ -20,8 +20,12 @@ config_default = {
 
         "@variable_1":      "No project replacement by default",
         "@variable_2":      "No dataset replacement by default"
-    }
+    },
     
+    "escaping_chars": {
+        '"': '\\"'
+        # '`': '\\`' # don't replace in windows OS
+    }
 }
 
 # ----------------------------------------------------
@@ -115,7 +119,6 @@ def trim_queries(s_queries):
             s_result.append(q)
     return s_result
 
-
 # ----------------------------------------------------
 # remove_comments()
 # ----------------------------------------------------
@@ -147,14 +150,46 @@ def format_query(s_query, config):
 
     print('Formatting query...')
 
-    s_result = s_query \
-        .replace('"', '\\"') \
-        .replace('`', '\\`')
+    s_result = s_query
+
+    for var, val in config['escaping_chars'].items():
+        s_result = s_result.replace(var, val)
 
     for var, val in config['variables'].items():
         s_result = s_result.replace(var, val)
 
     print(s_result)
+    return s_result
+
+
+'''
+----------------------------------------------------
+    1) make the command a single line
+    windows or maybe 2022 style
+    (TODO sometimes: investigate what happened with multiline text for bq query)
+    2) remove comments at the end of the lines
+
+    bqc: ready to run bq command 
+----------------------------------------------------
+'''
+def troubleshooting_bqc_format(bqc):
+
+    print('Troubleshooting_bqc_format()...')
+
+    s_lines_src = bqc.split('\n')
+    s_result = ""
+
+    for s in s_lines_src:
+
+        # remove trailing comment
+        comment_pos = s.find('--')
+        if comment_pos > -1:
+            s = s[0:comment_pos].strip()
+
+        # remove new line
+        if len(s) > 0:
+            s_result = s_result + s + ' ' # add space instead of new line
+
     return s_result
 
 '''
@@ -212,9 +247,12 @@ def main():
             query_no = 0
             for s_query in s_queries:
 
-                bqc = bq_command.format(query=format_query(s_query, config))
+                bqc = bq_command.format(
+                    query=troubleshooting_bqc_format(format_query(s_query, config))
+                )
                 query_no += 1
                 print('Starting query...')
+
                 rc = os.system(bqc)
 
                 if rc != 0:
