@@ -18,10 +18,10 @@
 -- src_procedureevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_procedureevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_procedureevents AS
 SELECT
-    hadm_id                             AS hadm_id,
-    subject_id                          AS subject_id,
+    u.hadm_id                             AS hadm_id,
+    u.subject_id                          AS subject_id,
     stay_id                             AS stay_id,
     itemid                              AS itemid,
     starttime                           AS starttime,
@@ -31,19 +31,23 @@ SELECT
     'procedureevents'                   AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        u.subject_id AS subject_id,
+        u.hadm_id AS hadm_id,
         starttime AS starttime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@icu_dataset.procedureevents
+    @source_project.@icu_dataset.procedureevents u
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON u.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON u.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_d_items
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_items AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_items AS
 SELECT
     itemid                              AS itemid,
     label                               AS label,
@@ -62,17 +66,17 @@ SELECT
         linksto AS linksto
     ))                                  AS trace_id
 FROM
-    `@source_project`.@icu_dataset.d_items
+    @source_project.@icu_dataset.d_items
 ;
 
 -- -------------------------------------------------------------------
 -- src_datetimeevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_datetimeevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_datetimeevents AS
 SELECT
-    subject_id  AS subject_id,
-    hadm_id     AS hadm_id,
+    u.subject_id  AS subject_id,
+    u.hadm_id     AS hadm_id,
     stay_id     AS stay_id,
     itemid      AS itemid,
     charttime   AS charttime,
@@ -81,20 +85,24 @@ SELECT
     'datetimeevents'                    AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        u.subject_id AS subject_id,
+        u.hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@icu_dataset.datetimeevents
+    @source_project.@icu_dataset.datetimeevents u
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON u.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON u.hadm_id = a.hadm_id
 ;
 
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_chartevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_chartevents AS
 SELECT
-    subject_id  AS subject_id,
-    hadm_id     AS hadm_id,
+    u.subject_id  AS subject_id,
+    u.hadm_id     AS hadm_id,
     stay_id     AS stay_id,
     itemid      AS itemid,
     charttime   AS charttime,
@@ -105,11 +113,15 @@ SELECT
     'chartevents'                       AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        u.subject_id AS subject_id,
+        u.hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@icu_dataset.chartevents
+    @source_project.@icu_dataset.chartevents u
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON u.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON u.hadm_id = a.hadm_id
 ;

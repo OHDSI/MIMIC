@@ -20,9 +20,9 @@
 -- src_patients
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_patients AS
-SELECT 
-    subject_id                          AS subject_id,
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_patients AS
+SELECT DISTINCT
+    c.subject_id                        AS subject_id,
     anchor_year                         AS anchor_year,
     anchor_age                          AS anchor_age,
     anchor_year_group                   AS anchor_year_group,
@@ -31,20 +31,22 @@ SELECT
     'patients'                          AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id
+        c.subject_id AS subject_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@core_dataset.patients
+    @source_project.@core_dataset.patients c
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON c.subject_id = s.subject_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_admissions
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_admissions AS
-SELECT
-    hadm_id                             AS hadm_id, -- PK
-    subject_id                          AS subject_id,
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_admissions AS
+SELECT DISTINCT
+    c.hadm_id                           AS hadm_id, -- PK
+    c.subject_id                        AS subject_id,
     admittime                           AS admittime,
     dischtime                           AS dischtime,
     deathtime                           AS deathtime,
@@ -62,22 +64,26 @@ SELECT
     'admissions'                        AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id
+        c.subject_id AS subject_id,
+        c.hadm_id AS hadm_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@core_dataset.admissions
+    @source_project.@core_dataset.admissions c
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON c.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON c.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_transfers
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_transfers AS
-SELECT
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_transfers AS
+SELECT DISTINCT
     transfer_id                         AS transfer_id,
-    hadm_id                             AS hadm_id,
-    subject_id                          AS subject_id,
+    c.hadm_id                             AS hadm_id,
+    c.subject_id                          AS subject_id,
     careunit                            AS careunit,
     intime                              AS intime,
     outtime                             AS outtime,
@@ -86,11 +92,15 @@ SELECT
     'transfers'                         AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        c.subject_id AS subject_id,
+        c.hadm_id AS hadm_id,
         transfer_id AS transfer_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@core_dataset.transfers
+    @source_project.@core_dataset.transfers c
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON c.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON c.hadm_id = a.hadm_id
 ;
 

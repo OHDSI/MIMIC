@@ -28,16 +28,16 @@
 -- -------------------------------------------------------------------
 
 
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.lk_datetimeevents_concept;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.lk_proc_event_clean;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.lk_datetimeevents_clean;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.lk_datetimeevents_concept;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.lk_proc_event_clean;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.lk_datetimeevents_clean;
 
 -- -------------------------------------------------------------------
 -- lk_hcpcsevents_clean
 -- Rule 1, HCPCS mapping
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_hcpcsevents_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_hcpcsevents_clean AS
  SELECT
     src.subject_id      AS subject_id,
     src.hadm_id         AS hadm_id,
@@ -50,9 +50,9 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_hcpcsevents_clean AS
     src.load_row_id                     AS load_row_id,
     src.trace_id                        AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_hcpcsevents src
+    @etl_project.@etl_dataset.src_hcpcsevents src
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_admissions adm
+    @etl_project.@etl_dataset.src_admissions adm
         ON src.hadm_id = adm.hadm_id
 ;
 
@@ -61,7 +61,7 @@ INNER JOIN
 -- Rule 2, ICD mapping
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_procedures_icd_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_procedures_icd_clean AS
 SELECT
     src.subject_id                              AS subject_id,
     src.hadm_id                                 AS hadm_id,
@@ -79,9 +79,9 @@ SELECT
     src.load_row_id                     AS load_row_id,
     src.trace_id                        AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_procedures_icd src
+    @etl_project.@etl_dataset.src_procedures_icd src
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_admissions adm
+    @etl_project.@etl_dataset.src_admissions adm
         ON src.hadm_id = adm.hadm_id
 ;
 
@@ -90,7 +90,7 @@ INNER JOIN
 -- Rule 3, d_items custom mapping
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_proc_d_items_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_proc_d_items_clean AS
 SELECT
     src.subject_id                      AS subject_id,
     src.hadm_id                         AS hadm_id,
@@ -104,7 +104,7 @@ SELECT
     src.load_row_id                     AS load_row_id,
     src.trace_id                        AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_procedureevents src
+    @etl_project.@etl_dataset.src_procedureevents src
 WHERE
     src.cancelreason = 0 -- not cancelled
 ;
@@ -115,7 +115,7 @@ WHERE
 -- gcpt_datetimeevents_to_concept -> mimiciv_proc_datetimeevents
 -- filter out 55 rows where the year is earlier than one year before patient's birth
 -- -------------------------------------------------------------------
-INSERT INTO `@etl_project`.@etl_dataset.lk_proc_d_items_clean
+INSERT INTO @etl_project.@etl_dataset.lk_proc_d_items_clean
 SELECT
     src.subject_id                      AS subject_id,
     src.hadm_id                         AS hadm_id,
@@ -128,9 +128,9 @@ SELECT
     src.load_row_id                     AS load_row_id,
     src.trace_id                        AS trace_id    
 FROM
-    `@etl_project`.@etl_dataset.src_datetimeevents src -- de
+    @etl_project.@etl_dataset.src_datetimeevents src -- de
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_patients pat
+    @etl_project.@etl_dataset.src_patients pat
         ON  pat.subject_id = src.subject_id
 WHERE
     EXTRACT(YEAR FROM src.value) >= pat.anchor_year - pat.anchor_age - 1
@@ -143,7 +143,7 @@ WHERE
 -- add gcpt_cpt4_to_concept --> mimiciv_proc_xxx (?)
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_hcpcs_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_hcpcs_concept AS
 SELECT
     vc.concept_code         AS source_code,
     vc.vocabulary_id        AS source_vocabulary_id,    
@@ -152,13 +152,13 @@ SELECT
     vc2.domain_id           AS target_domain_id,
     vc2.concept_id          AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
         AND vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
@@ -171,7 +171,7 @@ WHERE
 -- ICD - Rule 2
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_icd_proc_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_icd_proc_concept AS
 SELECT
     REPLACE(vc.concept_code, '.', '')       AS source_code,
     vc.vocabulary_id                        AS source_vocabulary_id,
@@ -180,13 +180,13 @@ SELECT
     vc2.domain_id                           AS target_domain_id,
     vc2.concept_id                          AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
         AND vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
@@ -203,7 +203,7 @@ WHERE
 -- can be optimized by including Specimen mapping to lk_itemid_concept
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_itemid_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_itemid_concept AS
 SELECT
     d_items.itemid                      AS itemid,
     CAST(d_items.itemid AS STRING)      AS source_code,
@@ -214,20 +214,20 @@ SELECT
     vc2.domain_id                       AS target_domain_id,
     vc2.concept_id                      AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.src_d_items d_items
+    @etl_project.@etl_dataset.src_d_items d_items
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON vc.concept_code = CAST(d_items.itemid AS STRING)
         AND vc.vocabulary_id IN (
             'mimiciv_proc_itemid',
             'mimiciv_proc_datetimeevents'
         )
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
         AND vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
@@ -244,7 +244,7 @@ WHERE
 
 -- Rule 1, HCPCS
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_procedure_mapped AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_procedure_mapped AS
 SELECT
     src.subject_id                          AS subject_id, -- to person
     src.hadm_id                             AS hadm_id, -- to visit
@@ -265,15 +265,15 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_hcpcsevents_clean src
+    @etl_project.@etl_dataset.lk_hcpcsevents_clean src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_hcpcs_concept lc
+    @etl_project.@etl_dataset.lk_hcpcs_concept lc
         ON src.hcpcs_cd = lc.source_code
 ;
 
 -- Rule 2, ICD
 
-INSERT INTO `@etl_project`.@etl_dataset.lk_procedure_mapped
+INSERT INTO @etl_project.@etl_dataset.lk_procedure_mapped
 SELECT
     src.subject_id                          AS subject_id, -- to person
     src.hadm_id                             AS hadm_id, -- to visit
@@ -294,9 +294,9 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_procedures_icd_clean src
+    @etl_project.@etl_dataset.lk_procedures_icd_clean src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_icd_proc_concept lc
+    @etl_project.@etl_dataset.lk_icd_proc_concept lc
         ON  src.source_code = lc.source_code
         AND src.source_vocabulary_id = lc.source_vocabulary_id
 ;
@@ -304,7 +304,7 @@ LEFT JOIN
 -- rule 3, "procedureevents" and itemid custom mapping
 -- rule 4, "datetimeevents" and itemid custom mapping
 
-INSERT INTO `@etl_project`.@etl_dataset.lk_procedure_mapped
+INSERT INTO @etl_project.@etl_dataset.lk_procedure_mapped
 SELECT
     src.subject_id                          AS subject_id, -- to person
     src.hadm_id                             AS hadm_id, -- to visit
@@ -325,9 +325,9 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_proc_d_items_clean src
+    @etl_project.@etl_dataset.lk_proc_d_items_clean src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_itemid_concept lc
+    @etl_project.@etl_dataset.lk_itemid_concept lc
         ON src.itemid = lc.itemid
 ;
 

@@ -8,20 +8,20 @@
         "@hosp_dataset":     "mimiciv_hosp",
         "@icu_dataset":      "mimiciv_icu",
 
-        "@voc_project": "odysseus-mimic-dev",
-        "@voc_dataset": "vocab_schema",
+        "@voc_project": "lcp-internal",
+        "@voc_dataset": "mimiciv_demo_omop",
 
-        "@wf_project": "odysseus-mimic-dev",
-        "@wf_dataset": "waveform_source_poc",
+        "@wf_project": "",
+        "@wf_dataset": "",
 
-        "@etl_project": "odysseus-mimic-dev",
-        "@etl_dataset": "mimiciv_full_cdm_*",
+        "@etl_project": "lcp-internal",
+        "@etl_dataset": "mimiciv_chorus_year1_cdm",
 
-        "@metrics_project": "odysseus-mimic-dev",
-        "@metrics_dataset": "mimiciv_full_metrics_*",
+        "@metrics_project": "lcp-internal",
+        "@metrics_dataset": "mimiciv_chorus_year1_metrics",
 
-        "@atlas_project": "odysseus-mimic-dev",
-        "@atlas_dataset": "mimiciv_full_current_cdm_*",
+        "@atlas_project": "lcp-internal",
+        "@atlas_dataset": "mimiciv_chorus_year1_atlas",
 
         "@waveforms_csv_path":  "gs://bucket..."
 

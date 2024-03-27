@@ -31,7 +31,7 @@
 --      lk_meas_waveform_mapped
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_no_hadm_all AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_no_hadm_all AS
 -- labevents
 SELECT
     src.subject_id                                  AS subject_id,
@@ -43,7 +43,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_meas_labevents_mapped src
+    @etl_project.@etl_dataset.lk_meas_labevents_mapped src
 WHERE
     src.hadm_id IS NULL
 UNION ALL
@@ -58,7 +58,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_specimen_mapped src
+    @etl_project.@etl_dataset.lk_specimen_mapped src
 WHERE
     src.hadm_id IS NULL
 UNION ALL
@@ -73,7 +73,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_meas_organism_mapped src
+    @etl_project.@etl_dataset.lk_meas_organism_mapped src
 WHERE
     src.hadm_id IS NULL
 UNION ALL
@@ -88,31 +88,18 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_meas_ab_mapped src
-WHERE
-    src.hadm_id IS NULL
-UNION ALL
--- waveforms
-SELECT
-    src.subject_id                                  AS subject_id,
-    CAST(src.start_datetime AS DATE)                AS date_id,
-    src.start_datetime                              AS start_datetime,
-    -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
-FROM
-    `@etl_project`.@etl_dataset.lk_meas_waveform_mapped src
+    @etl_project.@etl_dataset.lk_meas_ab_mapped src
 WHERE
     src.hadm_id IS NULL
 ;
+-- waveforms
+
 
 -- -------------------------------------------------------------------
 -- lk_visit_no_hadm_dist
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_no_hadm_dist AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_no_hadm_dist AS
 SELECT
     src.subject_id                                  AS subject_id,
     src.date_id                                     AS date_id,
@@ -130,7 +117,7 @@ SELECT
         src.date_id AS date_id
     ))                                  AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_visit_no_hadm_all src
+    @etl_project.@etl_dataset.lk_visit_no_hadm_all src
 GROUP BY
     src.subject_id,
     src.date_id
@@ -144,37 +131,11 @@ GROUP BY
 --      lk_meas_waveform_mapped
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_detail_waveform_dist AS
-SELECT
-    src.subject_id                                  AS subject_id,
-    src.hadm_id                                     AS hadm_id,
-    CAST(MIN(src.start_datetime) AS DATE)           AS date_id,
-    MIN(src.start_datetime)                         AS start_datetime,
-    MAX(src.start_datetime)                         AS end_datetime,
-    'AMBULATORY OBSERVATION'                        AS current_location, -- outpatient visit
-    src.reference_id                                AS reference_id,
-    -- 
-    'waveforms'                     AS unit_id,
-    'lk_meas_waveform_mapped'       AS load_table_id,
-    0                               AS load_row_id,
-    TO_JSON_STRING(STRUCT(
-        src.subject_id AS subject_id,
-        src.hadm_id AS hadm_id,
-        src.reference_id AS reference_id
-    ))                                  AS trace_id
-FROM
-    `@etl_project`.@etl_dataset.lk_meas_waveform_mapped src
-GROUP BY
-    src.subject_id,
-    src.hadm_id,
-    src.reference_id
-;
-
 -- -------------------------------------------------------------------
 -- lk_visit_clean
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_clean AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())               AS visit_occurrence_id,
     src.subject_id                                  AS subject_id,
@@ -195,7 +156,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_admissions_clean src -- adm
+    @etl_project.@etl_dataset.lk_admissions_clean src -- adm
 UNION ALL
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())               AS visit_occurrence_id,
@@ -217,7 +178,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_visit_no_hadm_dist src -- adm
+    @etl_project.@etl_dataset.lk_visit_no_hadm_dist src -- adm
 ;
 
 -- -------------------------------------------------------------------
@@ -227,7 +188,7 @@ FROM
 -- transfers with valid hadm_id
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_detail_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_detail_clean AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
     src.subject_id                                  AS subject_id,
@@ -247,7 +208,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM 
-    `@etl_project`.@etl_dataset.lk_transfers_clean src
+    @etl_project.@etl_dataset.lk_transfers_clean src
 WHERE
     src.hadm_id IS NOT NULL -- some ER transfers are excluded because not all of them fit to additional single day visits
 ;
@@ -258,7 +219,7 @@ WHERE
 -- Rule 2.
 -- ER admissions
 -- -------------------------------------------------------------------
-INSERT INTO `@etl_project`.@etl_dataset.lk_visit_detail_clean
+INSERT INTO @etl_project.@etl_dataset.lk_visit_detail_clean
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
     src.subject_id                                  AS subject_id,
@@ -277,7 +238,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM 
-    `@etl_project`.@etl_dataset.lk_admissions_clean src
+    @etl_project.@etl_dataset.lk_admissions_clean src
 WHERE
     src.is_er_admission
 ;
@@ -288,7 +249,7 @@ WHERE
 -- Rule 3.
 -- services
 -- -------------------------------------------------------------------
-INSERT INTO `@etl_project`.@etl_dataset.lk_visit_detail_clean
+INSERT INTO @etl_project.@etl_dataset.lk_visit_detail_clean
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
     src.subject_id                                  AS subject_id,
@@ -308,7 +269,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM 
-    `@etl_project`.@etl_dataset.lk_services_clean src
+    @etl_project.@etl_dataset.lk_services_clean src
 WHERE
     src.prev_service = src.lag_service -- ensure that the services sequence is still consistent after removing duplicates
 ;
@@ -319,31 +280,14 @@ WHERE
 -- Rule 4.
 -- waveforms
 -- -------------------------------------------------------------------
-INSERT INTO `@etl_project`.@etl_dataset.lk_visit_detail_clean
-SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
-    src.subject_id                                  AS subject_id,
-    src.hadm_id                                     AS hadm_id,
-    src.date_id                                     AS date_id,
-    src.start_datetime                              AS start_datetime,
-    src.end_datetime                                AS end_datetime,  -- if null, populate with next start_datetime
-    src.reference_id                                AS source_value,
-    src.current_location                            AS current_location, -- find prev and next for adm and disch location
-    -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
-FROM 
-    `@etl_project`.@etl_dataset.lk_visit_detail_waveform_dist src
-;
+
 
 -- -------------------------------------------------------------------
 -- lk_visit_detail_prev_next
 -- skip "mapped"
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_detail_prev_next AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_detail_prev_next AS
 SELECT 
     src.visit_detail_id                             AS visit_detail_id,
     src.subject_id                                  AS subject_id,
@@ -385,9 +329,9 @@ SELECT
     src.load_row_id                   AS load_row_id,
     src.trace_id                      AS trace_id
 FROM 
-    `@etl_project`.@etl_dataset.lk_visit_detail_clean src
+    @etl_project.@etl_dataset.lk_visit_detail_clean src
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_visit_clean vis
+    @etl_project.@etl_dataset.lk_visit_clean vis
         ON  src.subject_id = vis.subject_id
         AND (
             src.hadm_id = vis.hadm_id
@@ -409,20 +353,20 @@ LEFT JOIN
 -- then map it to standard Visit concepts
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_visit_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_concept AS
 SELECT 
     vc.concept_code     AS source_code,
     vc.concept_id       AS source_concept_id,
     vc2.concept_id      AS target_concept_id,
     vc.vocabulary_id    AS source_vocabulary_id
 FROM 
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1 
         and vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL

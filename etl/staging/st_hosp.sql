@@ -23,10 +23,10 @@
 -- src_diagnoses_icd
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_diagnoses_icd AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_diagnoses_icd AS
 SELECT
-    subject_id      AS subject_id,
-    hadm_id         AS hadm_id,
+    h.subject_id      AS subject_id,
+    h.hadm_id         AS hadm_id,
     seq_num         AS seq_num,
     icd_code        AS icd_code,
     icd_version     AS icd_version,
@@ -34,11 +34,15 @@ SELECT
     'diagnoses_icd'                     AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        hadm_id AS hadm_id,
+        h.hadm_id AS hadm_id,
         seq_num AS seq_num
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.diagnoses_icd
+    @source_project.@hosp_dataset.diagnoses_icd h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
@@ -49,10 +53,10 @@ FROM
 -- src_services
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_services AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_services AS
 SELECT
-    subject_id                          AS subject_id,
-    hadm_id                             AS hadm_id,
+    h.subject_id                          AS subject_id,
+    h.hadm_id                             AS hadm_id,
     transfertime                        AS transfertime,
     prev_service                        AS prev_service,
     curr_service                        AS curr_service,
@@ -60,24 +64,28 @@ SELECT
     'services'                          AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        h.subject_id AS subject_id,
+        h.hadm_id AS hadm_id,
         transfertime AS transfertime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.services
+    @source_project.@hosp_dataset.services h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_labevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_labevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_labevents AS
 SELECT
     labevent_id                         AS labevent_id,
-    subject_id                          AS subject_id,
+    h.subject_id                          AS subject_id,
     charttime                           AS charttime,
-    hadm_id                             AS hadm_id,
+    h.hadm_id                             AS hadm_id,
     itemid                              AS itemid,
     valueuom                            AS valueuom,
     value                               AS value,
@@ -91,14 +99,18 @@ SELECT
         labevent_id AS labevent_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.labevents
+    @source_project.@hosp_dataset.labevents h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_d_labitems
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_labitems AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_labitems AS
 SELECT
     itemid                              AS itemid,
     label                               AS label,
@@ -112,7 +124,7 @@ SELECT
         itemid AS itemid
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.d_labitems
+    @source_project.@hosp_dataset.d_labitems
 ;
 
 
@@ -124,33 +136,37 @@ FROM
 -- src_procedures_icd
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_procedures_icd AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_procedures_icd AS
 SELECT
-    subject_id                          AS subject_id,
-    hadm_id                             AS hadm_id,
+    h.subject_id                          AS subject_id,
+    h.hadm_id                             AS hadm_id,
     icd_code        AS icd_code,
     icd_version     AS icd_version,
     --
     'procedures_icd'                    AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        h.subject_id AS subject_id,
+        h.hadm_id AS hadm_id,
         icd_code AS icd_code,
         icd_version AS icd_version
     ))                                  AS trace_id -- this set of fields is not unique. To set quantity?
 FROM
-    `@source_project`.@hosp_dataset.procedures_icd
+    @source_project.@hosp_dataset.procedures_icd h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_hcpcsevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_hcpcsevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_hcpcsevents AS
 SELECT
-    hadm_id                             AS hadm_id,
-    subject_id                          AS subject_id,
+    h.hadm_id                             AS hadm_id,
+    h.subject_id                          AS subject_id,
     hcpcs_cd                            AS hcpcs_cd,
     seq_num                             AS seq_num,
     short_description                   AS short_description,
@@ -158,13 +174,17 @@ SELECT
     'hcpcsevents'                       AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        h.subject_id AS subject_id,
+        h.hadm_id AS hadm_id,
         hcpcs_cd AS hcpcs_cd,
         seq_num AS seq_num
     ))                                  AS trace_id -- this set of fields is not unique. To set quantity?
 FROM
-    `@source_project`.@hosp_dataset.hcpcsevents
+    @source_project.@hosp_dataset.hcpcsevents h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 
@@ -172,32 +192,36 @@ FROM
 -- src_drgcodes
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_drgcodes AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_drgcodes AS
 SELECT
-    hadm_id                             AS hadm_id,
-    subject_id                          AS subject_id,
+    h.hadm_id                             AS hadm_id,
+    h.subject_id                          AS subject_id,
     drg_code                            AS drg_code,
     description                         AS description,
     --
     'drgcodes'                       AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        h.subject_id AS subject_id,
+        h.hadm_id AS hadm_id,
         COALESCE(drg_code, '') AS drg_code
     ))                                  AS trace_id -- this set of fields is not unique.
 FROM
-    `@source_project`.@hosp_dataset.drgcodes
+    @source_project.@hosp_dataset.drgcodes h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
 -- src_prescriptions
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_prescriptions AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_prescriptions AS
 SELECT
-    hadm_id                             AS hadm_id,
-    subject_id                          AS subject_id,
+    h.hadm_id                             AS hadm_id,
+    h.subject_id                          AS subject_id,
     pharmacy_id                         AS pharmacy_id,
     starttime                           AS starttime,
     stoptime                            AS stoptime,
@@ -217,13 +241,17 @@ SELECT
     'prescriptions'                     AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        h.subject_id AS subject_id,
+        h.hadm_id AS hadm_id,
         pharmacy_id AS pharmacy_id,
         starttime AS starttime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.prescriptions
+    @source_project.@hosp_dataset.prescriptions h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 
@@ -231,11 +259,11 @@ FROM
 -- src_microbiologyevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_microbiologyevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_microbiologyevents AS
 SELECT
     microevent_id               AS microevent_id,
-    subject_id                  AS subject_id,
-    hadm_id                     AS hadm_id,
+    h.subject_id                  AS subject_id,
+    h.hadm_id                     AS hadm_id,
     chartdate                   AS chartdate,
     charttime                   AS charttime, -- usage: COALESCE(charttime, chartdate)
     spec_itemid                 AS spec_itemid, -- d_micro, type of specimen taken. If no grouth, then all other fields is null
@@ -253,12 +281,16 @@ SELECT
     'microbiologyevents'                AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
-        subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        h.subject_id AS subject_id,
+        h.hadm_id AS hadm_id,
         microevent_id AS microevent_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.microbiologyevents
+    @source_project.@hosp_dataset.microbiologyevents h
+JOIN @etl_project.@etl_dataset.subjects_to_include s
+ON h.subject_id = s.subject_id
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include a
+ON h.hadm_id = a.hadm_id
 ;
 
 -- -------------------------------------------------------------------
@@ -266,7 +298,7 @@ FROM
 -- raw d_micro is no longer available both in mimic_hosp and mimiciv_hosp
 -- -------------------------------------------------------------------
 
--- CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_micro AS
+-- CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_micro AS
 -- SELECT
 --     itemid                      AS itemid, -- numeric ID
 --     label                       AS label, -- source_code for custom mapping
@@ -278,7 +310,7 @@ FROM
 --         itemid AS itemid
 --     ))                                  AS trace_id
 -- FROM
---     `@source_project`.@hosp_dataset.d_micro
+--     @source_project.@hosp_dataset.d_micro
 -- ;
 
 -- -------------------------------------------------------------------
@@ -286,7 +318,7 @@ FROM
 -- MIMIC IV 2.0: generate src_d_micro from microbiologyevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_micro AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_micro AS
 WITH d_micro AS (
 
     SELECT DISTINCT
@@ -299,7 +331,7 @@ WITH d_micro AS (
             ab_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         ab_itemid IS NOT NULL
     UNION ALL
@@ -313,7 +345,7 @@ WITH d_micro AS (
             test_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         test_itemid IS NOT NULL
     UNION ALL
@@ -327,7 +359,7 @@ WITH d_micro AS (
             org_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         org_itemid IS NOT NULL
     UNION ALL
@@ -341,7 +373,7 @@ WITH d_micro AS (
             spec_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         spec_itemid IS NOT NULL
 )
@@ -361,7 +393,7 @@ FROM
 -- src_pharmacy
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_pharmacy AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_pharmacy AS
 SELECT
     pharmacy_id                         AS pharmacy_id,
     medication                          AS medication,
@@ -377,6 +409,6 @@ SELECT
         pharmacy_id AS pharmacy_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.pharmacy
+    @source_project.@hosp_dataset.pharmacy
 ;
 
