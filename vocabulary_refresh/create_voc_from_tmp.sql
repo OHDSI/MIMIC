@@ -21,7 +21,7 @@
 -- concept
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.concept AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.concept AS
 SELECT
     concept_id,
     concept_name,
@@ -36,17 +36,17 @@ SELECT
     'concept' AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID()) AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_concept
+    @bq_target_project.@bq_target_dataset.tmp_concept
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_concept
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_concept
 ;
 
 -- ------------------------------------------------------------------------------
 -- concept_relationship
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.concept_relationship AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.concept_relationship AS
 SELECT
     concept_id_1,
     concept_id_2,
@@ -57,26 +57,26 @@ SELECT
     'concept_relationship' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_concept_relationship
+    @bq_target_project.@bq_target_dataset.tmp_concept_relationship
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_concept_relationship
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_concept_relationship
 ;
 
 -- ------------------------------------------------------------------------------
 -- vocabulary
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.vocabulary AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.vocabulary AS
 SELECT
     *,
     'vocabulary' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_vocabulary
+    @bq_target_project.@bq_target_dataset.tmp_vocabulary
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_vocabulary
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_vocabulary
 ;
 
 -- ------------------------------------------------------------------------------
@@ -87,7 +87,7 @@ DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_vocabulary
 -- drug_strength
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.drug_strength AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.drug_strength AS
 SELECT
     drug_concept_id,
     ingredient_concept_id,
@@ -104,89 +104,89 @@ SELECT
     'drug_strength' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_drug_strength
+    @bq_target_project.@bq_target_dataset.tmp_drug_strength
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_drug_strength
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_drug_strength
 ;
 
 -- ------------------------------------------------------------------------------
 -- concept_class
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.concept_class AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.concept_class AS
 SELECT
     *,
     'concept_class' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_concept_class
+    @bq_target_project.@bq_target_dataset.tmp_concept_class
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_concept_class
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_concept_class
 ;
 
 -- ------------------------------------------------------------------------------
 -- concept_ancestor
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.concept_ancestor AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.concept_ancestor AS
 SELECT
     *,
     'concept_ancestor' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_concept_ancestor
+    @bq_target_project.@bq_target_dataset.tmp_concept_ancestor
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_concept_ancestor
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_concept_ancestor
 ;
 
 -- ------------------------------------------------------------------------------
 -- concept_synonym
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.concept_synonym AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.concept_synonym AS
 SELECT
     *,
     'concept_synonym' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_concept_synonym
+    @bq_target_project.@bq_target_dataset.tmp_concept_synonym
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_concept_synonym
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_concept_synonym
 ;
 
 -- ------------------------------------------------------------------------------
 -- domain
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.domain AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.domain AS
 SELECT
     *,
     'domain' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_domain
+    @bq_target_project.@bq_target_dataset.tmp_domain
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_domain
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_domain
 ;
 
 -- ------------------------------------------------------------------------------
 -- relationship
 -- ------------------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@bq_target_project.@bq_target_dataset`.relationship AS
+CREATE OR REPLACE TABLE @bq_target_project.@bq_target_dataset.relationship AS
 SELECT
     *,
     'relationship' AS load_table_id,
     0 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_relationship
+    @bq_target_project.@bq_target_dataset.tmp_relationship
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_relationship
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_relationship
 ;
 

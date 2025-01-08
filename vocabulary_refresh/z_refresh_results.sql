@@ -5,7 +5,7 @@
 
 -- -----------------------------------------------------------------------------------
 -- 2022-09-09
--- Add custom mapping to `odysseus-mimic-dev.vocab_2022_05_10_work20`
+-- Add custom mapping to odysseus-mimic-dev.vocab_2022_05_10_work20
 -- -----------------------------------------------------------------------------------
 
 +----------+-----------------------------------------------------------+-----------+
@@ -17,7 +17,7 @@ done!
 
 -- -----------------------------------------------------------------------------------
 -- 2020-09-19
--- TUF-11, Load vocabularies to `odysseus-mimic-dev.vocabulary_2020_09_11`
+-- TUF-11, Load vocabularies to odysseus-mimic-dev.vocabulary_2020_09_11
 -- -----------------------------------------------------------------------------------
 
 +----------+--------------------------------------------------------------------------+-----------+
@@ -196,9 +196,9 @@ SELECT DISTINCT
     c2.invalid_reason AS target_invalid_reason,
     c2.valid_end_date AS target_valid_end_date
 FROM 
-    `odysseus-mimic-dev`.vocabulary_2020_09_11.concept c1,
-    `odysseus-mimic-dev`.vocabulary_2020_09_11.concept c2,
-    `odysseus-mimic-dev`.vocabulary_2020_09_11.concept_relationship r
+    odysseus-mimic-dev.vocabulary_2020_09_11.concept c1,
+    odysseus-mimic-dev.vocabulary_2020_09_11.concept c2,
+    odysseus-mimic-dev.vocabulary_2020_09_11.concept_relationship r
 WHERE 
     c1.concept_id = r.concept_id_1
     AND c2.concept_id = r.concept_id_2
