@@ -149,7 +149,6 @@ FROM
     @bq_target_project.@bq_target_dataset.tmp_custom_mapping voc
 GROUP BY
     voc.source_vocabulary_id
-    -- voc.load_table_id
 ;
 
 DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary;
@@ -222,10 +221,9 @@ SELECT
     voc.concept_code            AS concept_code,
     voc.valid_start_date        AS valid_start_date,
     voc.valid_end_date          AS valid_end_date,
-    voc.invalid_reason          AS invalid_reason --,
-
-    -- voc.load_table_id           AS load_table_id,
-    -- voc.load_row_id              AS load_row_id
+    voc.invalid_reason          AS invalid_reason,
+    voc.load_table_id           AS load_table_id,
+    voc.load_row_id             AS load_row_id
     -- when loaded not by vocabulary_refresh, raw concept tables have no load_row_id, so comment it temporarily
 FROM 
     @bq_target_project.@bq_target_dataset.tmp_custom_concept voc
@@ -253,10 +251,9 @@ SELECT
     tcr.relationship_id          AS relationship_id,
     tcr.valid_start_date         AS valid_start_date,
     tcr.valid_end_date           AS valid_end_date,
-    tcr.invalid_reason           AS invalid_reason --,
-
-    -- tcr.load_table_id            AS load_table_id,
-    -- tcr.load_row_id              AS load_row_id
+    tcr.invalid_reason           AS invalid_reason,
+    tcr.load_table_id            AS load_table_id,
+    tcr.load_row_id              AS load_row_id
 FROM 
     @bq_target_project.@bq_target_dataset.tmp_custom_concept_relationship tcr
 -- LEFT JOIN 
@@ -297,10 +294,9 @@ SELECT
     voc.vocabulary_name       AS vocabulary_name,
     voc.vocabulary_reference  AS vocabulary_reference,
     voc.vocabulary_version    AS vocabulary_version,
-    voc.vocabulary_concept_id AS vocabulary_concept_id --,
-
-    -- voc.load_table_id           AS load_table_id,
-    -- voc.load_row_id             AS load_row_id
+    voc.vocabulary_concept_id AS vocabulary_concept_id,
+    voc.load_table_id           AS load_table_id,
+    voc.load_row_id             AS load_row_id
 FROM 
     @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary voc
 ;
@@ -322,10 +318,9 @@ SELECT
     vcv.vocabulary_reference    AS concept_code,
     CAST('1970-01-01' AS DATE)  AS valid_start_date,
     CAST('2099-12-31' AS DATE)  AS valid_end_date,
-    NULL                        AS invalid_reason --,
-
-    -- NULL                        AS load_table_id,
-    -- NULL                        AS load_row_id
+    NULL                        AS invalid_reason,
+    NULL                        AS load_table_id,
+    NULL                        AS load_row_id
 FROM 
     @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary vcv 
 ;
