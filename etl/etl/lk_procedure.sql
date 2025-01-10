@@ -114,6 +114,7 @@ WHERE
 -- Rule 4, d_items custom mapping
 -- gcpt_datetimeevents_to_concept -> mimiciv_proc_datetimeevents
 -- filter out 55 rows where the year is earlier than one year before patient's birth
+-- BG updating this to filter out all rows where the year is earlier than the patient's birth in OMOP which is equal to anchor_year
 -- -------------------------------------------------------------------
 INSERT INTO @etl_project.@etl_dataset.lk_proc_d_items_clean
 SELECT
@@ -133,7 +134,8 @@ INNER JOIN
     @etl_project.@etl_dataset.src_patients pat
         ON  pat.subject_id = src.subject_id
 WHERE
-    EXTRACT(YEAR FROM src.value) >= pat.anchor_year - pat.anchor_age - 1
+    -- EXTRACT(YEAR FROM src.value) >= pat.anchor_year - pat.anchor_age - 1
+    EXTRACT(YEAR FROM src.value) >= pat.anchor_year
 ;
 
 
