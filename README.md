@@ -9,7 +9,7 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 
 ### Concepts / Phylosophy ###
 
-######The ETL is based on the five logic steps.######
+######The ETL is based on the five logic steps######
 * Create a snapshot of the source data. The snapshot data is stored in staging source tables with prefix "src_".
 * Clean source data: filter out rows to be not used, format values, apply some business rules. This step results in creating "clean" intermediate tables with prefix "lk_" and suffix "clean".
 * Map distinct source codes to concepts in vocabulary tables. The step results in creating intermediate tables with prefix "lk_" and suffix "concept".
