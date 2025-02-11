@@ -37,7 +37,7 @@
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_visit_occurrence
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_occurrence
 (
     visit_occurrence_id           INT64     not null ,
     person_id                     INT64     not null ,
@@ -64,7 +64,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_visit_occurrence
 )
 ;
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_visit_occurrence
+INSERT INTO @etl_project.@etl_dataset.cdm_visit_occurrence
 SELECT
     src.visit_occurrence_id                 AS visit_occurrence_id,
     per.person_id                           AS person_id,
@@ -98,20 +98,20 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM 
-    `@etl_project`.@etl_dataset.lk_visit_clean src
+    @etl_project.@etl_dataset.lk_visit_clean src
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_visit_concept lat
+    @etl_project.@etl_dataset.lk_visit_concept lat
         ON lat.source_code = src.admission_type
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_visit_concept la 
+    @etl_project.@etl_dataset.lk_visit_concept la 
         ON la.source_code = src.admission_location
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_visit_concept ld
+    @etl_project.@etl_dataset.lk_visit_concept ld
         ON ld.source_code = src.discharge_location
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.cdm_care_site cs
+    @etl_project.@etl_dataset.cdm_care_site cs
         ON care_site_name = 'BIDMC' -- Beth Israel hospital for all
 ;

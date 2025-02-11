@@ -11,7 +11,7 @@
 -- unique
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -21,7 +21,7 @@ SELECT
     CAST(NULL AS STRING)                AS criteria_json,
     (COUNT({table_name}_id) - COUNT(DISTINCT {table_name}_id) = 0) AS test_passed
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name}
+    @etl_project.@etl_dataset.cdm_{table_name}
 ;
 
 -- -------------------------------------------------------------------
@@ -37,7 +37,7 @@ FROM
 --      allows 0?
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -50,9 +50,9 @@ SELECT
     ))                                  AS criteria_json,
     (COUNT(*) > 0 AND COUNT(*) - COUNT(vc.concept_id) = 0) AS test_passed
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name} cdm
+    @etl_project.@etl_dataset.cdm_{table_name} cdm
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON cdm.{domain_id}_concept_id = vc.concept_id
         AND vc.standard_concept = 'S'
         AND vc.domain_id = '{domain_id}' -- Aaaaaa
@@ -69,7 +69,7 @@ WHERE
 -- start time should be not later than end time
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -79,12 +79,12 @@ SELECT
     CAST(NULL AS STRING)                AS criteria_json,
     (COUNT(*) = 0) AS test_passed
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name}
+    @etl_project.@etl_dataset.cdm_{table_name}
 WHERE
     {date_prefix}_start_date > COALESCE({date_prefix}_end_date, PARSE_DATE('%Y-%m-%d','2099-12-31'))
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -94,7 +94,7 @@ SELECT
     CAST(NULL AS STRING)                AS criteria_json,
     (COUNT(*) = 0) AS test_passed
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name}
+    @etl_project.@etl_dataset.cdm_{table_name}
 WHERE
     {date_prefix}_start_datetime > COALESCE({date_prefix}_end_datetime, PARSE_DATETIME('%F','2099-12-31'))
 ;
@@ -103,7 +103,7 @@ WHERE
 -- foreign key
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -113,15 +113,15 @@ SELECT
     CAST(NULL AS STRING)                AS criteria_json,
     (COUNT(cdm.person_id) = 0)          AS test_passed -- FK source
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name} cdm
+    @etl_project.@etl_dataset.cdm_{table_name} cdm
 LEFT JOIN
-    `@etl_project`.@etl_dataset.cdm_person fk
+    @etl_project.@etl_dataset.cdm_person fk
         ON cdm.person_id = fk.person_id
 WHERE
     fk.person_id IS NULL -- FK target
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -131,15 +131,15 @@ SELECT
     CAST(NULL AS STRING)                AS criteria_json,
     (COUNT(cdm.visit_occurrence_id) = 0)        AS test_passed
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name} cdm
+    @etl_project.@etl_dataset.cdm_{table_name} cdm
 LEFT JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence fk
+    @etl_project.@etl_dataset.cdm_visit_occurrence fk
         ON cdm.visit_occurrence_id = fk.visit_occurrence_id
 WHERE
     fk.visit_occurrence_id IS NULL
 ;
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -151,9 +151,9 @@ SELECT
     ))                                  AS criteria_json,
     (COUNT(cdm.{source_value_prefix}_source_value) = 0) AS test_passed
 FROM
-    `@etl_project`.@etl_dataset.cdm_{table_name} cdm
+    @etl_project.@etl_dataset.cdm_{table_name} cdm
 LEFT JOIN
-    `@etl_project`.@etl_dataset.src_diagnoses_icd fk
+    @etl_project.@etl_dataset.src_diagnoses_icd fk
         ON cdm.{source_value_prefix}_source_value = fk.icd_code
 WHERE
     fk.icd_code IS NULL

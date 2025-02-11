@@ -12,7 +12,7 @@ SELECT
   min(concept_id) AS min_concept_id, 
   max(concept_id) AS max_concept_id, 
   count(*) AS row_count
-FROM `bq_target_project.bq_target_dataset.concept` 
+FROM @bq_target_project.@bq_target_dataset.concept
 WHERE concept_id >= 2000000000
 GROUP BY vocabulary_id 
 ORDER BY vocabulary_id 

@@ -12,15 +12,15 @@
 -- -------------------------------------------------------------------
 
 --relationships cycle
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_1;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_1
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_1;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_1
 AS
 SELECT
     1 check_id,
     'relationships cycle' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r,
-    `@bq_target_project.@bq_target_dataset`.concept_relationship r_int
+FROM @bq_target_project.@bq_target_dataset.concept_relationship r,
+    @bq_target_project.@bq_target_dataset.concept_relationship r_int
 WHERE r.invalid_reason IS NULL
     AND r_int.concept_id_1 = r.concept_id_2
     AND r_int.concept_id_2 = r.concept_id_1
@@ -30,16 +30,16 @@ WHERE r.invalid_reason IS NULL
 ;
 
 --opposing relationships between same pair of concepts
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_2;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_2
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_2;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_2
 AS
 SELECT 
     2 check_id,
     'opposing relationships between same pair of concepts' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r,
-    `@bq_target_project.@bq_target_dataset`.concept_relationship r_int,
-    `@bq_target_project.@bq_target_dataset`.relationship rel
+FROM @bq_target_project.@bq_target_dataset.concept_relationship r,
+    @bq_target_project.@bq_target_dataset.concept_relationship r_int,
+    @bq_target_project.@bq_target_dataset.relationship rel
 WHERE r.invalid_reason IS NULL
     AND r.relationship_id = rel.relationship_id
     AND r_int.concept_id_1 = r.concept_id_1
@@ -50,19 +50,19 @@ WHERE r.invalid_reason IS NULL
 ;
 
 --relationships without reverse
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_3;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_3
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_3;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_3
 AS
 SELECT 
     3 check_id,
     'relationships without reverse' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r,
-    `@bq_target_project.@bq_target_dataset`.relationship rel
+FROM @bq_target_project.@bq_target_dataset.concept_relationship r,
+    @bq_target_project.@bq_target_dataset.relationship rel
 WHERE r.relationship_id = rel.relationship_id
     AND NOT EXISTS (
         SELECT 1
-        FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r_int
+        FROM @bq_target_project.@bq_target_dataset.concept_relationship r_int
         WHERE r_int.relationship_id = rel.reverse_relationship_id
             AND r_int.concept_id_1 = r.concept_id_2
             AND r_int.concept_id_2 = r.concept_id_1
@@ -75,16 +75,16 @@ WHERE r.relationship_id = rel.relationship_id
 
 
 --direct and reverse mappings are not same
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_6;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_6
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_6;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_6
 AS
 SELECT 
     6 check_id,
     'direct and reverse mappings are not same' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r,
-    `@bq_target_project.@bq_target_dataset`.relationship rel,
-    `@bq_target_project.@bq_target_dataset`.concept_relationship r_int
+FROM @bq_target_project.@bq_target_dataset.concept_relationship r,
+    @bq_target_project.@bq_target_dataset.relationship rel,
+    @bq_target_project.@bq_target_dataset.concept_relationship r_int
 WHERE r.relationship_id = rel.relationship_id
     AND r_int.relationship_id = rel.reverse_relationship_id
     AND r_int.concept_id_1 = r.concept_id_2
@@ -97,8 +97,8 @@ WHERE r.relationship_id = rel.relationship_id
 
 
 --wrong valid_start_date, valid_end_date or invalid_reason for the concept
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_7;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_7
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_7;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_7
 AS
 SELECT 
     7 check_id,
@@ -109,7 +109,7 @@ SELECT
     c.valid_start_date,
     c.valid_end_date,
     c.invalid_reason
-FROM `@bq_target_project.@bq_target_dataset`.concept c
+FROM @bq_target_project.@bq_target_dataset.concept c
 -- JOIN vocabulary_conversion vc ON vc.vocabulary_id_v5 = c.vocabulary_id
 -- table vocabulary_conversion is absent FROM a usual vocab package
 WHERE (
@@ -133,8 +133,8 @@ WHERE (
 ;
 
 --wrong valid_start_date, valid_end_date or invalid_reason for the voc_concept_relationship
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_8;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_8
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_8;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_8
 AS
 SELECT 
     8 check_id,
@@ -161,14 +161,14 @@ FROM (
                 THEN 1
             ELSE 0
             END check_flag
-    FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r
+    FROM @bq_target_project.@bq_target_dataset.concept_relationship r
     ) AS s0
 WHERE check_flag = 1
 ;
 
 --RxE to Rx name duplications
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_9;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_9
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_9;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_9
 AS
 SELECT 
     9 check_id,
@@ -179,8 +179,8 @@ SELECT
     NULL AS valid_start_date,
     NULL AS valid_end_date,
     NULL AS invalid_reason
-FROM `@bq_target_project.@bq_target_dataset`.concept c1
-JOIN `@bq_target_project.@bq_target_dataset`.concept c2 ON upper(c2.concept_name) = upper(c1.concept_name)
+FROM @bq_target_project.@bq_target_dataset.concept c1
+JOIN @bq_target_project.@bq_target_dataset.concept c2 ON upper(c2.concept_name) = upper(c1.concept_name)
     AND c2.concept_class_id = c1.concept_class_id
     AND c2.vocabulary_id = 'RxNorm Extension'
     AND c2.invalid_reason IS NULL
@@ -189,19 +189,19 @@ WHERE c1.vocabulary_id = 'RxNorm'
 ;
 
 --one concept has multiple replaces
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_10;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_10
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_10;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_10
 AS
 SELECT 
     10 check_id,
     'one concept has multiple replaces' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r
+FROM @bq_target_project.@bq_target_dataset.concept_relationship r
 INNER JOIN
     (
         SELECT r_int.concept_id_1,
             r_int.relationship_id
-        FROM `@bq_target_project.@bq_target_dataset`.concept_relationship r_int
+        FROM @bq_target_project.@bq_target_dataset.concept_relationship r_int
         WHERE r_int.relationship_id IN (
                 'Concept replaced by',
                 'Concept same_as to',
@@ -220,8 +220,8 @@ INNER JOIN
 ;
 
 --wrong concept_name [AVOF-1438]
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_11;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_11
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_11;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_11
 AS
 SELECT 
     11 check_id,
@@ -232,21 +232,21 @@ SELECT
     c.valid_start_date,
     c.valid_end_date,
     c.invalid_reason
-FROM `@bq_target_project.@bq_target_dataset`.concept c
+FROM @bq_target_project.@bq_target_dataset.concept c
 WHERE c.domain_id <> 'Metadata'
     AND c.concept_code = 'OMOP generated'
 ;
 
 --wrong relationships: 'Maps to'/'Maps to value' not to 'S'
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_12;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_12
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_12;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_12
 AS
 SELECT 
     12 check_id,
     'wrong relationships: "Maps to"/"Maps to value" not to "S"' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept c2,
-    `@bq_target_project.@bq_target_dataset`.concept_relationship r
+FROM @bq_target_project.@bq_target_dataset.concept c2,
+    @bq_target_project.@bq_target_dataset.concept_relationship r
 WHERE c2.concept_id = r.concept_id_2
     AND coalesce(c2.standard_concept,'C')<>'S'
     AND r.relationship_id IN ('Maps to','Maps to value')
@@ -254,15 +254,15 @@ WHERE c2.concept_id = r.concept_id_2
 ;
 
 --wrong relationships: 'Maps to'/'Maps to value' not FROM 'C' or NULL (unless it is to self)
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_13;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_13
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_13;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_13
 AS
 SELECT 
     13 check_id,
     'wrong relationships: "Maps to"/"Maps to value" not FROM "C" or NULL (unless it is to self)' AS check_name,
     r.*
-FROM `@bq_target_project.@bq_target_dataset`.concept c1,
-    `@bq_target_project.@bq_target_dataset`.concept_relationship r
+FROM @bq_target_project.@bq_target_dataset.concept c1,
+    @bq_target_project.@bq_target_dataset.concept_relationship r
 WHERE c1.concept_id = r.concept_id_1
     AND coalesce(c1.standard_concept,'C')='S'
     AND r.relationship_id IN ('Maps to','Maps to value')
@@ -271,8 +271,8 @@ WHERE c1.concept_id = r.concept_id_1
 ;
 
 --nonexistent relationships, classes, domains and vocabularies
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_14;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_14
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_14;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_14
 AS
 SELECT 
     14 check_id,
@@ -280,13 +280,13 @@ SELECT
     relationship_id 
 FROM
 (
-    SELECT relationship_id FROM `@bq_target_project.@bq_target_dataset`.concept_relationship
+    SELECT relationship_id FROM @bq_target_project.@bq_target_dataset.concept_relationship
     EXCEPT DISTINCT
-    SELECT relationship_id FROM `@bq_target_project.@bq_target_dataset`.relationship
+    SELECT relationship_id FROM @bq_target_project.@bq_target_dataset.relationship
 );
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_15;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_15
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_15;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_15
 AS
 SELECT 
     15 check_id,
@@ -294,13 +294,13 @@ SELECT
     concept_class_id
 FROM
 (
-    SELECT concept_class_id FROM `@bq_target_project.@bq_target_dataset`.concept
+    SELECT concept_class_id FROM @bq_target_project.@bq_target_dataset.concept
     EXCEPT DISTINCT
-    SELECT concept_class_id FROM `@bq_target_project.@bq_target_dataset`.concept_class
+    SELECT concept_class_id FROM @bq_target_project.@bq_target_dataset.concept_class
 );
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_16;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_16
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_16;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_16
 AS
 SELECT 
     16 check_id,
@@ -308,13 +308,13 @@ SELECT
     domain_id
 FROM
 (
-    SELECT domain_id FROM `@bq_target_project.@bq_target_dataset`.concept
+    SELECT domain_id FROM @bq_target_project.@bq_target_dataset.concept
     EXCEPT DISTINCT
-    SELECT domain_id FROM `@bq_target_project.@bq_target_dataset`.domain
+    SELECT domain_id FROM @bq_target_project.@bq_target_dataset.domain
 );
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_17;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_17
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_17;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_17
 AS
 SELECT 
     17 check_id,
@@ -322,62 +322,62 @@ SELECT
     vocabulary_id
 FROM
 (
-    SELECT vocabulary_id FROM `@bq_target_project.@bq_target_dataset`.concept
+    SELECT vocabulary_id FROM @bq_target_project.@bq_target_dataset.concept
     EXCEPT DISTINCT
-    SELECT vocabulary_id FROM `@bq_target_project.@bq_target_dataset`.vocabulary
+    SELECT vocabulary_id FROM @bq_target_project.@bq_target_dataset.vocabulary
 );
 
 -- create and show summary
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_errors_summary;
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.z_check_voc_errors_summary
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_errors_summary;
+CREATE TABLE @bq_target_project.@bq_target_dataset.z_check_voc_errors_summary
 AS
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_1
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_1
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_2
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_2
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_3
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_3
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_6
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_6
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_7
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_7
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_8
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_8
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_9
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_9
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_10
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_10
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_11
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_11
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_12
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_12
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_13
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_13
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_14
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_14
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_15
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_15
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_16
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_16
     GROUP BY check_id, check_name
 UNION ALL
-SELECT check_id, check_name, COUNT(*) AS row_count FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_17
+SELECT check_id, check_name, COUNT(*) AS row_count FROM @bq_target_project.@bq_target_dataset.z_check_voc_17
     GROUP BY check_id, check_name
 ;
 
-SELECT * FROM `@bq_target_project.@bq_target_dataset`.z_check_voc_errors_summary
+SELECT * FROM @bq_target_project.@bq_target_dataset.z_check_voc_errors_summary
 ORDER BY check_id;
 

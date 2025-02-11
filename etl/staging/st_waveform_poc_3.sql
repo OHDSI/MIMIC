@@ -34,7 +34,7 @@
 -- src_waveform_header
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header_3
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_header_3
 (       
     reference_id            STRING,
     raw_files_path          STRING,
@@ -50,7 +50,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header_3
 
 -- parsed codes to be targeted to table cdm_measurement
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx_3
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_mx_3
 (
     case_id                 STRING,  -- FK to the header
     segment_name            STRING, -- two digits of case_id, 5 digits of internal sequence number
@@ -86,7 +86,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx_3
 -- -------------------------------------------------------------------
 
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_header_3
+INSERT INTO @etl_project.@etl_dataset.src_waveform_header_3
 SELECT
     subj.short_reference_id             AS reference_id,
     subj.long_reference_id              AS raw_files_path,
@@ -102,13 +102,13 @@ SELECT
         subj.short_reference_id AS reference_id
     ))                                  AS trace_id
 FROM
-    `@wf_project`.@wf_dataset.poc_3_header subj
+    @wf_project.@wf_dataset.poc_3_header subj
 ;
 
 -- Chunk 1
 -- 25-second interval, mass data
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_mx_3
+INSERT INTO @etl_project.@etl_dataset.src_waveform_mx_3
 SELECT
     src.case_id                         AS case_id, -- FK to the header
     src.segment_name                    AS segment_name,
@@ -131,9 +131,9 @@ SELECT
             src.src_name AS src_name
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.poc_3_chunk_1 src
+    @wf_project.@wf_dataset.poc_3_chunk_1 src
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_patients pat
+    @etl_project.@etl_dataset.src_patients pat
         ON  CAST(REPLACE(src.case_id, 'p', '') AS INT64) = pat.subject_id    -- filter out mass data in demo dataset
 ;
 
@@ -141,7 +141,7 @@ INNER JOIN
 -- Chunk 2
 -- 5-minute interval, summarized data for Full set and Demo
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_mx_3
+INSERT INTO @etl_project.@etl_dataset.src_waveform_mx_3
 SELECT
     src.case_id                         AS case_id, -- FK to the header
     src.segment_name                    AS segment_name,
@@ -164,14 +164,14 @@ SELECT
             src.src_name AS src_name
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.poc_3_chunk_2 src
+    @wf_project.@wf_dataset.poc_3_chunk_2 src
 ;
 
 
 -- Chunk 3
 -- 25-second interval, tiny mass data for Demo
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_mx_3
+INSERT INTO @etl_project.@etl_dataset.src_waveform_mx_3
 SELECT
     src.case_id                         AS case_id, -- FK to the header
     src.segment_name                    AS segment_name,
@@ -194,7 +194,7 @@ SELECT
             src.src_name AS src_name
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.poc_3_chunk_3 src
+    @wf_project.@wf_dataset.poc_3_chunk_3 src
 ;
 
 

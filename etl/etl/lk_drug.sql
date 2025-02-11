@@ -27,7 +27,7 @@
 -- lk_prescriptions_clean 
 -- Rule 1
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_prescriptions_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_prescriptions_clean AS
 SELECT
     -- -- 'drug:['                || COALESCE(drug, drug_name_poe, drug_name_generic,'') || ']'||
     -- 'drug:['                || COALESCE(drug,'') || ']'||
@@ -67,9 +67,9 @@ SELECT
     src.trace_id                    AS trace_id
 
 FROM
-    `@etl_project`.@etl_dataset.src_prescriptions src -- pr
+    @etl_project.@etl_dataset.src_prescriptions src -- pr
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.src_pharmacy pharm
+    @etl_project.@etl_dataset.src_pharmacy pharm
         ON src.pharmacy_id = pharm.pharmacy_id
 WHERE
     src.starttime IS NOT NULL
@@ -81,7 +81,7 @@ WHERE
 -- Rule 1
 -- mapping is 85% done from gsn coding
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_pr_ndc_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_pr_ndc_concept AS
 SELECT DISTINCT
     src.ndc_source_code     AS source_code,
     vc.domain_id            AS source_domain_id,
@@ -89,17 +89,17 @@ SELECT DISTINCT
     vc2.domain_id           AS target_domain_id,
     vc2.concept_id          AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.lk_prescriptions_clean src -- pr
+    @etl_project.@etl_dataset.lk_prescriptions_clean src -- pr
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON  vc.concept_code = src.ndc_source_code --this covers 85% of direct mapping but no standard
         AND vc.vocabulary_id = src.ndc_source_vocabulary -- NDC
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1 
         and vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL --covers 71% of rxnorm standards concepts
@@ -109,7 +109,7 @@ LEFT JOIN
 -- lk_pr_gcpt_concept
 -- Rule 1
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_pr_gcpt_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_pr_gcpt_concept AS
 SELECT DISTINCT
     src.gcpt_source_code    AS source_code,
     vc.domain_id            AS source_domain_id,
@@ -117,17 +117,17 @@ SELECT DISTINCT
     vc2.domain_id           AS target_domain_id,
     vc2.concept_id          AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.lk_prescriptions_clean src -- pr
+    @etl_project.@etl_dataset.lk_prescriptions_clean src -- pr
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON  vc.concept_code = src.gcpt_source_code
         AND vc.vocabulary_id = src.gcpt_source_vocabulary -- mimiciv_drug_ndc
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1 
         and vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL --covers 71% of rxnorm standards concepts
@@ -137,7 +137,7 @@ LEFT JOIN
 -- lk_pr_route_concept
 -- Rule 1
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_pr_route_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_pr_route_concept AS
 SELECT DISTINCT
     src.route_source_code   AS source_code,
     vc.domain_id            AS source_domain_id,
@@ -145,17 +145,17 @@ SELECT DISTINCT
     vc2.domain_id           AS target_domain_id,
     vc2.concept_id          AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.lk_prescriptions_clean src -- pr
+    @etl_project.@etl_dataset.lk_prescriptions_clean src -- pr
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON  vc.concept_code = src.route_source_code
         AND vc.vocabulary_id = src.route_source_vocabulary
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1 
         and vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL --covers 71% of rxnorm standards concepts
@@ -165,7 +165,7 @@ LEFT JOIN
 -- lk_drug_mapped
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_drug_mapped AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_drug_mapped AS
 SELECT
     src.hadm_id                                     AS hadm_id,
     src.subject_id                                  AS subject_id,
@@ -191,17 +191,17 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_prescriptions_clean src
+    @etl_project.@etl_dataset.lk_prescriptions_clean src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_pr_ndc_concept vc_ndc
+    @etl_project.@etl_dataset.lk_pr_ndc_concept vc_ndc
         ON  src.ndc_source_code = vc_ndc.source_code
         AND vc_ndc.target_concept_id IS NOT NULL
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_pr_gcpt_concept vc_gcpt
+    @etl_project.@etl_dataset.lk_pr_gcpt_concept vc_gcpt
         ON  src.gcpt_source_code = vc_gcpt.source_code
         AND vc_gcpt.target_concept_id IS NOT NULL
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_pr_route_concept vc_route
+    @etl_project.@etl_dataset.lk_pr_route_concept vc_route
         ON src.route_source_code = vc_route.source_code
         AND vc_route.target_concept_id IS NOT NULL
 ;

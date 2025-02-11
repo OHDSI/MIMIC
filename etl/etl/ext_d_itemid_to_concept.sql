@@ -11,7 +11,7 @@
 -- -------------------------------------------------------------------
 
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.d_items_to_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.d_items_to_concept AS
 WITH
 counts AS
 (
@@ -25,7 +25,7 @@ counts AS
         src.target_concept_id       AS target_concept_id,
         COUNT(*)                    AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_chartevents_mapped src
+        @etl_project.@etl_dataset.lk_chartevents_mapped src
     GROUP BY
         src.itemid,
         src.source_label,
@@ -45,7 +45,7 @@ counts AS
         src.target_concept_id       AS target_concept_id,
         COUNT(*)                    AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_procedure_mapped src
+        @etl_project.@etl_dataset.lk_procedure_mapped src
     WHERE
         src.unit_id LIKE '%.procedureevents'
         OR src.unit_id LIKE '%.datetimeevents'
@@ -75,10 +75,10 @@ SELECT
 FROM
     counts src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON  src.source_concept_id = vc.concept_id
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON src.target_concept_id = vc2.concept_id
 ORDER BY
     itemid, target_vocabulary_id, target_concept_id
@@ -88,14 +88,14 @@ ORDER BY
 -- d_labitems.itemid to concept_id
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.d_labitems_to_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.d_labitems_to_concept AS
 WITH
 counts AS
 (
     SELECT
         itemid AS itemid, COUNT(*) AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_meas_labevents_mapped
+        @etl_project.@etl_dataset.lk_meas_labevents_mapped
     GROUP BY itemid
 )
 SELECT
@@ -116,7 +116,7 @@ SELECT
     src.target_standard_concept     AS target_standard_concept, -- for double-check
     counts.row_count                AS row_count
 FROM
-    `@etl_project`.@etl_dataset.lk_meas_d_labitems_concept src
+    @etl_project.@etl_dataset.lk_meas_d_labitems_concept src
 LEFT JOIN
     counts 
         USING (itemid)
@@ -129,32 +129,32 @@ ORDER BY
 -- d_micro.itemid to concept_id
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.d_micro_to_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.d_micro_to_concept AS
 WITH
 counts AS
 (
     SELECT
         spec_itemid AS itemid, COUNT(*) AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_specimen_mapped
+        @etl_project.@etl_dataset.lk_specimen_mapped
     GROUP BY itemid
     UNION ALL -- more unions
     SELECT
         test_itemid AS itemid, COUNT(*) AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_meas_organism_mapped
+        @etl_project.@etl_dataset.lk_meas_organism_mapped
     GROUP BY itemid
     UNION ALL -- more unions
     SELECT
         org_itemid AS itemid, COUNT(*) AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_meas_organism_mapped
+        @etl_project.@etl_dataset.lk_meas_organism_mapped
     GROUP BY itemid
     UNION ALL
     SELECT
         ab_itemid AS itemid, COUNT(*) AS row_count
     FROM
-        `@etl_project`.@etl_dataset.lk_meas_ab_mapped
+        @etl_project.@etl_dataset.lk_meas_ab_mapped
     GROUP BY itemid
 )
 SELECT
@@ -174,15 +174,15 @@ SELECT
     src.target_standard_concept     AS target_standard_concept, -- for double-check
     counts.row_count                AS row_count
 FROM
-    `@etl_project`.@etl_dataset.lk_d_micro_concept src
+    @etl_project.@etl_dataset.lk_d_micro_concept src
 LEFT JOIN
     counts 
         USING (itemid)
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON  src.source_concept_id = vc.concept_id
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON src.target_concept_id = vc2.concept_id
 ORDER BY
     itemid, target_vocabulary_id, target_concept_id

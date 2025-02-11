@@ -13,7 +13,7 @@
 -- QA tests report table
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@metrics_project`.@metrics_dataset.report_qa_test AS
+CREATE OR REPLACE TABLE @metrics_project.@metrics_dataset.report_qa_test AS
 SELECT
     CAST(NULL AS STRING)                AS report_id, -- task_id, run_id, target_dataset etc.
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS

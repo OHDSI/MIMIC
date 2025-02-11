@@ -33,7 +33,7 @@
 -- rules 1-3
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_observation_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_observation_clean AS
 -- rule 1, insurance
 SELECT
     src.subject_id                  AS subject_id,
@@ -49,7 +49,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_admissions src -- adm
+    @etl_project.@etl_dataset.src_admissions src -- adm
 WHERE
     src.insurance IS NOT NULL
 
@@ -69,7 +69,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_admissions src -- adm
+    @etl_project.@etl_dataset.src_admissions src -- adm
 WHERE
     src.marital_status IS NOT NULL
 
@@ -89,7 +89,7 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_admissions src -- adm
+    @etl_project.@etl_dataset.src_admissions src -- adm
 WHERE
     src.language IS NOT NULL
 ;
@@ -99,7 +99,7 @@ WHERE
 -- Rule 4, drgcodes
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.lk_observation_clean
+INSERT INTO @etl_project.@etl_dataset.lk_observation_clean
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
@@ -115,9 +115,9 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_drgcodes src -- drg
+    @etl_project.@etl_dataset.src_drgcodes src -- drg
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_admissions adm
+    @etl_project.@etl_dataset.src_admissions adm
         ON src.hadm_id = adm.hadm_id
 WHERE
     src.description IS NOT NULL
@@ -130,7 +130,7 @@ WHERE
 -- Rules 1-4
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_obs_admissions_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_obs_admissions_concept AS
 SELECT DISTINCT
     src.value_as_string         AS source_code,
     src.source_vocabulary_id    AS source_vocabulary_id,
@@ -139,19 +139,19 @@ SELECT DISTINCT
     vc2.domain_id               AS target_domain_id,
     vc2.concept_id              AS target_concept_id
 FROM
-    `@etl_project`.@etl_dataset.lk_observation_clean src
+    @etl_project.@etl_dataset.lk_observation_clean src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON src.value_as_string = vc.concept_code
         AND src.source_vocabulary_id = vc.vocabulary_id
         -- valid period should be used to map drg_code, but due to the date shift it is not applicable
         -- AND src.start_datetime BETWEEN vc.valid_start_date AND vc.valid_end_date
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
         AND vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
@@ -161,7 +161,7 @@ LEFT JOIN
 -- lk_observation_mapped
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_observation_mapped AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_observation_mapped AS
 SELECT
     src.hadm_id                             AS hadm_id, -- to visit
     src.subject_id                          AS subject_id, -- to person
@@ -179,9 +179,9 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_observation_clean src
+    @etl_project.@etl_dataset.lk_observation_clean src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_obs_admissions_concept lc
+    @etl_project.@etl_dataset.lk_obs_admissions_concept lc
         ON src.value_as_string = lc.source_code
         AND src.source_vocabulary_id = lc.source_vocabulary_id
 ;

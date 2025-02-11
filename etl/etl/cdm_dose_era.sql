@@ -9,7 +9,7 @@
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_dose_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_dose_era
 (
     dose_era_id           INT64     not null ,
     person_id             INT64     not null ,
@@ -32,7 +32,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_dose_era
 -- -------------------------------------------------------------------
 -- collect Drug Exposures
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_drugIngredientExp AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_drugIngredientExp AS
 SELECT
     de.drug_exposure_id                     AS drug_exposure_id,
     de.person_id                            AS person_id,
@@ -54,13 +54,13 @@ SELECT
     ds.denominator_value                    AS denominator_value,
     ds.denominator_unit_concept_id          AS denominator_unit_concept_id,
     c.concept_class_id                      AS concept_class_id
-FROM `@etl_project`.@etl_dataset.cdm_drug_exposure de
-INNER JOIN `@etl_project`.@etl_dataset.voc_drug_strength ds
+FROM @etl_project.@etl_dataset.cdm_drug_exposure de
+INNER JOIN @etl_project.@etl_dataset.voc_drug_strength ds
     ON de.drug_concept_id = ds.drug_concept_id
-INNER JOIN `@etl_project`.@etl_dataset.voc_concept_ancestor ca
+INNER JOIN @etl_project.@etl_dataset.voc_concept_ancestor ca
     ON  de.drug_concept_id = ca.descendant_concept_id
     AND ds.ingredient_concept_id = ca.ancestor_concept_id
-LEFT JOIN `@etl_project`.@etl_dataset.voc_concept c
+LEFT JOIN @etl_project.@etl_dataset.voc_concept c
     ON  de.drug_concept_id = concept_id
     AND c.vocabulary_id IN ('RxNorm', 'RxNorm Extension')
 ;
@@ -73,7 +73,7 @@ LEFT JOIN `@etl_project`.@etl_dataset.voc_concept c
 -- TODO
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_drugWithDose AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_drugWithDose AS
 SELECT
     drug_exposure_id                        AS drug_exposure_id,
     person_id                               AS person_id,
@@ -181,7 +181,7 @@ SELECT
             ELSE numerator_unit_concept_id
         END
     END                                     AS unit_concept_id
-FROM `@etl_project`.@etl_dataset.tmp_drugIngredientExp
+FROM @etl_project.@etl_dataset.tmp_drugIngredientExp
 ;
 
 -- -------------------------------------------------------------------
@@ -192,7 +192,7 @@ FROM `@etl_project`.@etl_dataset.tmp_drugIngredientExp
 -- TODO
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_cteDoseTarget AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_cteDoseTarget AS
 SELECT
     dwd.drug_exposure_id                                                AS drug_exposure_id,
     dwd.person_id                                                       AS person_id,
@@ -210,7 +210,7 @@ SELECT
         DATE_ADD(drug_exposure_start_date, INTERVAL 1 DAY))       AS drug_exposure_end_date
         -- Add 1 day to the drug_exposure_start_date since
         -- there is no end_date or INTERVAL for the days_supply
-FROM `@etl_project`.@etl_dataset.tmp_drugWithDose dwd
+FROM @etl_project.@etl_dataset.tmp_drugWithDose dwd
 WHERE
     dose_value <> -1
 ;
@@ -224,7 +224,7 @@ WHERE
 -- NOTE - record count should double exactly
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_rawdata AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_cteDoseEndDates_rawdata AS
 SELECT
     person_id                                       AS person_id,
     drug_concept_id                                 AS drug_concept_id,
@@ -235,7 +235,7 @@ SELECT
     ROW_NUMBER() OVER (
         PARTITION BY person_id, drug_concept_id, unit_concept_id, CAST(dose_value AS INT64)
         ORDER BY drug_exposure_start_date)          AS start_ordinal
-FROM `@etl_project`.@etl_dataset.tmp_cteDoseTarget
+FROM @etl_project.@etl_dataset.tmp_cteDoseTarget
 UNION ALL
 -- pad the end dates by 30 to allow a grace period for overlapping ranges.
 SELECT
@@ -246,7 +246,7 @@ SELECT
     DATE_ADD(drug_exposure_end_date, INTERVAL 30 DAY)           AS event_date,
     1                                                           AS event_type,
     NULL                                                        AS start_ordinal
-FROM `@etl_project`.@etl_dataset.tmp_cteDoseTarget
+FROM @etl_project.@etl_dataset.tmp_cteDoseTarget
 ;
 
 -- -------------------------------------------------------------------
@@ -257,7 +257,7 @@ FROM `@etl_project`.@etl_dataset.tmp_cteDoseTarget
 -- TODO
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_e AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_cteDoseEndDates_e AS
 SELECT
     person_id                                                                   AS person_id,
     drug_concept_id                                                             AS drug_concept_id,
@@ -273,7 +273,7 @@ SELECT
         ORDER BY event_date, event_type)                                        AS overall_ord
         -- order by above pulls the current START down from the prior
         -- rows so that the NULLs from the END DATES will contain a value we can compare with
-FROM `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_rawdata
+FROM @etl_project.@etl_dataset.tmp_cteDoseEndDates_rawdata
 ;
 
 -- -------------------------------------------------------------------
@@ -284,14 +284,14 @@ FROM `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_rawdata
 -- TODO
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_cteDoseEndDates AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_cteDoseEndDates AS
 SELECT
     person_id                                       AS person_id,
     drug_concept_id                                 AS drug_concept_id,
     unit_concept_id                                 AS unit_concept_id,
     dose_value                                      AS dose_value,
     DATE_SUB(event_date, INTERVAL 30 DAY)           AS end_date   -- unpad the end date
-FROM `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_e
+FROM @etl_project.@etl_dataset.tmp_cteDoseEndDates_e
 WHERE
     (2 * start_ordinal) - overall_ord = 0
 ;
@@ -304,7 +304,7 @@ WHERE
 -- TODO
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_cteDoseFinalEnds AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_cteDoseFinalEnds AS
 SELECT
     dt.person_id                    AS person_id,
     dt.drug_concept_id              AS drug_concept_id,
@@ -312,8 +312,8 @@ SELECT
     dt.dose_value                   AS dose_value,
     dt.drug_exposure_start_date     AS drug_exposure_start_date,
     MIN(e.end_date)                 AS drug_era_end_date
-FROM `@etl_project`.@etl_dataset.tmp_cteDoseTarget dt
-INNER JOIN `@etl_project`.@etl_dataset.tmp_cteDoseEndDates e
+FROM @etl_project.@etl_dataset.tmp_cteDoseTarget dt
+INNER JOIN @etl_project.@etl_dataset.tmp_cteDoseEndDates e
     ON  dt.person_id = e.person_id
     AND dt.drug_concept_id = e.drug_concept_id
     AND dt.unit_concept_id = e.unit_concept_id
@@ -337,7 +337,7 @@ GROUP BY
 -- final Dose Eras
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_dose_era
+INSERT INTO @etl_project.@etl_dataset.cdm_dose_era
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())   AS dose_era_id,
     person_id                           AS person_id,
@@ -349,7 +349,7 @@ SELECT
     'dose_era.drug_exposure'            AS unit_id,
     CAST(NULL AS STRING)                AS load_table_id,
     CAST(NULL AS INT64)                 AS load_row_id
-FROM `@etl_project`.@etl_dataset.tmp_cteDoseFinalEnds
+FROM @etl_project.@etl_dataset.tmp_cteDoseFinalEnds
 GROUP BY
     person_id,
     drug_concept_id,
@@ -364,10 +364,10 @@ ORDER BY
 -- -------------------------------------------------------------------
 -- Drop Temporary Tables
 -- -------------------------------------------------------------------
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_drugIngredientExp;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_drugWithDose;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_cteDoseTarget;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_rawdata;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_cteDoseEndDates_e;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_cteDoseEndDates;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_cteDoseFinalEnds;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_drugIngredientExp;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_drugWithDose;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_cteDoseTarget;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_cteDoseEndDates_rawdata;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_cteDoseEndDates_e;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_cteDoseEndDates;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_cteDoseFinalEnds;

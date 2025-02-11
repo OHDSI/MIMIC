@@ -2,7 +2,7 @@
 
 -- Unload to ATLAS-- Copy Vocabulary tables
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.concept AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.concept AS 
 SELECT
     concept_id,
     concept_name,
@@ -14,32 +14,32 @@ SELECT
     valid_start_DATE,
     valid_end_DATE,
     invalid_reason
-FROM `@etl_project`.@etl_dataset.voc_concept;
+FROM @etl_project.@etl_dataset.voc_concept;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.vocabulary AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.vocabulary AS 
 SELECT
     vocabulary_id,
     vocabulary_name,
     vocabulary_reference,
     vocabulary_version,
     vocabulary_concept_id
-FROM `@etl_project`.@etl_dataset.voc_vocabulary;
+FROM @etl_project.@etl_dataset.voc_vocabulary;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.domain AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.domain AS 
 SELECT
     domain_id,
     domain_name,
     domain_concept_id
-FROM `@etl_project`.@etl_dataset.voc_domain;
+FROM @etl_project.@etl_dataset.voc_domain;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.concept_class AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.concept_class AS 
 SELECT
     concept_class_id,
     concept_class_name,
     concept_class_concept_id
-FROM `@etl_project`.@etl_dataset.voc_concept_class;
+FROM @etl_project.@etl_dataset.voc_concept_class;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.concept_relationship AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.concept_relationship AS 
 SELECT
     concept_id_1,
     concept_id_2,
@@ -47,9 +47,9 @@ SELECT
     valid_start_DATE,
     valid_end_DATE,
     invalid_reason
-FROM `@etl_project`.@etl_dataset.voc_concept_relationship;
+FROM @etl_project.@etl_dataset.voc_concept_relationship;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.relationship AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.relationship AS 
 SELECT
     relationship_id,
     relationship_name,
@@ -57,24 +57,24 @@ SELECT
     defines_ancestry,
     reverse_relationship_id,
     relationship_concept_id
-FROM `@etl_project`.@etl_dataset.voc_relationship;
+FROM @etl_project.@etl_dataset.voc_relationship;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.concept_synonym AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.concept_synonym AS 
 SELECT
     concept_id,
     concept_synonym_name,
     language_concept_id
-FROM `@etl_project`.@etl_dataset.voc_concept_synonym;
+FROM @etl_project.@etl_dataset.voc_concept_synonym;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.concept_ancestor AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.concept_ancestor AS 
 SELECT
     ancestor_concept_id,
     descendant_concept_id,
     min_levels_of_separation,
     max_levels_of_separation
-FROM `@etl_project`.@etl_dataset.voc_concept_ancestor;
+FROM @etl_project.@etl_dataset.voc_concept_ancestor;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.source_to_concept_map AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.source_to_concept_map AS 
 SELECT
     source_code,
     source_concept_id,
@@ -85,9 +85,9 @@ SELECT
     valid_start_DATE,
     valid_end_DATE,
     invalid_reason
-FROM `@etl_project`.@etl_dataset.voc_source_to_concept_map;
+FROM @etl_project.@etl_dataset.voc_source_to_concept_map;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.drug_strength AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.drug_strength AS 
 SELECT
     drug_concept_id,
     ingredient_concept_id,
@@ -101,12 +101,12 @@ SELECT
     valid_start_DATE,
     valid_end_DATE,
     invalid_reason
-FROM `@etl_project`.@etl_dataset.voc_drug_strength;
+FROM @etl_project.@etl_dataset.voc_drug_strength;
 
 
 -- Copy CDM tables
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.cohort_definition AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.cohort_definition AS 
 SELECT
     cohort_definition_id,
     cohort_definition_name,
@@ -115,18 +115,18 @@ SELECT
     cohort_definition_syntax,
     subject_concept_id,
     cohort_initiation_date
-FROM `@etl_project`.@etl_dataset.cdm_cohort_definition;
+FROM @etl_project.@etl_dataset.cdm_cohort_definition;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.attribute_definition AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.attribute_definition AS 
 SELECT
     attribute_definition_id,
     attribute_name,
     attribute_description,
     attribute_type_concept_id,
     attribute_syntax
-FROM `@etl_project`.@etl_dataset.cdm_attribute_definition;
+FROM @etl_project.@etl_dataset.cdm_attribute_definition;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.cdm_source AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.cdm_source AS 
 SELECT
     cdm_source_name,
     cdm_source_abbreviation,
@@ -138,9 +138,9 @@ SELECT
     cdm_release_date,
     cdm_version,
     vocabulary_version
-FROM `@etl_project`.@etl_dataset.cdm_cdm_source;
+FROM @etl_project.@etl_dataset.cdm_cdm_source;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.metadata AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.metadata AS 
 SELECT
     metadata_concept_id,
     metadata_type_concept_id,
@@ -149,9 +149,9 @@ SELECT
     value_as_concept_id,
     metadata_date,
     metadata_datetime
-FROM `@etl_project`.@etl_dataset.cdm_metadata;
+FROM @etl_project.@etl_dataset.cdm_metadata;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.person AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.person AS 
 SELECT
     person_id,
     gender_concept_id,
@@ -171,18 +171,18 @@ SELECT
     race_source_concept_id,
     ethnicity_source_value,
     ethnicity_source_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_person;
+FROM @etl_project.@etl_dataset.cdm_person;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.observation_period AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.observation_period AS 
 SELECT
     observation_period_id,
     person_id,
     observation_period_start_date,
     observation_period_end_date,
     period_type_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_observation_period;
+FROM @etl_project.@etl_dataset.cdm_observation_period;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.specimen AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.specimen AS 
 SELECT
     specimen_id,
     person_id,
@@ -199,9 +199,9 @@ SELECT
     unit_source_value,
     anatomic_site_source_value,
     disease_status_source_value
-FROM `@etl_project`.@etl_dataset.cdm_specimen;
+FROM @etl_project.@etl_dataset.cdm_specimen;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.death AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.death AS 
 SELECT
     person_id,
     death_date,
@@ -210,9 +210,9 @@ SELECT
     cause_concept_id,
     cause_source_value,
     cause_source_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_death;
+FROM @etl_project.@etl_dataset.cdm_death;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.visit_occurrence AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.visit_occurrence AS 
 SELECT
     visit_occurrence_id,
     person_id,
@@ -231,9 +231,9 @@ SELECT
     discharge_to_concept_id,
     discharge_to_source_value,
     preceding_visit_occurrence_id
-FROM `@etl_project`.@etl_dataset.cdm_visit_occurrence;
+FROM @etl_project.@etl_dataset.cdm_visit_occurrence;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.visit_detail AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.visit_detail AS 
 SELECT
     visit_detail_id,
     person_id,
@@ -254,9 +254,9 @@ SELECT
     discharge_to_source_value,
     visit_detail_parent_id,
     visit_occurrence_id
-FROM `@etl_project`.@etl_dataset.cdm_visit_detail;
+FROM @etl_project.@etl_dataset.cdm_visit_detail;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.procedure_occurrence AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.procedure_occurrence AS 
 SELECT
     procedure_occurrence_id,
     person_id,
@@ -272,9 +272,9 @@ SELECT
     procedure_source_value,
     procedure_source_concept_id,
     modifier_source_value
-FROM `@etl_project`.@etl_dataset.cdm_procedure_occurrence;
+FROM @etl_project.@etl_dataset.cdm_procedure_occurrence;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.drug_exposure AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.drug_exposure AS 
 SELECT
     drug_exposure_id,
     person_id,
@@ -299,9 +299,9 @@ SELECT
     drug_source_concept_id,
     route_source_value,
     dose_unit_source_value
-FROM `@etl_project`.@etl_dataset.cdm_drug_exposure;
+FROM @etl_project.@etl_dataset.cdm_drug_exposure;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.device_exposure AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.device_exposure AS 
 SELECT
     device_exposure_id,
     person_id,
@@ -318,9 +318,9 @@ SELECT
     visit_detail_id,
     device_source_value,
     device_source_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_device_exposure;
+FROM @etl_project.@etl_dataset.cdm_device_exposure;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.condition_occurrence AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.condition_occurrence AS 
 SELECT
     condition_occurrence_id,
     person_id,
@@ -338,9 +338,9 @@ SELECT
     condition_source_concept_id,
     condition_status_source_value,
     condition_status_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_condition_occurrence;
+FROM @etl_project.@etl_dataset.cdm_condition_occurrence;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.measurement AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.measurement AS 
 SELECT
     measurement_id,
     person_id,
@@ -362,9 +362,9 @@ SELECT
     measurement_source_concept_id,
     unit_source_value,
     value_source_value
-FROM `@etl_project`.@etl_dataset.cdm_measurement;
+FROM @etl_project.@etl_dataset.cdm_measurement;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.note AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.note AS 
 SELECT
     note_id,
     person_id,
@@ -380,9 +380,9 @@ SELECT
     visit_occurrence_id,
     visit_detail_id,
     note_source_value
-FROM `@etl_project`.@etl_dataset.cdm_note;
+FROM @etl_project.@etl_dataset.cdm_note;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.note_nlp AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.note_nlp AS 
 SELECT
     note_nlp_id,
     note_id,
@@ -398,9 +398,9 @@ SELECT
     term_exists,
     term_temporal,
     term_modifiers
-FROM `@etl_project`.@etl_dataset.cdm_note_nlp;
+FROM @etl_project.@etl_dataset.cdm_note_nlp;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.observation AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.observation AS 
 SELECT
     observation_id,
     person_id,
@@ -420,18 +420,18 @@ SELECT
     observation_source_concept_id,
     unit_source_value,
     qualifier_source_value
-FROM `@etl_project`.@etl_dataset.cdm_observation;
+FROM @etl_project.@etl_dataset.cdm_observation;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.fact_relationship AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.fact_relationship AS 
 SELECT
     domain_concept_id_1,
     fact_id_1,
     domain_concept_id_2,
     fact_id_2,
     relationship_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_fact_relationship;
+FROM @etl_project.@etl_dataset.cdm_fact_relationship;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.location AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.location AS 
 SELECT
     location_id,
     address_1,
@@ -441,9 +441,9 @@ SELECT
     zip,
     county,
     location_source_value
-FROM `@etl_project`.@etl_dataset.cdm_location;
+FROM @etl_project.@etl_dataset.cdm_location;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.care_site AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.care_site AS 
 SELECT
     care_site_id,
     care_site_name,
@@ -451,9 +451,9 @@ SELECT
     location_id,
     care_site_source_value,
     place_of_service_source_value
-FROM `@etl_project`.@etl_dataset.cdm_care_site;
+FROM @etl_project.@etl_dataset.cdm_care_site;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.provider AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.provider AS 
 SELECT
     provider_id,
     provider_name,
@@ -468,9 +468,9 @@ SELECT
     specialty_source_concept_id,
     gender_source_value,
     gender_source_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_provider;
+FROM @etl_project.@etl_dataset.cdm_provider;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.payer_plan_period AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.payer_plan_period AS 
 SELECT
     payer_plan_period_id,
     person_id,
@@ -489,9 +489,9 @@ SELECT
     stop_reason_concept_id,
     stop_reason_source_value,
     stop_reason_source_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_payer_plan_period;
+FROM @etl_project.@etl_dataset.cdm_payer_plan_period;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.cost AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.cost AS 
 SELECT
     cost_id,
     cost_event_id,
@@ -515,17 +515,17 @@ SELECT
     revenue_code_source_value,
     drg_concept_id,
     drg_source_value
-FROM `@etl_project`.@etl_dataset.cdm_cost;
+FROM @etl_project.@etl_dataset.cdm_cost;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.cohort AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.cohort AS 
 SELECT
     cohort_definition_id,
     subject_id,
     cohort_start_date,
     cohort_end_date
-FROM `@etl_project`.@etl_dataset.cdm_cohort;
+FROM @etl_project.@etl_dataset.cdm_cohort;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.cohort_attribute AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.cohort_attribute AS 
 SELECT
     cohort_definition_id,
     subject_id,
@@ -534,9 +534,9 @@ SELECT
     attribute_definition_id,
     value_as_number,
     value_as_concept_id
-FROM `@etl_project`.@etl_dataset.cdm_cohort_attribute;
+FROM @etl_project.@etl_dataset.cdm_cohort_attribute;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.drug_era AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.drug_era AS 
 SELECT
     drug_era_id,
     person_id,
@@ -545,9 +545,9 @@ SELECT
     drug_era_end_date,
     drug_exposure_count,
     gap_days
-FROM `@etl_project`.@etl_dataset.cdm_drug_era;
+FROM @etl_project.@etl_dataset.cdm_drug_era;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.dose_era AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.dose_era AS 
 SELECT
     dose_era_id,
     person_id,
@@ -556,9 +556,9 @@ SELECT
     dose_value,
     dose_era_start_date,
     dose_era_end_date
-FROM `@etl_project`.@etl_dataset.cdm_dose_era;
+FROM @etl_project.@etl_dataset.cdm_dose_era;
 
-CREATE OR REPLACE TABLE `@atlas_project`.@atlas_dataset.condition_era AS 
+CREATE OR REPLACE TABLE @atlas_project.@atlas_dataset.condition_era AS 
 SELECT
     condition_era_id,
     person_id,
@@ -566,5 +566,5 @@ SELECT
     condition_era_start_date,
     condition_era_end_date,
     condition_occurrence_count
-FROM `@etl_project`.@etl_dataset.cdm_condition_era;
+FROM @etl_project.@etl_dataset.cdm_condition_era;
 

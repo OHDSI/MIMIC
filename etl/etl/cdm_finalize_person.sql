@@ -19,21 +19,21 @@
 -- cdm_person
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_person AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_person AS
 SELECT per.*
 FROM 
-    `@etl_project`.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.cdm_person per
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_observation_period op
+    @etl_project.@etl_dataset.cdm_observation_period op
         ON  per.person_id = op.person_id
 ;
 
-TRUNCATE TABLE `@etl_project`.@etl_dataset.cdm_person;
+TRUNCATE TABLE @etl_project.@etl_dataset.cdm_person;
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_person
+INSERT INTO @etl_project.@etl_dataset.cdm_person
 SELECT per.*
 FROM
-    `@etl_project`.@etl_dataset.tmp_person per
+    @etl_project.@etl_dataset.tmp_person per
 ;
 
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_person;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_person;

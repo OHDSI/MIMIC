@@ -69,9 +69,9 @@
 
 -- poc_2
 
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.lk_wf_clean;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.lk_wf_clean;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_waveform_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_waveform_clean AS
 SELECT
     wh.subject_id                           AS subject_id,
     CONCAT(
@@ -93,18 +93,18 @@ SELECT
     src.load_row_id                         AS load_row_id,
     src.trace_id                            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_waveform_mx src -- wm
+    @etl_project.@etl_dataset.src_waveform_mx src -- wm
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_waveform_header wh
+    @etl_project.@etl_dataset.src_waveform_header wh
         ON wh.reference_id = src.reference_id
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_patients pat
+    @etl_project.@etl_dataset.src_patients pat
         ON wh.subject_id = pat.subject_id
 ;
 
 -- poc_3
 
-INSERT INTO `@etl_project`.@etl_dataset.lk_waveform_clean
+INSERT INTO @etl_project.@etl_dataset.lk_waveform_clean
 SELECT
     wh.subject_id                           AS subject_id,
     CONCAT(
@@ -126,9 +126,9 @@ SELECT
     src.load_row_id                         AS load_row_id,
     src.trace_id                            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_waveform_mx_3 src -- wm
+    @etl_project.@etl_dataset.src_waveform_mx_3 src -- wm
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_waveform_header_3 wh
+    @etl_project.@etl_dataset.src_waveform_header_3 wh
         ON wh.case_id = src.case_id
 ;
 
@@ -138,7 +138,7 @@ INNER JOIN
 -- row_num is added to select the earliest if more than one hadm_ids are found
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_wf_hadm_id AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_wf_hadm_id AS
 SELECT
     src.trace_id                        AS event_trace_id,
     adm.hadm_id                         AS hadm_id,
@@ -147,9 +147,9 @@ SELECT
         ORDER BY adm.start_datetime
     )                                   AS row_num
 FROM
-    `@etl_project`.@etl_dataset.lk_waveform_clean src
+    @etl_project.@etl_dataset.lk_waveform_clean src
 INNER JOIN 
-    `@etl_project`.@etl_dataset.lk_admissions_clean adm
+    @etl_project.@etl_dataset.lk_admissions_clean adm
         ON adm.subject_id = src.subject_id
         AND src.start_datetime BETWEEN adm.start_datetime AND adm.end_datetime
 ;
@@ -161,7 +161,7 @@ INNER JOIN
 -- -------------------------------------------------------------------
 
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_meas_waveform_mapped AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_waveform_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
     src.subject_id                          AS subject_id,
@@ -182,29 +182,29 @@ SELECT
     src.load_row_id                         AS load_row_id,
     src.trace_id                            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_waveform_clean src
+    @etl_project.@etl_dataset.lk_waveform_clean src
 -- mapping of the main source code
 -- mapping for measurement unit
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
+    @etl_project.@etl_dataset.lk_meas_unit_concept uc
         ON uc.source_code = src.unit_source_value
         -- supposing that the standard mapping is supplemented with custom concepts for waveform specific units
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc1
+    @etl_project.@etl_dataset.voc_concept vc1
         ON vc1.concept_code = src.source_code
         AND vc1.vocabulary_id = 'mimiciv_meas_wf'
             -- supposing that the standard mapping is supplemented with custom concepts for waveform specific values
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vr
+    @etl_project.@etl_dataset.voc_concept_relationship vr
         ON vc1.concept_id = vr.concept_id_1
         AND vr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_wf_hadm_id hadm
+    @etl_project.@etl_dataset.lk_wf_hadm_id hadm
         ON hadm.event_trace_id = src.trace_id
         AND hadm.row_num = 1
 ;

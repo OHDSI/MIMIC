@@ -11,7 +11,7 @@
 -- FK to `@source_project`.@core_dataset.admissions.deathtime
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_unit_test
+INSERT INTO @metrics_project.@metrics_dataset.report_unit_test
 SELECT
     CAST(NULL AS STRING)                AS report_id,
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -21,7 +21,7 @@ SELECT
     CAST(NULL AS STRING)                AS criteria_json,
     (COUNT(cdm.death_date) = 0)          AS test_passed -- FK source
 FROM
-    `@etl_project`.@etl_dataset.cdm_death cdm
+    @etl_project.@etl_dataset.cdm_death cdm
 LEFT JOIN
 (
     SELECT deathtime FROM `@source_project`.@core_dataset.admissions
