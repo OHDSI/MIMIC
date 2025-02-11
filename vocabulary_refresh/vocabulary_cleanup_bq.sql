@@ -11,28 +11,28 @@
 -- -------------------------------------------------------------------
 
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_1;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_2;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_3;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_6;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_7;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_8;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_9;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_10;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_11;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_12;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_13;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_14;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_15;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_16;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_17;
--- DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.z_check_voc_errors_summary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_1;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_2;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_3;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_6;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_7;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_8;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_9;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_10;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_11;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_12;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_13;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_14;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_15;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_16;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_17;
+-- DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.z_check_voc_errors_summary;
 
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_relationship;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_concept;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_concept_relationship;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_vocabulary;
 

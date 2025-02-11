@@ -34,7 +34,7 @@
 -- Saturation probably repeats labs. Compare to Lab with source_value = "Oxygen Saturation | 50817"
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_chartevents_clean AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_chartevents_clean AS
 SELECT
     src.subject_id                  AS subject_id,
     src.hadm_id                     AS hadm_id,
@@ -60,9 +60,9 @@ SELECT
     src.load_row_id         AS load_row_id,
     src.trace_id            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.src_chartevents src -- ce
+    @etl_project.@etl_dataset.src_chartevents src -- ce
 INNER JOIN
-    `@etl_project`.@etl_dataset.src_d_items di
+    @etl_project.@etl_dataset.src_d_items di
         ON  src.itemid = di.itemid
 WHERE
     di.label NOT LIKE '%Temperature'
@@ -81,7 +81,7 @@ WHERE
 -- brand new custom vocabulary -> mimiciv_meas_chartevents_value
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_chartevents_code_dist AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_chartevents_code_dist AS
 -- source codes to be mapped
 SELECT
     itemid                      AS itemid,
@@ -90,7 +90,7 @@ SELECT
     'mimiciv_meas_chart'        AS source_vocabulary_id,
     COUNT(*)                    AS row_count
 FROM
-    `@etl_project`.@etl_dataset.lk_chartevents_clean
+    @etl_project.@etl_dataset.lk_chartevents_clean
 GROUP BY
     itemid,
     source_code,
@@ -104,7 +104,7 @@ SELECT
     'mimiciv_meas_chartevents_value'    AS source_vocabulary_id, -- both obs values and conditions
     COUNT(*)                            AS row_count
 FROM
-    `@etl_project`.@etl_dataset.lk_chartevents_clean
+    @etl_project.@etl_dataset.lk_chartevents_clean
 GROUP BY
     source_code,
     source_label
@@ -116,7 +116,7 @@ GROUP BY
 -- for possible future mapping
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_chartevents_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_chartevents_concept AS
 SELECT
     src.itemid                  AS itemid,
     src.source_code             AS source_code,
@@ -130,30 +130,30 @@ SELECT
     vc2.concept_id              AS target_concept_id,
     src.row_count               AS row_count
 FROM
-    `@etl_project`.@etl_dataset.tmp_chartevents_code_dist src
+    @etl_project.@etl_dataset.tmp_chartevents_code_dist src
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc
+    @etl_project.@etl_dataset.voc_concept vc
         ON  vc.concept_code = src.source_code
         AND vc.vocabulary_id = src.source_vocabulary_id
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept_relationship vcr
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
         ON  vc.concept_id = vcr.concept_id_1
         AND vcr.relationship_id = 'Maps to'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.voc_concept vc2
+    @etl_project.@etl_dataset.voc_concept vc2
         ON vc2.concept_id = vcr.concept_id_2
         AND vc2.standard_concept = 'S'
         AND vc2.invalid_reason IS NULL
 ;
 
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_chartevents_code_dist;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_chartevents_code_dist;
 
 -- -------------------------------------------------------------------
 -- lk_chartevents_mapped
 -- src_chartevents to measurement and measurement value
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_chartevents_mapped AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_chartevents_mapped AS
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
     src.subject_id                              AS subject_id,
@@ -185,18 +185,18 @@ SELECT
     src.load_row_id         AS load_row_id,
     src.trace_id            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_chartevents_clean src -- ce
+    @etl_project.@etl_dataset.lk_chartevents_clean src -- ce
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_chartevents_concept c_main -- main
+    @etl_project.@etl_dataset.lk_chartevents_concept c_main -- main
         ON c_main.source_code = src.source_code 
         AND c_main.source_vocabulary_id = 'mimiciv_meas_chart'
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_chartevents_concept c_value -- values for main
+    @etl_project.@etl_dataset.lk_chartevents_concept c_value -- values for main
         ON c_value.source_code = src.value
         AND c_value.source_vocabulary_id = 'mimiciv_meas_chartevents_value'
         AND c_value.target_domain_id = 'Meas Value'
 LEFT JOIN 
-    `@etl_project`.@etl_dataset.lk_meas_unit_concept uc
+    @etl_project.@etl_dataset.lk_meas_unit_concept uc
         ON uc.source_code = src.valueuom
 ;
 
@@ -206,7 +206,7 @@ LEFT JOIN
 -- src_chartevents to condition
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_chartevents_condition_mapped AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_chartevents_condition_mapped AS
 SELECT
     src.subject_id                              AS subject_id,
     src.hadm_id                                 AS hadm_id,
@@ -223,9 +223,9 @@ SELECT
     src.load_row_id         AS load_row_id,
     src.trace_id            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_chartevents_clean src -- ce
+    @etl_project.@etl_dataset.lk_chartevents_clean src -- ce
 INNER JOIN
-    `@etl_project`.@etl_dataset.lk_chartevents_concept c_main -- condition domain from values, mapped
+    @etl_project.@etl_dataset.lk_chartevents_concept c_main -- condition domain from values, mapped
         ON c_main.source_code = src.value
         AND c_main.source_vocabulary_id = 'mimiciv_meas_chartevents_value'
         AND c_main.target_domain_id = 'Condition'

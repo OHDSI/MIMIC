@@ -13,7 +13,7 @@
 -- Person is assumed to have a given
 -- condition.
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_target_condition
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_target_condition
 AS SELECT
     co.condition_occurrence_id                                              AS condition_occurrence_id,
     co.person_id                                                            AS person_id,
@@ -28,12 +28,12 @@ AS SELECT
     -- - to set condition_era_end_date to same condition_era_start_date
           -- or condition_era_start_date + INTERVAL '1 day', when condition_end_date IS NULL
 FROM
-    `@etl_project`.@etl_dataset.cdm_condition_occurrence co
+    @etl_project.@etl_dataset.cdm_condition_occurrence co
 WHERE
     co.condition_concept_id != 0
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_dates_un_condition
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_dates_un_condition
     AS SELECT
         person_id                               AS person_id,
         condition_concept_id                    AS condition_concept_id,
@@ -46,7 +46,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_dates_un_condition
             ORDER BY
                 condition_start_date)               AS start_ordinal
     FROM
-        `@etl_project`.@etl_dataset.tmp_target_condition
+        @etl_project.@etl_dataset.tmp_target_condition
 UNION ALL
     SELECT
         person_id                                             AS person_id,
@@ -55,10 +55,10 @@ UNION ALL
         1                                                     AS event_type,
         NULL                                                  AS start_ordinal
     FROM
-        `@etl_project`.@etl_dataset.tmp_target_condition
+        @etl_project.@etl_dataset.tmp_target_condition
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_dates_rows_condition
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_dates_rows_condition
 AS SELECT
     person_id                       AS person_id,
     condition_concept_id            AS condition_concept_id,
@@ -83,30 +83,30 @@ AS SELECT
             event_type)             AS overall_ord
         -- this re-numbers the inner UNION so all rows are numbered ordered by the event date
 FROM
-    `@etl_project`.@etl_dataset.tmp_dates_un_condition
+    @etl_project.@etl_dataset.tmp_dates_un_condition
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_enddates_condition
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_enddates_condition
 AS SELECT
     person_id                                       AS person_id,
     condition_concept_id                            AS condition_concept_id,
     DATE_SUB (event_date, INTERVAL 30 DAY)          AS end_date  -- unpad the end date
 FROM
-    `@etl_project`.@etl_dataset.tmp_dates_rows_condition e
+    @etl_project.@etl_dataset.tmp_dates_rows_condition e
 WHERE
     (2 * e.start_ordinal) - e.overall_ord = 0
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_conditionends
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_conditionends
 AS SELECT
     c.person_id                             AS person_id,
     c.condition_concept_id                  AS condition_concept_id,
     c.condition_start_date                  AS condition_start_date,
     MIN(e.end_date)                         AS era_end_date
 FROM
-    `@etl_project`.@etl_dataset.tmp_target_condition c
+    @etl_project.@etl_dataset.tmp_target_condition c
 JOIN
-    `@etl_project`.@etl_dataset.tmp_enddates_condition e
+    @etl_project.@etl_dataset.tmp_enddates_condition e
         ON  c.person_id            = e.person_id
         AND c.condition_concept_id = e.condition_concept_id
         AND e.end_date             >= c.condition_start_date
@@ -122,7 +122,7 @@ GROUP BY
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_condition_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_era
 (
     condition_era_id            INT64     not null ,
     person_id                   INT64     not null ,
@@ -143,7 +143,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_condition_era
 -- a standardized algorithm.
 -- 30 days window is allowed.
 -- -------------------------------------------------------------------
-INSERT INTO `@etl_project`.@etl_dataset.cdm_condition_era
+INSERT INTO @etl_project.@etl_dataset.cdm_condition_era
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())               AS condition_era_id,
     person_id                                       AS person_id,
@@ -156,7 +156,7 @@ SELECT
     CAST(NULL AS STRING)                            AS load_table_id,
     CAST(NULL AS INT64)                             AS load_row_id
 FROM
-    `@etl_project`.@etl_dataset.tmp_conditionends
+    @etl_project.@etl_dataset.tmp_conditionends
 GROUP BY
     person_id,
     condition_concept_id,
@@ -169,11 +169,11 @@ ORDER BY
 -- -------------------------------------------------------------------
 -- Drop temporary tables
 -- -------------------------------------------------------------------
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_conditionends;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_enddates_condition;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_dates_rows_condition;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_dates_un_condition;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_target_condition;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_conditionends;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_enddates_condition;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_dates_rows_condition;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_dates_un_condition;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_target_condition;
 -- -------------------------------------------------------------------
 -- Loading finished
 -- -------------------------------------------------------------------

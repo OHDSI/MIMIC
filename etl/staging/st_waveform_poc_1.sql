@@ -61,7 +61,7 @@
 -- src_waveform_header
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_header
 (       
     reference_id            STRING,
     raw_files_path          STRING,
@@ -82,7 +82,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header
 -- src_waveform_header
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_dx
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_dx
 (       
     reference_id            STRING,  -- FK to the header
     waveform_id             STRING,  -- row number inside the reference_id
@@ -102,7 +102,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_dx
 
 -- parsed codes to be targeted to table cdm_measurement
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_mx
 (
     subject_id              INT64,
     reference_id            STRING,  -- FK to the header
@@ -141,12 +141,12 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx
 
 -- select random existing subject_id and hadm_id
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_subject AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_subject AS
 SELECT
     subject_id,
     hadm_id
 FROM
-    `@etl_project`.@etl_dataset.src_admissions
+    @etl_project.@etl_dataset.src_admissions
 LIMIT 1
 ;
 
@@ -155,7 +155,7 @@ LIMIT 1
 -- -------------------------------------------------------------------
 
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_header
+INSERT INTO @etl_project.@etl_dataset.src_waveform_header
 SELECT
     '3700002_0011.CCSIMxv1' AS reference_id,
     'gs://waveform_storage/3700002/0011.wfdb' AS raw_files_path,
@@ -170,14 +170,14 @@ SELECT
 FROM
 (
     SELECT COUNT(*) AS row_count 
-    FROM `@wf_project`.@wf_dataset.raw_case055_ecg_lines3
+    FROM @wf_project.@wf_dataset.raw_case055_ecg_lines3
 ) src
 CROSS JOIN
-    `@etl_project`.@etl_dataset.src_waveform_subject subj
+    @etl_project.@etl_dataset.src_waveform_subject subj
 ;
 
 -- line_1
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_mx
+INSERT INTO @etl_project.@etl_dataset.src_waveform_mx
 -- line_1
 SELECT
     subj.subject_id AS subject_id,
@@ -197,9 +197,9 @@ SELECT
             src.row_id AS row_id
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.raw_case055_ecg_lines3 src
+    @wf_project.@wf_dataset.raw_case055_ecg_lines3 src
 CROSS JOIN
-    `@etl_project`.@etl_dataset.src_waveform_subject subj
+    @etl_project.@etl_dataset.src_waveform_subject subj
 UNION ALL
 -- line_2
 SELECT
@@ -220,9 +220,9 @@ SELECT
             src.row_id AS row_id
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.raw_case055_ecg_lines3 src
+    @wf_project.@wf_dataset.raw_case055_ecg_lines3 src
 CROSS JOIN
-    `@etl_project`.@etl_dataset.src_waveform_subject subj
+    @etl_project.@etl_dataset.src_waveform_subject subj
 UNION ALL
 -- line_3
 SELECT
@@ -243,7 +243,7 @@ SELECT
             src.row_id AS row_id
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.raw_case055_ecg_lines3 src
+    @wf_project.@wf_dataset.raw_case055_ecg_lines3 src
 CROSS JOIN
-    `@etl_project`.@etl_dataset.src_waveform_subject subj
+    @etl_project.@etl_dataset.src_waveform_subject subj
 ;

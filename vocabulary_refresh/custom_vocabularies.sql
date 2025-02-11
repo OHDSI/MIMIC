@@ -26,14 +26,14 @@
 -- go
 
 -- -- temp create backup
--- CREATE TABLE `@bq_target_project.@bq_target_dataset`.concept_bak AS
--- SELECT * FROM `@bq_target_project.@bq_target_dataset`.concept
+-- CREATE TABLE @bq_target_project.@bq_target_dataset.concept_bak AS
+-- SELECT * FROM @bq_target_project.@bq_target_dataset.concept
 -- ;
--- CREATE TABLE `@bq_target_project.@bq_target_dataset`.concept_relationship_bak AS
--- SELECT * FROM `@bq_target_project.@bq_target_dataset`.concept_relationship
+-- CREATE TABLE @bq_target_project.@bq_target_dataset.concept_relationship_bak AS
+-- SELECT * FROM @bq_target_project.@bq_target_dataset.concept_relationship
 -- ;
--- CREATE TABLE `@bq_target_project.@bq_target_dataset`.vocabulary_bak AS
--- SELECT * FROM `@bq_target_project.@bq_target_dataset`.vocabulary
+-- CREATE TABLE @bq_target_project.@bq_target_dataset.vocabulary_bak AS
+-- SELECT * FROM @bq_target_project.@bq_target_dataset.vocabulary
 -- ;
 
 
@@ -44,9 +44,9 @@
 
 -- tmp_custom_concept
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_custom_concept AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_custom_concept AS
 SELECT
     voc.source_concept_id           AS concept_id,
     voc.concept_name                AS concept_name,
@@ -67,7 +67,7 @@ SELECT
     -- voc.load_table_id               AS load_table_id,
     -- MIN(voc.load_row_id)            AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_mapping voc
+    @bq_target_project.@bq_target_dataset.tmp_custom_mapping voc
 GROUP BY
     voc.source_concept_id,
     voc.concept_name,
@@ -87,9 +87,9 @@ GROUP BY
 
 -- tmp_custom_concept_relationship
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept_relationship;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_relationship AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_custom_concept_relationship AS
 SELECT
     tcr.source_concept_id               AS concept_id_1,
     CASE
@@ -106,7 +106,7 @@ SELECT
     -- tcr.load_table_id                   AS load_table_id,
     -- tcr.load_row_id                     AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_mapping tcr
+    @bq_target_project.@bq_target_dataset.tmp_custom_mapping tcr
 WHERE
     tcr.target_concept_id IS NOT NULL
 
@@ -128,16 +128,16 @@ SELECT
     -- tcr.load_table_id                   AS load_table_id,
     -- tcr.load_row_id                     AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_mapping tcr
+    @bq_target_project.@bq_target_dataset.tmp_custom_mapping tcr
 WHERE
     tcr.target_concept_id IS NOT NULL
 ;
 
 -- tmp_custom_vocabulary
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary_dist;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary_dist;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary_dist AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary_dist AS
 SELECT
     voc.source_vocabulary_id        AS source_vocabulary_id,
 
@@ -146,15 +146,15 @@ SELECT
     -- voc.load_table_id               AS load_table_id,
     -- MIN(voc.load_row_id)            AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_mapping voc
+    @bq_target_project.@bq_target_dataset.tmp_custom_mapping voc
 GROUP BY
     voc.source_vocabulary_id
     -- voc.load_table_id
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary AS
 SELECT
     voc.source_vocabulary_id        AS vocabulary_id,
     voc.source_vocabulary_id        AS vocabulary_name,
@@ -168,22 +168,22 @@ SELECT
     voc.load_table_id               AS load_table_id,
     voc.load_row_id                 AS load_row_id
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary_dist voc
+    @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary_dist voc
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary_dist;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary_dist;
 
 -- -------------------------------------------------------------------
 -- Re-write voc_concept to remove previous version of custom concept
 -- Keep PEDSnet originated custom concepts
 -- -------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_concept;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_voc_concept AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_voc_concept AS
 SELECT *
 FROM
-    `@bq_target_project.@bq_target_dataset`.concept
+    @bq_target_project.@bq_target_dataset.concept
 WHERE
     concept_id < 2000000000
 ;
@@ -193,17 +193,17 @@ WHERE
 -- Keep links to PEDSnet originated custom concepts
 -- ----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_concept_relationship;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_voc_concept_relationship AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_voc_concept_relationship AS
 SELECT vr.*
 FROM
-    `@bq_target_project.@bq_target_dataset`.concept_relationship vr
+    @bq_target_project.@bq_target_dataset.concept_relationship vr
 INNER JOIN
-    `@bq_target_project.@bq_target_dataset`.tmp_voc_concept vc1
+    @bq_target_project.@bq_target_dataset.tmp_voc_concept vc1
         ON  vc1.concept_id = vr.concept_id_1
 INNER JOIN
-    `@bq_target_project.@bq_target_dataset`.tmp_voc_concept vc2
+    @bq_target_project.@bq_target_dataset.tmp_voc_concept vc2
         ON  vc2.concept_id = vr.concept_id_2
 ;
 
@@ -211,7 +211,7 @@ INNER JOIN
 -- Add new custom concepts to the re-written
 -- -------------------------------------------------------------------
 
-INSERT INTO `@bq_target_project.@bq_target_dataset`.tmp_voc_concept
+INSERT INTO @bq_target_project.@bq_target_dataset.tmp_voc_concept
 SELECT
     voc.concept_id              AS concept_id,
     voc.concept_name            AS concept_name,
@@ -228,25 +228,25 @@ SELECT
     -- voc.load_row_id              AS load_row_id
     -- when loaded not by vocabulary_refresh, raw concept tables have no load_row_id, so comment it temporarily
 FROM 
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_concept voc
+    @bq_target_project.@bq_target_dataset.tmp_custom_concept voc
 -- LEFT JOIN
---     `@bq_target_project.@bq_target_dataset`.concept vc
+--     @bq_target_project.@bq_target_dataset.concept vc
 --         ON  vc.concept_id = voc.concept_id
 -- WHERE
 --     vc.concept_id IS NULL
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.concept;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.concept AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.concept AS
 SELECT * 
-FROM `@bq_target_project.@bq_target_dataset`.tmp_voc_concept;
+FROM @bq_target_project.@bq_target_dataset.tmp_voc_concept;
 
 -- ----------------------------------------------------------------------
 -- Add relationships to the added custom concepts
 -- ----------------------------------------------------------------------
 
-INSERT INTO `@bq_target_project.@bq_target_dataset`.tmp_voc_concept_relationship
+INSERT INTO @bq_target_project.@bq_target_dataset.tmp_voc_concept_relationship
 SELECT
     tcr.concept_id_1             AS concept_id_1,
     tcr.concept_id_2             AS concept_id_2,
@@ -258,31 +258,31 @@ SELECT
     -- tcr.load_table_id            AS load_table_id,
     -- tcr.load_row_id              AS load_row_id
 FROM 
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_relationship tcr
+    @bq_target_project.@bq_target_dataset.tmp_custom_concept_relationship tcr
 -- LEFT JOIN 
---     `@bq_target_project.@bq_target_dataset`.concept_relationship vcr
+--     @bq_target_project.@bq_target_dataset.concept_relationship vcr
 --         ON  tcr.concept_id_1 = vcr.concept_id_1
 --         AND tcr.concept_id_2 = vcr.concept_id_2
 -- WHERE
 --     vcr.concept_id_1 IS NULL
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.concept_relationship;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.concept_relationship AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.concept_relationship AS
 SELECT *
-FROM `@bq_target_project.@bq_target_dataset`.tmp_voc_concept_relationship;
+FROM @bq_target_project.@bq_target_dataset.tmp_voc_concept_relationship;
 
 -- ----------------------------------------------------------------------
 -- Re-write vocabularies to remove previous version of custom vocabularies
 -- ----------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_vocabulary;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_voc_vocabulary AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_voc_vocabulary AS
 SELECT *
 FROM
-    `@bq_target_project.@bq_target_dataset`.vocabulary
+    @bq_target_project.@bq_target_dataset.vocabulary
 WHERE
     vocabulary_concept_id < 2000000000
 ;
@@ -291,7 +291,7 @@ WHERE
 -- Add custom vocabularies to Vocabulary and Concept table
 -- ----------------------------------------------------------------------
 
-INSERT INTO `@bq_target_project.@bq_target_dataset`.tmp_voc_vocabulary
+INSERT INTO @bq_target_project.@bq_target_dataset.tmp_voc_vocabulary
 SELECT
     voc.vocabulary_id         AS vocabulary_id,
     voc.vocabulary_name       AS vocabulary_name,
@@ -302,16 +302,16 @@ SELECT
     -- voc.load_table_id           AS load_table_id,
     -- voc.load_row_id             AS load_row_id
 FROM 
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary voc
+    @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary voc
 ;
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.vocabulary;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.vocabulary AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.vocabulary AS
 SELECT *
-FROM `@bq_target_project.@bq_target_dataset`.tmp_voc_vocabulary;
+FROM @bq_target_project.@bq_target_dataset.tmp_voc_vocabulary;
 
-INSERT INTO `@bq_target_project.@bq_target_dataset`.concept
+INSERT INTO @bq_target_project.@bq_target_dataset.concept
 SELECT
     vcv.vocabulary_concept_id   AS concept_id,
     vcv.vocabulary_name         AS concept_name,
@@ -327,7 +327,7 @@ SELECT
     -- NULL                        AS load_table_id,
     -- NULL                        AS load_row_id
 FROM 
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary vcv 
+    @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary vcv 
 ;
 
 
@@ -337,15 +337,15 @@ FROM
 -- tmp_custom_concept_skipped
 -- -------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_skipped;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept_skipped;
 
-CREATE TABLE `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_skipped AS
+CREATE TABLE @bq_target_project.@bq_target_dataset.tmp_custom_concept_skipped AS
 SELECT
     tcc.*
 FROM
-    `@bq_target_project.@bq_target_dataset`.tmp_custom_concept tcc
+    @bq_target_project.@bq_target_dataset.tmp_custom_concept tcc
 INNER JOIN
-    `@bq_target_project.@bq_target_dataset`.concept vc
+    @bq_target_project.@bq_target_dataset.concept vc
         ON  tcc.concept_id = vc.concept_id
         AND tcc.concept_name <> vc.concept_name
 ;
@@ -354,10 +354,10 @@ INNER JOIN
 -- clean up
 -- -------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_concept_relationship;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_custom_vocabulary;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_concept;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_concept_relationship;
-DROP TABLE IF EXISTS `@bq_target_project.@bq_target_dataset`.tmp_voc_vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_custom_vocabulary;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_concept;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_concept_relationship;
+DROP TABLE IF EXISTS @bq_target_project.@bq_target_dataset.tmp_voc_vocabulary;
 
