@@ -3,26 +3,25 @@
 
     "variables": 
     {
-        "@source_project":   "source_project...",
-        "@core_dataset":     "core...",
-        "@hosp_dataset":     "hosp...",
-        "@icu_dataset":      "icu...",
-        "@ed_dataset":       "ed...",
+        "@source_project":   "physionet-data",
+        "@core_dataset":     "mimiciv_hosp",
+        "@hosp_dataset":     "mimiciv_hosp",
+        "@icu_dataset":      "mimiciv_icu",
 
-        "@voc_project": "etl_project...",
-        "@voc_dataset": "voc...",
+        "@voc_project": "odysseus-mimic-dev",
+        "@voc_dataset": "vocab_schema",
 
-        "@wf_project": "etl_project...",
-        "@wf_dataset": "wf...",
+        "@wf_project": "odysseus-mimic-dev",
+        "@wf_dataset": "waveform_source_poc",
 
-        "@etl_project": "etl_project...",
-        "@etl_dataset": "etl...",
+        "@etl_project": "odysseus-mimic-dev",
+        "@etl_dataset": "mimiciv_full_cdm_*",
 
-        "@metrics_project": "etl_project...",
-        "@metrics_dataset": "metrics...",
+        "@metrics_project": "odysseus-mimic-dev",
+        "@metrics_dataset": "mimiciv_full_metrics_*",
 
-        "@atlas_project": "etl_project...",
-        "@atlas_dataset": "atlas...",
+        "@atlas_project": "odysseus-mimic-dev",
+        "@atlas_dataset": "mimiciv_full_current_cdm_*",
 
         "@waveforms_csv_path":  "gs://bucket..."
 

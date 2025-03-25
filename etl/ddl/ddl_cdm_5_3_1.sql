@@ -4,7 +4,7 @@
 -- ----------------------------------------------------------------------------
 
 /*OMOP CDM v5.3.1 14June2018*/
-#standardsql
+
 
 CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_cohort_definition (
   cohort_definition_id            INT64       not null,

@@ -7,7 +7,6 @@
         "@core_dataset":     "mimic_demo_core",
         "@hosp_dataset":     "mimic_demo_hosp",
         "@icu_dataset":      "mimic_demo_icu",
-        "@ed_dataset":       "mimic_demo_ed",
 
         "@voc_project": "odysseus-mimic-dev",
         "@voc_dataset": "vocabulary_2020_09_11",

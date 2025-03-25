@@ -1,0 +1,3 @@
+The csv.zip file contains a small example subset of extracted data following the folder structure that is present in the MIMIC waveform folders. 
+To run the ETL in a GCP environment put those items in a bucket storage folder with this path:
+gs://mimic_iv_to_omop/waveforms/source_data/csv/...

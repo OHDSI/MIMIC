@@ -4,6 +4,15 @@
 
 ###Latest updates (recent first):###
 
+*2022-09-09*
+
+* MIMIC 2.0 is issued: run ETL on MIMIC 2.0.
+* bq_run_script.py is updated to fit current BQ requirement of single line queries
+* load_row_id is commented out in custom_vocabularies.sql to match standard vocabs loaded outside vocabulary_refresh
+* @bq_target_project and @bq_target_dataset are moved to "variables" section in vocabulary_refresh.conf
+* known issue: if a custom mapping csv is renamed, the old copy should be deleted from google storage bucket manually. Otherwise, there will be two mappings under old name and under the new.
+
+
 *2020-09-11*
 
 * Put it into MIMIC IV to OMOP project
