@@ -7,9 +7,9 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 * Version 1.0
 
 
-### Concepts / Phylosophy ###
+## Concepts / Philosophy
 
-######The ETL is based on the five logic steps######
+### The ETL is based on five logic steps:
 * Create a snapshot of the source data. The snapshot data is stored in staging source tables with prefix "src_".
 * Clean source data: filter out rows to be not used, format values, apply some business rules. This step results in creating "clean" intermediate tables with prefix "lk_" and suffix "clean".
 * Map distinct source codes to concepts in vocabulary tables. The step results in creating intermediate tables with prefix "lk_" and suffix "concept".
@@ -17,7 +17,7 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 * Join cleaned data and mapped codes. The step results in creating intermediate tables with prefix "lk_" and suffix "mapped".
 * Distribute mapped data by target CDM tables according to target_domain_id values.
 
-######The ETL process encapsulates the following workflows:######
+### The ETL process encapsulates the following workflows:
 * **vocabulary refresh**, which loads vocabulary and custom mapping data from local folders to the vocabulary dataset. 
 * **waveform collecting**, which loads parsed waveform data from google storage bucket to the waveform staging dataset.
 * **ddl**, which creates empty cdm tables in the ETL dataset.
@@ -27,19 +27,19 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 * **metrics**, which builds metric report data for internal QA.
 * **unload**, which copies CDM and vocabulary tables to the final CDM OMOP dataset.
 
-* On the POC level **waveform collecting** workflow is represented by a single script `scripts/wf_read.py`, which iterates through subfolders in the given bucket path. It populates `wf_header` table with folder structure data, and `wf_details` table with data from CSV files found there. These tables are used as source tables for poc_2 unit in `measurement` and `condition_occurrence` tables. POC_3 data is loaded and prepared manually (todo: provide both manual scripts)
+* On the POC level **waveform collecting** workflow is represented by a single script, `scripts/wf_read.py`, which iterates through subfolders in the given bucket path. It populates `wf_header` table with folder structure data, and `wf_details` table with data from CSV files found there. These tables are used as source tables for poc_2 unit in `measurement` and `condition_occurrence` tables. POC_3 data is loaded and prepared manually (todo: provide both manual scripts)
 * All workflows from **ddl** to **metrics** operate with so called "ETL" dataset, where intermediate tables are created, and all tables have prefixes according to their roles. I.e. voc for vocabulary tables, src for snapshot of source tables, lk for intermediate aka lookup tables, cdm for target CDM tables. Most of the tables have additional fields: unit_id, load_table_id, load_row_id, trace_id.
 * The last step, **unload**, populates the final OMOP CDM dataset, also referred as "ATLAS" dataset. Only CDM and vocabulary tables are kept here, prefixes and additional fields are removed. The final OMOP CDM dataset can be analysed with OHDSI tools as ATLAS or DQD.
 
 
-### How to run the conversion ###
+### How to run the conversion
 
-######To run ETL end-to-end:######
+#### To run the ETL pipeline end-to-end
 * load the latest standard OMOP vocabularies from http://athena.ohdsi.org if needed
     * create a working copy of the loaded vocabularies, where custom mapping data will be added to
 * set variables in vocabulary_refresh/README.md
     * run vocabulary refresh commands given below from directory "vocabulary_refresh"
-* set the project variables in conf/\*.etlconf
+* set the project variables in `conf/*.etlconf`
     * run script "wf_read" to load waveform sample data if needed
     * run workflow commands below in the given sequence 
         * in the workflow commands <env> is the "environment" name, which equals "dev" for the demo dataset and "full" for the full set
@@ -60,8 +60,8 @@ python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_metrics.co
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_unload.conf
 ```
 
-######To look at UT and Metrics reports:######
-* see metrics dataset name in the corresponding .etlconf file
+#### To look at UT and Metrics reports
+* see metrics dataset name in the corresponding `.etlconf` file
 
 ```SQL
 -- Metrics - row count
@@ -94,20 +94,32 @@ order by table_id, report_starttime
 ;
 ```
 
-######More option to run ETL parts:######
+#### More option to run ETL parts
 * Run a workflow:
-    * with local variables: `python scripts/run_workflow.py -c conf/workflow_etl.conf`
+    * with local variables:
+        ```
+        python scripts/run_workflow.py -c conf/workflow_etl.conf
+        ```
         * copy "variables" section from file.etlconf
-    * with global variables: `python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf`
+    * with global variables:
+        ```
+        python scripts/run_workflow.py -e conf/dev.etlconf -c conf/workflow_etl.conf
+        ```
 * Run explicitly named scripts (space delimited):
-    `python scripts/run_workflow.py -e conf/dev.etlconf etl/etl/cdm_drug_era.sql`
+    ```
+    python scripts/run_workflow.py -e conf/dev.etlconf etl/etl/cdm_drug_era.sql
+    ```
 * Run in background:
-    `nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf > ../out_full_etl.out &`
+    ```
+    nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf > ../out_full_etl.out &
+    ```
 * Continue after an error:
-    `nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf etl/etl/cdm_observation.sql etl/etl/cdm_observation_period.sql etl/etl/cdm_fact_relationship.sql etl/etl/cdm_condition_era.sql etl/etl/cdm_drug_era.sql etl/etl/cdm_dose_era.sql etl/etl/cdm_cdm_source.sql >> ../out_full_etl.out &`
+    ```
+    nohup python scripts/run_workflow.py -e conf/full.etlconf -c conf/workflow_etl.conf etl/etl/cdm_observation.sql etl/etl/cdm_observation_period.sql etl/etl/cdm_fact_relationship.sql etl/etl/cdm_condition_era.sql etl/etl/cdm_drug_era.sql etl/etl/cdm_dose_era.sql etl/etl/cdm_cdm_source.sql >> ../out_full_etl.out &
+    ```
 
 
-### Change Log (latest first) ###
+### Changelog (latest first)
 
 **2023-02-17**
 
