@@ -78,7 +78,16 @@ INSERT INTO `@bq_target_project.@bq_target_dataset`.z_check_tmp_custom_mapping
 SELECT 'relationship_end_date' AS field_name, COUNT(*) as cnt_empty 
 FROM `@bq_target_project.@bq_target_dataset`.tmp_custom_mapping
 WHERE relationship_end_date IS NULL;
- 
+
+INSERT INTO `@bq_target_project.@bq_target_dataset`.z_check_tmp_custom_mapping
+SELECT 'duplicate_source_concept_id' AS field_name, COUNT(*) as cnt_empty 
+FROM (
+    SELECT source_concept_id
+    FROM `@bq_target_project.@bq_target_dataset`.tmp_custom_mapping
+    GROUP BY source_concept_id
+    HAVING COUNT(*) > 1
+) t;
+
 SELECT
     field_name, cnt_empty
 FROM `@bq_target_project.@bq_target_dataset`.z_check_tmp_custom_mapping

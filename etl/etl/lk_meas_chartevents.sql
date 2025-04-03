@@ -169,7 +169,7 @@ SELECT
     c_main.source_concept_id                    AS source_concept_id,
     c_main.target_domain_id                     AS target_domain_id,
     c_main.target_concept_id                    AS target_concept_id,
-    IF(src.valuenum IS NULL, src.value, NULL)   AS value_source_value,
+    src.value                                   AS value_source_value,
     IF(
         IF(src.valuenum IS NULL, src.value, NULL) IS NOT NULL,
         COALESCE(c_value.target_concept_id, 0), 

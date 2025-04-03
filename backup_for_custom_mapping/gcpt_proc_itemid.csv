@@ -1,5 +1,5 @@
 concept_name,source_concept_id,source_vocabulary_id,source_domain_id,source_concept_class_id,standard_concept,concept_code,valid_start_date,valid_end_date,invalid_reason,target_concept_id,relationship_id,reverese_relationship_id,relationship_valid_start_date,relationship_end_date,invalid_reason_cr
-CT scan,2000003001,mimiciv_proc_itemid,Procedure,Procedure,,221214,1970-01-01,2099-12-31,,4300757,Maps to,Mapped from,1970-01-01,2099-12-31,
+CT scan,2000003001,mimiciv_proc_itemid,Procedure,Procedure,,221214,1970-01-01,2099-12-31,,4180642,Maps to,Mapped from,1970-01-01,2099-12-31,
 X-ray,2000003002,mimiciv_proc_itemid,Procedure,Procedure,,221216,1970-01-01,2099-12-31,,4056681,Maps to,Mapped from,1970-01-01,2099-12-31,
 Ultrasound,2000003003,mimiciv_proc_itemid,Procedure,Procedure,,221217,1970-01-01,2099-12-31,,4037672,Maps to,Mapped from,1970-01-01,2099-12-31,
 Venogram,2000003004,mimiciv_proc_itemid,Procedure,Procedure,,221219,1970-01-01,2099-12-31,,4175809,Maps to,Mapped from,1970-01-01,2099-12-31,

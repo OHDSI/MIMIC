@@ -1,0 +1,120 @@
+run mimiciv 2_0
+
+
+-- 2023-02-17
+
+cd home\mimic\mimiciv\mimiciv_20
+
+-- run with right config
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ddl.conf
+2023-02-17 18:21:18.677191 | start...                            | Done.
+2023-02-17 18:21:56.350362 | etl/ddl/ddl_voc_5_3_1.sql           | Done.
+2023-02-17 18:23:42.885627 | etl/ddl/ddl_cdm_5_3_1.sql           | Done.
+Run time: 0:02:24.214439
+-- old Run time: 0:01:46.906848
+
+gcloud components update
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_staging.conf
+-- poc_waveforms was not changed, so leave it as is
+2023-02-20 13:56:51.386372 | start...                            | Done.
+2023-02-20 13:57:20.948941 | etl/staging/st_core.sql             | Done.
+2023-02-20 13:59:17.448402 | etl/staging/st_hosp.sql             | Done.
+2023-02-20 14:01:20.046335 | etl/staging/st_icu.sql              | Done.
+2023-02-20 14:01:37.152882 | etl/staging/st_waveform_poc_2.sql   | Done.
+2023-02-20 14:02:03.513201 | etl/staging/st_waveform_poc_3.sql   | Done.
+2023-02-20 14:03:14.362763 | etl/staging/voc_copy_to_target_dataset.sql | Done.
+Run time: 0:06:22.990390
+-- old Run time: 0:05:53.919381
+
+-- load custom mapping
+
+-- check CSVs in the gs folder
+-- if necessary, clean the target gs folder, copy CSVs to gs
+-- copy standard vocabs to vocab_work dataset
+-- run vocabulary_refresh, only the step to apply the custom mapping to the standard vocabs
+
+python vocabulary_refresh.py -s20
+2023-02-21 20:29:44.049601 | start...                            | Done.
+2023-02-21 20:32:25.904388 | custom_vocabularies.sql             | Done.
+Run time: 0:02:41.857780
+
+python vocabulary_refresh.py -s30
+-- syntax error on cleanup
+-- errors in the vocab data (see table z_check_voc_errors_summary)
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_etl.conf
+2023-02-21 20:57:00.240905 | start...                            | Done.
+2023-02-21 20:57:08.042829 | etl/etl/cdm_location.sql            | Done.
+2023-02-21 20:57:26.554668 | etl/etl/cdm_care_site.sql           | Done.
+2023-02-21 20:57:53.383692 | etl/etl/cdm_person.sql              | Done.
+2023-02-21 20:58:08.219178 | etl/etl/cdm_death.sql               | Done.
+2023-02-21 20:58:43.780237 | etl/etl/lk_vis_part_1.sql           | Done.
+2023-02-21 20:59:04.185932 | etl/etl/lk_meas_unit.sql            | Done.
+2023-02-21 21:00:22.986201 | etl/etl/lk_meas_chartevents.sql     | Done.
+2023-02-21 21:01:42.081693 | etl/etl/lk_meas_labevents.sql       | Done.
+2023-02-21 21:03:26.530923 | etl/etl/lk_meas_specimen.sql        | Done.
+2023-02-21 21:03:56.435680 | etl/etl/lk_meas_waveform.sql        | Done.
+2023-02-21 21:05:25.278908 | etl/etl/lk_vis_part_2.sql           | Done.
+2023-02-21 21:05:44.344908 | etl/etl/cdm_visit_occurrence.sql    | Done.
+2023-02-21 21:06:03.806781 | etl/etl/cdm_visit_detail.sql        | Done.
+2023-02-21 21:06:34.316078 | etl/etl/lk_cond_diagnoses.sql       | Done.
+2023-02-21 21:08:34.446755 | etl/etl/lk_procedure.sql            | Done.
+2023-02-21 21:09:08.752582 | etl/etl/lk_observation.sql          | Done.
+2023-02-21 21:09:57.220220 | etl/etl/cdm_condition_occurrence.sql | Done.
+2023-02-21 21:10:51.425798 | etl/etl/cdm_procedure_occurrence.sql | Done.
+2023-02-21 21:11:03.245744 | etl/etl/cdm_specimen.sql            | Done.
+2023-02-21 21:12:34.881021 | etl/etl/cdm_measurement.sql         | Done.
+2023-02-21 21:13:46.730497 | etl/etl/lk_drug.sql                 | Done.
+2023-02-21 21:14:07.205304 | etl/etl/cdm_drug_exposure.sql       | Done.
+2023-02-21 21:14:39.940703 | etl/etl/cdm_device_exposure.sql     | Done.
+2023-02-21 21:15:35.880126 | etl/etl/cdm_observation.sql         | Done.
+2023-02-21 21:17:06.474274 | etl/etl/cdm_observation_period.sql  | Done.
+2023-02-21 21:17:29.788018 | etl/etl/cdm_finalize_person.sql     | Done.
+2023-02-21 21:18:10.443097 | etl/etl/cdm_fact_relationship.sql   | Done.
+2023-02-21 21:19:41.746709 | etl/etl/cdm_condition_era.sql       | Done.
+2023-02-21 21:23:03.806449 | etl/etl/cdm_drug_era.sql            | Done.
+2023-02-21 21:24:29.463111 | etl/etl/cdm_dose_era.sql            | Done.
+2023-02-21 21:24:47.768950 | etl/etl/ext_d_itemid_to_concept.sql | Done.
+2023-02-21 21:24:55.166202 | etl/etl/cdm_cdm_source.sql          | Done.
+Run time: 0:27:54.934292
+-- old Run time: 0:27:26.555793
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_ut.conf
+2023-03-01 13:54:59.638192 | start...                            | Done.
+2023-03-01 13:55:03.888641 | test/ut/ut_start.sql                | Done.
+2023-03-01 13:59:25.709319 | test/ut/ut_basic_gen.sql            | Done.
+2023-03-01 13:59:42.158199 | test/ut/ut_care_site.sql            | Done.
+2023-03-01 14:00:09.787281 | test/ut/ut_person.sql               | Done.
+Run time: 0:05:10.153666
+-- old Run time: 0:05:25.735130
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_metrics.conf
+2023-02-22 15:28:50.211882 | start...                            | Done.
+2023-02-22 15:31:13.057929 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2023-02-22 15:31:55.925466 | test/metrics_gen/me_persons_visits.sql | Done.
+2023-02-22 15:50:18.450343 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2023-02-22 15:56:35.466021 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2023-02-22 15:58:50.910227 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+Run time: 0:30:00.703322
+-- old Run time: 0:27:34.572917
+
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_unload.conf
+2023-03-01 13:42:18.461879 | start...                            | Done.
+2023-03-01 13:46:53.119150 | etl/unload/unload_to_atlas_gen.sql  | Done.
+2023-03-01 13:47:07.093550 | etl/unload/unload_to_atlas_extra.sql | Done.
+Run time: 0:04:48.634676
+-- old Run time: 0:05:41.819210
+
+-- run metrics again
+python scripts\run_workflow.py -e conf\full.etlconf -c conf\workflow_metrics.conf
+2023-03-31 18:54:34.704906 | start...                            | Done.
+2023-03-31 18:57:19.118390 | test/metrics_gen/me_totals_from_conf.sql | Done.
+2023-03-31 18:58:03.247886 | test/metrics_gen/me_persons_visits.sql | Done.
+2023-03-31 19:17:07.278680 | test/metrics_gen/me_top100_from_conf.sql | Done.
+2023-03-31 19:24:18.693829 | test/metrics_gen/me_mapping_rate_from_conf.sql | Done.
+2023-03-31 19:26:46.292971 | test/metrics_gen/me_tops_together_from_conf.sql | Done.
+Run time: 0:32:11.591065
+
+-----------------------

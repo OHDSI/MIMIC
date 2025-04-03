@@ -26,7 +26,7 @@ SELECT
     itemid                              AS itemid,
     starttime                           AS starttime,
     value                               AS value,
-    cancelreason                        AS cancelreason,
+    CAST(0 AS INT64)                    AS cancelreason, -- MIMIC IV 2.0 change, the field is removed
     --
     'procedureevents'                   AS load_table_id,
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
