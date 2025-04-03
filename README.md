@@ -4,7 +4,7 @@
 
 The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP CDM format.
 
-* Version 1.0
+* Version 1.0.0
 
 
 ## Concepts / Philosophy
