@@ -29,7 +29,7 @@
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_measurement
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_measurement
 (
     measurement_id                INT64     not null ,
     person_id                     INT64     not null ,
@@ -65,7 +65,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_measurement
 -- demo:  115,272 rows from mapped 107,209 rows. Remove duplicates
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
+INSERT INTO @etl_project.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
@@ -93,12 +93,12 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM  
-    `@etl_project`.@etl_dataset.lk_meas_labevents_mapped src -- 107,209 
+    @etl_project.@etl_dataset.lk_meas_labevents_mapped src -- 107,209 
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per -- 110,849
+    @etl_project.@etl_dataset.cdm_person per -- 110,849
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis -- 116,559
+    @etl_project.@etl_dataset.cdm_visit_occurrence vis -- 116,559
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
@@ -111,7 +111,7 @@ WHERE
 -- chartevents
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
+INSERT INTO @etl_project.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
@@ -139,12 +139,12 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM  
-    `@etl_project`.@etl_dataset.lk_chartevents_mapped src
+    @etl_project.@etl_dataset.lk_chartevents_mapped src
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.cdm_visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
@@ -156,7 +156,7 @@ WHERE
 -- Microbiology - organism
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
+INSERT INTO @etl_project.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
@@ -184,12 +184,12 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM  
-    `@etl_project`.@etl_dataset.lk_meas_organism_mapped src
+    @etl_project.@etl_dataset.lk_meas_organism_mapped src
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis -- 116,559
+    @etl_project.@etl_dataset.cdm_visit_occurrence vis -- 116,559
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
@@ -202,7 +202,7 @@ WHERE
 -- Microbiology - antibiotics
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
+INSERT INTO @etl_project.@etl_dataset.cdm_measurement
 SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
@@ -230,12 +230,12 @@ SELECT
     src.load_row_id                 AS load_row_id,
     src.trace_id                    AS trace_id
 FROM  
-    `@etl_project`.@etl_dataset.lk_meas_ab_mapped src
+    @etl_project.@etl_dataset.lk_meas_ab_mapped src
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.cdm_person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis -- 116,559
+    @etl_project.@etl_dataset.cdm_visit_occurrence vis -- 116,559
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
@@ -249,7 +249,7 @@ WHERE
 -- wf demo poc: 1,500 rows from 1,500 rows in mapped
 -- -------------------------------------------------------------------
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_measurement
+INSERT INTO @etl_project.@etl_dataset.cdm_measurement
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
     per.person_id                           AS person_id,
@@ -277,12 +277,12 @@ SELECT
     src.load_row_id                         AS load_row_id,
     src.trace_id                            AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_meas_waveform_mapped src
+    @etl_project.@etl_dataset.lk_meas_waveform_mapped src
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per 
+    @etl_project.@etl_dataset.cdm_person per 
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_detail vd 
+    @etl_project.@etl_dataset.cdm_visit_detail vd 
         ON src.reference_id = vd.visit_detail_source_value
 WHERE
     src.target_domain_id = 'Measurement'

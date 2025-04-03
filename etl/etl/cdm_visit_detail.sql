@@ -29,7 +29,7 @@
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_visit_detail
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_detail
 (
     visit_detail_id                    INT64     not null ,
     person_id                          INT64     not null ,
@@ -66,7 +66,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_visit_detail
 
 
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_visit_detail
+INSERT INTO @etl_project.@etl_dataset.cdm_visit_detail
 SELECT
     src.visit_detail_id                     AS visit_detail_id,
     per.person_id                           AS person_id,
@@ -102,25 +102,25 @@ SELECT
     src.load_row_id                   AS load_row_id,
     src.trace_id                      AS trace_id
 FROM
-    `@etl_project`.@etl_dataset.lk_visit_detail_prev_next src
+    @etl_project.@etl_dataset.lk_visit_detail_prev_next src
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_person per 
+    @etl_project.@etl_dataset.cdm_person per 
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    `@etl_project`.@etl_dataset.cdm_visit_occurrence vis 
+    @etl_project.@etl_dataset.cdm_visit_occurrence vis 
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
 LEFT JOIN
-    `@etl_project`.@etl_dataset.cdm_care_site cs
+    @etl_project.@etl_dataset.cdm_care_site cs
         ON cs.care_site_source_value = src.current_location
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_visit_concept vdc
+    @etl_project.@etl_dataset.lk_visit_concept vdc
         ON vdc.source_code = src.current_location
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_visit_concept la 
+    @etl_project.@etl_dataset.lk_visit_concept la 
         ON la.source_code = src.admission_location
 LEFT JOIN
-    `@etl_project`.@etl_dataset.lk_visit_concept ld
+    @etl_project.@etl_dataset.lk_visit_concept ld
         ON ld.source_code = src.discharge_location
 ;

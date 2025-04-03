@@ -20,7 +20,7 @@
 -- Add second row for Waveform POC?
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_cdm_source
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cdm_source
 (
     cdm_source_name                 STRING        not null ,
     cdm_source_abbreviation         STRING             ,
@@ -40,7 +40,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_cdm_source
 )
 ;
 
-INSERT INTO `@etl_project`.@etl_dataset.cdm_cdm_source
+INSERT INTO @etl_project.@etl_dataset.cdm_cdm_source
 SELECT
     'MIMIC IV'                              AS cdm_source_name,
     'mimiciv'                               AS cdm_source_abbreviation,
@@ -62,7 +62,7 @@ SELECT
     ))                                  AS trace_id
 
 FROM 
-    `@etl_project`.@etl_dataset.voc_vocabulary v
+    @etl_project.@etl_dataset.voc_vocabulary v
 WHERE
     v.vocabulary_id = 'None'
 ;

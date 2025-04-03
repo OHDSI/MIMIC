@@ -61,7 +61,7 @@
 -- src_waveform_header
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_header
 (       
     reference_id            STRING,
     raw_files_path          STRING,
@@ -77,7 +77,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_header
 
 -- parsed codes to be targeted to table cdm_measurement
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_mx
 (
     case_id                 INT64,  -- FK to the header
     segment_name            STRING, -- two digits of case_id, 5 digits of internal sequence number
@@ -109,7 +109,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_waveform_mx
 -- -------------------------------------------------------------------
 
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_header
+INSERT INTO @etl_project.@etl_dataset.src_waveform_header
 SELECT
     subj.short_reference_id             AS reference_id,
     subj.long_reference_id              AS raw_files_path,
@@ -125,21 +125,21 @@ SELECT
         subj.short_reference_id AS reference_id
     ))                                  AS trace_id
 FROM
-    `@wf_project`.@wf_dataset.wf_header subj
+    @wf_project.@wf_dataset.wf_header subj
 INNER JOIN
     (
         SELECT 
             case_id, 
             MIN(date_time) AS start_datetime,
             MAX(date_time) AS end_datetime 
-        FROM `@wf_project`.@wf_dataset.wf_details
+        FROM @wf_project.@wf_dataset.wf_details
         GROUP BY case_id
     ) src
         ON src.case_id = subj.case_id
 ;
 
 
-INSERT INTO `@etl_project`.@etl_dataset.src_waveform_mx
+INSERT INTO @etl_project.@etl_dataset.src_waveform_mx
 SELECT
     src.case_id                         AS case_id, -- FK to the header
     CAST(src.segment_name AS STRING)    AS segment_name,
@@ -158,8 +158,8 @@ SELECT
             src.src_name AS src_name
         )) AS trace_id -- 
 FROM
-    `@wf_project`.@wf_dataset.wf_details src
+    @wf_project.@wf_dataset.wf_details src
 INNER JOIN
-    `@wf_project`.@wf_dataset.wf_header subj
+    @wf_project.@wf_dataset.wf_header subj
         ON src.case_id = subj.case_id
 ;

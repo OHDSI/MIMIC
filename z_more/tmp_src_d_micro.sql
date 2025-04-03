@@ -3,7 +3,7 @@
 -- MIMIC IV 2.0: generate src_d_micro from microbiologyevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_src_d_micro AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_src_d_micro AS
 WITH d_micro AS (
 
     SELECT DISTINCT
@@ -16,7 +16,7 @@ WITH d_micro AS (
             ab_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         ab_itemid IS NOT NULL
     UNION ALL
@@ -30,7 +30,7 @@ WITH d_micro AS (
             test_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         test_itemid IS NOT NULL
     UNION ALL
@@ -44,7 +44,7 @@ WITH d_micro AS (
             org_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         org_itemid IS NOT NULL
     UNION ALL
@@ -58,7 +58,7 @@ WITH d_micro AS (
             spec_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         spec_itemid IS NOT NULL
 )
@@ -73,4 +73,3 @@ SELECT
 FROM
     d_micro
 ;
-

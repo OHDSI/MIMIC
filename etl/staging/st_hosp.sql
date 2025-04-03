@@ -23,7 +23,7 @@
 -- src_diagnoses_icd
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_diagnoses_icd AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_diagnoses_icd AS
 SELECT
     subject_id      AS subject_id,
     hadm_id         AS hadm_id,
@@ -38,7 +38,7 @@ SELECT
         seq_num AS seq_num
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.diagnoses_icd
+    @source_project.@hosp_dataset.diagnoses_icd
 ;
 
 -- -------------------------------------------------------------------
@@ -49,7 +49,7 @@ FROM
 -- src_services
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_services AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_services AS
 SELECT
     subject_id                          AS subject_id,
     hadm_id                             AS hadm_id,
@@ -65,14 +65,14 @@ SELECT
         transfertime AS transfertime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.services
+    @source_project.@hosp_dataset.services
 ;
 
 -- -------------------------------------------------------------------
 -- src_labevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_labevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_labevents AS
 SELECT
     labevent_id                         AS labevent_id,
     subject_id                          AS subject_id,
@@ -91,14 +91,14 @@ SELECT
         labevent_id AS labevent_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.labevents
+    @source_project.@hosp_dataset.labevents
 ;
 
 -- -------------------------------------------------------------------
 -- src_d_labitems
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_labitems AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_labitems AS
 SELECT
     itemid                              AS itemid,
     label                               AS label,
@@ -112,7 +112,7 @@ SELECT
         itemid AS itemid
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.d_labitems
+    @source_project.@hosp_dataset.d_labitems
 ;
 
 
@@ -124,7 +124,7 @@ FROM
 -- src_procedures_icd
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_procedures_icd AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_procedures_icd AS
 SELECT
     subject_id                          AS subject_id,
     hadm_id                             AS hadm_id,
@@ -140,14 +140,14 @@ SELECT
         icd_version AS icd_version
     ))                                  AS trace_id -- this set of fields is not unique. To set quantity?
 FROM
-    `@source_project`.@hosp_dataset.procedures_icd
+    @source_project.@hosp_dataset.procedures_icd
 ;
 
 -- -------------------------------------------------------------------
 -- src_hcpcsevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_hcpcsevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_hcpcsevents AS
 SELECT
     hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
@@ -164,7 +164,7 @@ SELECT
         seq_num AS seq_num
     ))                                  AS trace_id -- this set of fields is not unique. To set quantity?
 FROM
-    `@source_project`.@hosp_dataset.hcpcsevents
+    @source_project.@hosp_dataset.hcpcsevents
 ;
 
 
@@ -172,7 +172,7 @@ FROM
 -- src_drgcodes
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_drgcodes AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_drgcodes AS
 SELECT
     hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
@@ -187,14 +187,14 @@ SELECT
         COALESCE(drg_code, '') AS drg_code
     ))                                  AS trace_id -- this set of fields is not unique.
 FROM
-    `@source_project`.@hosp_dataset.drgcodes
+    @source_project.@hosp_dataset.drgcodes
 ;
 
 -- -------------------------------------------------------------------
 -- src_prescriptions
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_prescriptions AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_prescriptions AS
 SELECT
     hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
@@ -223,7 +223,7 @@ SELECT
         starttime AS starttime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.prescriptions
+    @source_project.@hosp_dataset.prescriptions
 ;
 
 
@@ -231,7 +231,7 @@ FROM
 -- src_microbiologyevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_microbiologyevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_microbiologyevents AS
 SELECT
     microevent_id               AS microevent_id,
     subject_id                  AS subject_id,
@@ -258,7 +258,7 @@ SELECT
         microevent_id AS microevent_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.microbiologyevents
+    @source_project.@hosp_dataset.microbiologyevents
 ;
 
 -- -------------------------------------------------------------------
@@ -266,7 +266,7 @@ FROM
 -- raw d_micro is no longer available both in mimic_hosp and mimiciv_hosp
 -- -------------------------------------------------------------------
 
--- CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_micro AS
+-- CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_micro AS
 -- SELECT
 --     itemid                      AS itemid, -- numeric ID
 --     label                       AS label, -- source_code for custom mapping
@@ -278,7 +278,7 @@ FROM
 --         itemid AS itemid
 --     ))                                  AS trace_id
 -- FROM
---     `@source_project`.@hosp_dataset.d_micro
+--     @source_project.@hosp_dataset.d_micro
 -- ;
 
 -- -------------------------------------------------------------------
@@ -286,7 +286,7 @@ FROM
 -- MIMIC IV 2.0: generate src_d_micro from microbiologyevents
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_d_micro AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_d_micro AS
 WITH d_micro AS (
 
     SELECT DISTINCT
@@ -299,7 +299,7 @@ WITH d_micro AS (
             ab_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         ab_itemid IS NOT NULL
     UNION ALL
@@ -313,7 +313,7 @@ WITH d_micro AS (
             test_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         test_itemid IS NOT NULL
     UNION ALL
@@ -327,7 +327,7 @@ WITH d_micro AS (
             org_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         org_itemid IS NOT NULL
     UNION ALL
@@ -341,7 +341,7 @@ WITH d_micro AS (
             spec_itemid AS itemid
         ))                                  AS trace_id
     FROM
-        `@source_project`.@hosp_dataset.microbiologyevents
+        @source_project.@hosp_dataset.microbiologyevents
     WHERE
         spec_itemid IS NOT NULL
 )
@@ -361,7 +361,7 @@ FROM
 -- src_pharmacy
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_pharmacy AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_pharmacy AS
 SELECT
     pharmacy_id                         AS pharmacy_id,
     medication                          AS medication,
@@ -377,6 +377,6 @@ SELECT
         pharmacy_id AS pharmacy_id
     ))                                  AS trace_id
 FROM
-    `@source_project`.@hosp_dataset.pharmacy
+    @source_project.@hosp_dataset.pharmacy
 ;
 

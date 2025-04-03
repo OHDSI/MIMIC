@@ -15,7 +15,7 @@
 -- Rule 1, visit_detail.transfers
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_test
+INSERT INTO @metrics_project.@metrics_dataset.report_qa_test
 SELECT
     CAST(NULL AS STRING)                AS report_id, -- task_id, run_id, target_dataset etc.
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -31,7 +31,7 @@ FROM
         'visit_detail.transfers'    AS unit_id,
         COUNT(*)                    AS row_count
     FROM
-        `@etl_project`.@etl_dataset.src_transfers tr
+        @etl_project.@etl_dataset.src_transfers tr
     WHERE 
         tr.eventtype != 'discharge' -- these are not useful
 ) src
@@ -39,7 +39,7 @@ LEFT JOIN
 (
     SELECT unit_id, row_count
     FROM
-        `@metrics_project`.@metrics_dataset.report_qa_row_count
+        @metrics_project.@metrics_dataset.report_qa_row_count
     WHERE
         table_id = 'cdm_visit_detail'
         AND unit_id = 'visit_detail.transfers'
@@ -51,7 +51,7 @@ LEFT JOIN
 -- Rule 2, visit_detail.admissions
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_test
+INSERT INTO @metrics_project.@metrics_dataset.report_qa_test
 SELECT
     CAST(NULL AS STRING)                AS report_id, -- task_id, run_id, target_dataset etc.
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -67,7 +67,7 @@ FROM
         'visit_detail.admissions'    AS unit_id,
         COUNT(*)                    AS row_count
     FROM 
-        `@etl_project`.@etl_dataset.src_admissions adm
+        @etl_project.@etl_dataset.src_admissions adm
     WHERE 
         adm.edregtime IS NOT NULL -- only those having a emergency timestamped
 ) src
@@ -75,7 +75,7 @@ LEFT JOIN
 (
     SELECT unit_id, row_count
     FROM
-        `@metrics_project`.@metrics_dataset.report_qa_row_count
+        @metrics_project.@metrics_dataset.report_qa_row_count
     WHERE
         table_id = 'cdm_visit_detail'
         AND unit_id = 'visit_detail.admissions'
@@ -87,7 +87,7 @@ LEFT JOIN
 -- Rule 3, visit_detail.services
 -- -------------------------------------------------------------------
 
-INSERT INTO `@metrics_project`.@metrics_dataset.report_qa_test
+INSERT INTO @metrics_project.@metrics_dataset.report_qa_test
 SELECT
     CAST(NULL AS STRING)                AS report_id, -- task_id, run_id, target_dataset etc.
     FORMAT_DATETIME('%Y-%m-%d %X', CURRENT_DATETIME()) AS report_starttime, -- X = HH:MM:SS
@@ -103,9 +103,9 @@ FROM
         'visit_detail.services'     AS unit_id,
         COUNT(*)                    AS row_count
     FROM 
-        `@etl_project`.@etl_dataset.src_services src
+        @etl_project.@etl_dataset.src_services src
     INNER JOIN 
-        `@etl_project`.@etl_dataset.cdm_visit_occurrence vis 
+        @etl_project.@etl_dataset.cdm_visit_occurrence vis 
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', COALESCE(CAST(src.hadm_id AS STRING), 'None'))
 ) src
@@ -113,7 +113,7 @@ LEFT JOIN
 (
     SELECT unit_id, row_count
     FROM
-        `@metrics_project`.@metrics_dataset.report_qa_row_count
+        @metrics_project.@metrics_dataset.report_qa_row_count
     WHERE
         table_id = 'cdm_visit_detail'
         AND unit_id = 'visit_detail.services'

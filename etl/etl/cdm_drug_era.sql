@@ -8,15 +8,15 @@
 -- "standard" script
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.lk_join_voc_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_join_voc_drug
 AS SELECT DISTINCT
     ca.descendant_concept_id    AS descendant_concept_id,
     ca.ancestor_concept_id      AS ancestor_concept_id,
     c.concept_id                AS concept_id
 FROM
-    `@etl_project`.@etl_dataset.voc_concept_ancestor ca
+    @etl_project.@etl_dataset.voc_concept_ancestor ca
 JOIN
-    `@etl_project`.@etl_dataset.voc_concept c
+    @etl_project.@etl_dataset.voc_concept c
         ON  ca.ancestor_concept_id = c.concept_id
         AND c.vocabulary_id        IN ('RxNorm', 'RxNorm Extension')    -- selects RxNorm, RxNorm Extension vocabulary_id
         AND c.concept_class_id     = 'Ingredient'                       -- selects the Ingredients only.
@@ -31,7 +31,7 @@ JOIN
 -- The drug_concept_id field only contains
 -- Concepts that have the concept_class 'Ingredient'
 -- -------------------------------------------------------------------
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_pretarget_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_pretarget_drug
 AS SELECT
     d.drug_exposure_id          AS drug_exposure_id,
     d.person_id                 AS person_id,
@@ -40,15 +40,15 @@ AS SELECT
     d.days_supply               AS days_supply,
     d.drug_exposure_end_date    AS drug_exposure_end_date
 FROM
-    `@etl_project`.@etl_dataset.cdm_drug_exposure d
+    @etl_project.@etl_dataset.cdm_drug_exposure d
 JOIN
-    `@etl_project`.@etl_dataset.lk_join_voc_drug v
+    @etl_project.@etl_dataset.lk_join_voc_drug v
         ON v.descendant_concept_id = d.drug_concept_id
 WHERE
     d.drug_concept_id != 0
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_subenddates_un_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_subenddates_un_drug
     AS SELECT
         person_id                           AS person_id,
         ingredient_concept_id               AS ingredient_concept_id,
@@ -61,7 +61,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_subenddates_un_drug
             ORDER BY
                 drug_exposure_start_date)   AS start_ordinal
     FROM
-        `@etl_project`.@etl_dataset.tmp_pretarget_drug
+        @etl_project.@etl_dataset.tmp_pretarget_drug
 UNION ALL
     SELECT
         person_id                   AS person_id,
@@ -70,10 +70,10 @@ UNION ALL
         1                           AS event_type,
         NULL                        AS start_ordinal
     FROM
-        `@etl_project`.@etl_dataset.tmp_pretarget_drug
+        @etl_project.@etl_dataset.tmp_pretarget_drug
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_subenddates_rows_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_subenddates_rows_drug
 AS SELECT
     person_id                       AS person_id,
     ingredient_concept_id           AS ingredient_concept_id,
@@ -98,30 +98,30 @@ AS SELECT
             event_type)             AS overall_ord
             -- this re-numbers the inner UNION so all rows are numbered ordered by the event date
 FROM
-    `@etl_project`.@etl_dataset.tmp_subenddates_un_drug
+    @etl_project.@etl_dataset.tmp_subenddates_un_drug
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_subenddates_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_subenddates_drug
 AS SELECT
     person_id               AS person_id,
     ingredient_concept_id   AS ingredient_concept_id,
     event_date              AS end_date
 FROM
-    `@etl_project`.@etl_dataset.tmp_subenddates_rows_drug e
+    @etl_project.@etl_dataset.tmp_subenddates_rows_drug e
 WHERE
     (2 * e.start_ordinal) - e.overall_ord = 0
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.temp_ends_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.temp_ends_drug
 AS SELECT
     dt.person_id                    AS person_id,
     dt.ingredient_concept_id        AS drug_concept_id,
     dt.drug_exposure_start_date     AS drug_exposure_start_date,
     MIN(e.end_date)                 AS drug_sub_exposure_end_date
 FROM
-    `@etl_project`.@etl_dataset.tmp_pretarget_drug dt
+    @etl_project.@etl_dataset.tmp_pretarget_drug dt
 JOIN
-    `@etl_project`.@etl_dataset.tmp_subenddates_drug e
+    @etl_project.@etl_dataset.tmp_subenddates_drug e
         ON  dt.person_id             = e.person_id
         AND dt.ingredient_concept_id = e.ingredient_concept_id
         AND e.end_date               >= dt.drug_exposure_start_date
@@ -132,7 +132,7 @@ GROUP BY
     dt.drug_exposure_start_date
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_sub_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_sub_drug
 AS SELECT
     ROW_NUMBER() OVER (
         PARTITION BY
@@ -148,7 +148,7 @@ AS SELECT
     drug_sub_exposure_end_date      AS drug_sub_exposure_end_date,
     COUNT(*)                        AS drug_exposure_count
 FROM
-    `@etl_project`.@etl_dataset.temp_ends_drug
+    @etl_project.@etl_dataset.temp_ends_drug
 GROUP BY
     person_id,
     drug_concept_id,
@@ -158,7 +158,7 @@ ORDER BY
     drug_concept_id
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_finaltarget_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_finaltarget_drug
 AS SELECT
     row_number                              AS row_number,
     person_id                               AS person_id,
@@ -169,10 +169,10 @@ AS SELECT
     DATE_DIFF( drug_sub_exposure_end_date,
               drug_sub_exposure_start_date, DAY) AS days_exposed
 FROM
-    `@etl_project`.@etl_dataset.tmp_sub_drug
+    @etl_project.@etl_dataset.tmp_sub_drug
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_enddates_un_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_enddates_un_drug
     AS SELECT
         person_id                                       AS person_id,
         ingredient_concept_id                           AS ingredient_concept_id,
@@ -185,7 +185,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_enddates_un_drug
             ORDER BY
                 drug_sub_exposure_start_date)           AS start_ordinal
     FROM
-        `@etl_project`.@etl_dataset.tmp_finaltarget_drug
+        @etl_project.@etl_dataset.tmp_finaltarget_drug
 UNION ALL
 -- pad the end dates by 30 to allow a grace period for overlapping ranges.
     SELECT
@@ -195,10 +195,10 @@ UNION ALL
         1                                                               AS event_type,
         NULL                                                            AS start_ordinal
     FROM
-        `@etl_project`.@etl_dataset.tmp_finaltarget_drug
+        @etl_project.@etl_dataset.tmp_finaltarget_drug
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_enddates_rows_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_enddates_rows_drug
 AS SELECT
     person_id                       AS person_id,
     ingredient_concept_id           AS ingredient_concept_id,
@@ -223,21 +223,21 @@ AS SELECT
             event_type)             AS overall_ord
       -- this re-numbers the inner UNION so all rows are numbered ordered by the event date
 FROM
-    `@etl_project`.@etl_dataset.tmp_enddates_un_drug
+    @etl_project.@etl_dataset.tmp_enddates_un_drug
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_enddates_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_enddates_drug
 AS SELECT
     person_id                                       AS person_id,
     ingredient_concept_id                           AS ingredient_concept_id,
     DATE_SUB (event_date, INTERVAL 30 DAY)          AS end_date  -- unpad the end date
 FROM
-    `@etl_project`.@etl_dataset.tmp_enddates_rows_drug e
+    @etl_project.@etl_dataset.tmp_enddates_rows_drug e
 WHERE
     (2 * e.start_ordinal) - e.overall_ord = 0
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.tmp_drugera_ends_drug
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_drugera_ends_drug
 AS SELECT
     ft.person_id                        AS person_id,
     ft.ingredient_concept_id            AS ingredient_concept_id,
@@ -246,9 +246,9 @@ AS SELECT
     ft.drug_exposure_count              AS drug_exposure_count,
     ft.days_exposed                     AS days_exposed
 FROM
-    `@etl_project`.@etl_dataset.tmp_finaltarget_drug ft
+    @etl_project.@etl_dataset.tmp_finaltarget_drug ft
 JOIN
-    `@etl_project`.@etl_dataset.tmp_enddates_drug e
+    @etl_project.@etl_dataset.tmp_enddates_drug e
         ON ft.person_id              = e.person_id
         AND e.end_date               >= ft.drug_sub_exposure_start_date
         AND ft.ingredient_concept_id = e.ingredient_concept_id
@@ -265,7 +265,7 @@ GROUP BY
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_drug_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_era
 (
     drug_era_id         INT64     not null ,
     person_id           INT64     not null ,
@@ -284,7 +284,7 @@ CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.cdm_drug_era
 -- -------------------------------------------------------------------
 -- @summary: 30 days window is allowed
 -- -------------------------------------------------------------------
-INSERT INTO `@etl_project`.@etl_dataset.cdm_drug_era
+INSERT INTO @etl_project.@etl_dataset.cdm_drug_era
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())                                   AS drug_era_id,
     person_id                                                           AS person_id,
@@ -299,7 +299,7 @@ SELECT
     CAST(NULL AS STRING)                                                AS load_table_id,
     CAST(NULL AS INT64)                                                 AS load_row_id
 FROM
-    `@etl_project`.@etl_dataset.tmp_drugera_ends_drug
+    @etl_project.@etl_dataset.tmp_drugera_ends_drug
 GROUP BY
     person_id,
     drug_era_end_date,
@@ -312,17 +312,17 @@ ORDER BY
 -- -------------------------------------------------------------------
 -- Drop temporary table
 -- -------------------------------------------------------------------
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_drugera_ends_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_enddates_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_finaltarget_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_enddates_un_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_sub_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.temp_ends_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_pretarget_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_subenddates_un_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_subenddates_rows_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_subenddates_drug;
-DROP TABLE IF EXISTS `@etl_project`.@etl_dataset.tmp_enddates_rows_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_drugera_ends_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_enddates_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_finaltarget_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_enddates_un_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_sub_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.temp_ends_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_pretarget_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_subenddates_un_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_subenddates_rows_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_subenddates_drug;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_enddates_rows_drug;
 -- -------------------------------------------------------------------
 -- Loading finished
 -- -------------------------------------------------------------------
