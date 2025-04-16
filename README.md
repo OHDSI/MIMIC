@@ -4,7 +4,7 @@
 
 The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP CDM format.
 
-* Version 1.0.0
+* Version TBD (1+)
 
 
 ## Concepts / Philosophy
@@ -35,8 +35,10 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 ### How to run the conversion
 
 #### To run the ETL pipeline end-to-end
-* load the latest standard OMOP vocabularies from http://athena.ohdsi.org if needed
+* load the latest standard OMOP vocabularies from http://athena.ohdsi.org 
     * create a working copy of the loaded vocabularies, where custom mapping data will be added to
+* get custom mapping vocabulary _delta tables from https://github.com/TuftsCTSI/CVB/tree/main/MIMIC/Ontology
+* get other custom mapping vocabulary _delta tables, if needed
 * set variables in vocabulary_refresh/README.md
     * run vocabulary refresh commands given below from directory "vocabulary_refresh"
 * set the project variables in `conf/*.etlconf`
@@ -120,6 +122,10 @@ order by table_id, report_starttime
 
 
 ### Changelog (latest first)
+
+**2024-04-16**
+* Initial update from v1.0.0 to a new approach for custom vocabularies
+* Update to vocabulary setup to use _delta custom vocabulary tables instead of gcpt tables
 
 **2023-02-17**
 
