@@ -4,7 +4,6 @@
     "variables": 
     {
         "@source_project":   "physionet-data",
-        "@core_dataset":     "mimiciv_hosp",
         "@hosp_dataset":     "mimiciv_hosp",
         "@icu_dataset":      "mimiciv_icu",
 
