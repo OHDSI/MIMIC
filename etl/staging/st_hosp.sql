@@ -50,7 +50,7 @@ SELECT
     admission_type                      AS admission_type,
     admission_location                  AS admission_location,
     discharge_location                  AS discharge_location,
-    race                                AS ethnicity, -- MIMIC IV 2.0 change, field race replaced field ethnicity
+    race                                AS race,
     edregtime                           AS edregtime,
     insurance                           AS insurance,
     marital_status                      AS marital_status,
