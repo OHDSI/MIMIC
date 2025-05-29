@@ -114,7 +114,7 @@ FROM
     @source_project.@icu_dataset.chartevents
 ;
 
-CREATE OR REPLACE TABLE `@etl_project`.@etl_dataset.src_outputevents AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_outputevents AS
 SELECT
     subject_id  AS subject_id,
     hadm_id     AS hadm_id,
@@ -134,5 +134,5 @@ SELECT
         charttime AS charttime
     ))                                  AS trace_id
 FROM
-    `@source_project`.@icu_dataset.outputevents
+    @source_project.@icu_dataset.outputevents
 ;
