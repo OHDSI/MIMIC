@@ -27,7 +27,7 @@ config_default = {
 
     "cdm_prefix":               "cdm_",
 
-    "cdm_ddl":                  "etl/ddl/ddl_cdm_5_3_1.sql",
+    "cdm_ddl":                  "etl/ddl/ddl_cdm_5_4_2.sql",
 
     "output_sql_file":          "test/ut/ut_basic_gen.sql",
 

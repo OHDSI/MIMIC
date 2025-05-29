@@ -25,7 +25,7 @@ config_default = {
         "config_to_read": "qa_fields.conf",
         "config_to_write": "qa_fields_generated.conf",
 
-        "ddl_script": "../etl/ddl/ddl_cdm_5_3_1.sql",
+        "ddl_script": "../etl/ddl/ddl_cdm_5_4_2.sql",
         "cdm_tables_config": "cdm_tables.conf",
 
         "qa_report_table": "report_qa_test",
