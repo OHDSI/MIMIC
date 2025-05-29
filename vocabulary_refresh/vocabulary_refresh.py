@@ -33,15 +33,13 @@ def read_params():
     step_values = {
         "0": "run all steps",
 
-        "10": "run steps 11-13 for athena standard vocabularies",
-        "11": "copy files to gs",
-        "12": "load from gs to intermediate bq tables tmp_*",
-        "13": "create final voc tables from intermediate",
+        "10": "run step 11 to generate complete vocabulary tables",
+        "11": "combine standard vocabulary / athena tables with custom _delta tables",
 
-        "20": "run steps 21-23 for custom mapping",
-        "21": "copy files to gs",
-        "22": "load from gs to intermediate bq table tmp_custom_mapping, verify the table",
-        "23": "create custom concepts and its relationships in voc tables",
+        "20": "run steps 21-23 to copy to and setup tables on BigQuery",
+        "21": "copy combined athena + _delta tables to gs bucket",
+        "22": "load from gs to intermediate bq tables tmp_*",
+        "23": "create final voc tables from intermediate",
 
         "30": "run steps 31-32 for vocabulary tables",
         "31": "check vocabulary tables",
@@ -111,8 +109,8 @@ def main():
 
     gsutil_rm_csv = "gsutil rm {target_path}/*.csv"
     gsutil_cp_csv = "gsutil cp {source_path}/*.csv {target_path}/"
-    dataset_fullname = "`{project}.{dataset}`"
-    run_command_load = "python load_to_bq_vocab.py --{step_name} --config {config_file}"
+    run_command_load = "python load_to_bq_vocab.py --config {config_file}"
+    run_append_delta_tables = "python append_athena_delta_tables.py --config {config_file}"
     # run_command_bq_script = "python bq_run_script.py --config {config_file} {script_file}"
     run_command_bq_script = "python bq_run_script.py -c {config_file} {script_file}"
 
@@ -122,76 +120,44 @@ def main():
     return_code = 0
 
     # 1. Download and unzip files from Athena
-    # We start from from the point when Athena vocabularies are downloaded and CPT vocabulary is updated
+    # We start from the point when Athena vocabularies are downloaded and CPT vocabulary is updated
 
-    # 2. Copy files to GCP bucket
+    # 2. Combine Athena tables with custom mapping _delta tables
     if return_code == 0 and params['step'] in [11, 10, 0]:
+        run_command = run_append_delta_tables.format(config_file=params['config_file'])
+        print(run_command)
+        return_code = os.system(run_command)
+        print("return_code", return_code)
+
+    # 3. Copy files to GCP bucket
+    if return_code == 0 and params['step'] in [21, 20, 0]:
         run_command = gsutil_rm_csv.format(target_path=config['gs_athena_csv_path'])
         print(run_command)
         return_code = os.system(run_command)
         print("return_code", return_code)
 
         run_command = gsutil_cp_csv.format(
-            source_path=config['local_athena_csv_path'], target_path=config['gs_athena_csv_path'])
+            source_path=config['combined_athena_delta_tables_path'], target_path=config['gs_athena_csv_path'])
         print(run_command)
         return_code = os.system(run_command)
         print("return_code", return_code)
 
-    # 3. Load files to intermediate BQ tables
-    if return_code == 0 and params['step'] in [12, 10, 0]:
-        run_command = run_command_load.format(step_name="athena", config_file=params['config_file'])
+    # 4. Load files to intermediate BQ tables
+    if return_code == 0 and params['step'] in [22, 20, 0]:
+        run_command = run_command_load.format(config_file=params['config_file'])
         print(run_command)
         return_code = os.system(run_command)
         print("return_code", return_code)
 
-    # 4. Populate target vocabulary tables from intermediate tables
-    if return_code == 0 and params['step'] in [13, 10, 0]:
+    # 5. Populate target vocabulary tables from intermediate tables
+    if return_code == 0 and params['step'] in [23, 20, 0]:
         run_command = run_command_bq_script.format( \
             config_file=params['config_file'], script_file="create_voc_from_tmp.sql")
         print(run_command)
         return_code = os.system(run_command)
         print("return_code", return_code)
 
-
-    #####To refresh or add new custom mapping#####
-
-    # 5. Copy custom mapping files to custom_mapping_csv/ folder, and update custom_mapping_list.tsv
-    # It is a manual step
-
-    # 6. Copy custom mapping files to GCP bucket
-    if return_code == 0 and params['step'] in [21, 20, 0]:
-        run_command = gsutil_rm_csv.format(target_path=config['gs_mapping_csv_path'])
-        print(run_command)
-        run_command = gsutil_cp_csv.format(
-            source_path=config['local_mapping_csv_path'], target_path=config['gs_mapping_csv_path'])
-        print(run_command)
-        return_code = os.system(run_command)
-        print("return_code", return_code)
-
-    # 7. Load files to the intermediate BQ table (tmp_custom_mapping)
-    if return_code == 0 and params['step'] in [22, 20, 0]:
-        run_command = run_command_load.format(step_name="mapping", config_file=params['config_file'])
-        print(run_command)
-        return_code = os.system(run_command)
-        print("return_code", return_code)
-
-        run_command = run_command_bq_script.format( \
-            config_file=params['config_file'], script_file="check_custom_loaded.sql")
-        print(run_command)
-        return_code = os.system(run_command)
-        print("return_code", return_code)
-
-    # 8. Add custom concepts to vocabulary tables from the intermediate table
-    if return_code == 0 and params['step'] in [23, 20, 0]:
-        run_command = run_command_bq_script.format( \
-            config_file=params['config_file'], script_file="custom_vocabularies.sql")
-        print(run_command)
-        return_code = os.system(run_command)
-        print("return_code", return_code)
-
-    #####Verify the result#####
-
-    # 9. Verify target tables
+    # 6. Verify target tables
     if return_code == 0 and params['step'] in [31, 30, 0]:
         run_command = run_command_bq_script.format( \
             config_file=params['config_file'], script_file="vocabulary_check_bq.sql")
@@ -199,7 +165,7 @@ def main():
         return_code = os.system(run_command)
         print("return_code", return_code)
 
-    # 10. Clean up temporary tables from the previous step
+    # 7. Clean up temporary tables from the previous step
     # collect the list to clean up
     if return_code == 0 and params['step'] in [32, 30, 0]:
         run_command = run_command_bq_script.format( \

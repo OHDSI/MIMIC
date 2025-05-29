@@ -77,35 +77,27 @@ def read_params():
 
     print('Read params...')
     params = {
-        "steps":    ["mandatory: indicate '-a' for 'athena', '-m' for (custom) 'mapping' or both"],
         "config_file":   "optional: indicate '-c' for 'config', json file name. Defaults are hard-coded"
     }
     
     # Parsing command line arguments
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"ampc:",["athena", "mapping", "config="])
+        opts, args = getopt.getopt(sys.argv[1:],"c:",["config="])
         if len(opts) == 0:
             raise getopt.GetoptError("read_params() error", "Mandatory argument is missing.")
     except getopt.GetoptError:
         print("Please indicate correct params:")
         print(params)
-        print("for example:\npython load_to_bq_vocab.py --athena --config vocabulary_refresh.conf")
+        print("for example:\npython load_to_bq_vocab.py --config vocabulary_refresh.conf")
         sys.exit(2)
 
-    st = []
     for opt, arg in opts:
 
         if opt == '-c' or opt == '--config':
             if os.path.isfile(arg):
                 params['config_file'] = arg
             else:
-                params['config_file'] = ''             
-
-        if opt == '-a' or opt == '--athena':
-            st.append('athena')
-        if opt == '-m' or opt == '--mapping':
-            st.append('mapping')
-        params['steps'] = st
+                params['config_file'] = ''
 
     print(params)
     return params
@@ -206,32 +198,19 @@ def main():
     return_code = 0
     gs_file_path = '{gs_path}/{table}{ext}'
 
-    for step in params['steps']:
+    rca = 0
+    for table in config['vocabulary_tables']:
 
-        rca = 0
-        if step == 'athena':
-            for table in config['vocabulary_tables']:
+        gs_path = gs_file_path.format(
+            gs_path=config['gs_athena_csv_path'], table=table.upper(), ext='.csv')
 
-                gs_path = gs_file_path.format(
-                    gs_path=config['gs_athena_csv_path'], table=table.upper(), ext='.csv')
+        rc = load_table(table, gs_path, config['athena_csv_delimiter'], \
+            config['athena_csv_quote'], config)
+        if rc != 0:
+            rca += 1
+            continue
 
-                rc = load_table(table, gs_path, config['athena_csv_delimiter'], \
-                    config['athena_csv_quote'], config)
-                if rc != 0:
-                    rca += 1
-                    continue
-        rcm = 0
-        if step == 'mapping':
-
-            gs_path = gs_file_path.format(
-                gs_path=config['gs_mapping_csv_path'], table='*', ext='.csv')
-
-            rc = load_table(config['custom_mapping_table'], gs_path, config['mapping_csv_delimiter'], \
-                config['mapping_csv_quote'], config)
-            if rc != 0:
-                rcm += 1
-
-    return_code = rca + rcm * 0xff
+    return_code = rca * 0xff
     return return_code
 
 # ----------------------------------------------------

@@ -1,6 +1,0 @@
-concept_name,source_concept_id,source_vocabulary_id,source_domain_id,source_concept_class_id,standard_concept,concept_code,valid_start_date,valid_end_date,invalid_reason,target_concept_id,relationship_id,reverese_relationship_id,relationship_valid_start_date,relationship_end_date,invalid_reason_cr
-Government,2000001301,mimiciv_obs_insurance,Meas Value,Answer,,Government,1970-01-01,2099-12-31,,21498981,Maps to,Mapped from,1970-01-01,2099-12-31,
-Medicaid,2000001302,mimiciv_obs_insurance,Meas Value,Answer,,Medicaid,1970-01-01,2099-12-31,,45885112,Maps to,Mapped from,1970-01-01,2099-12-31,
-Medicare,2000001303,mimiciv_obs_insurance,Meas Value,Answer,,Medicare,1970-01-01,2099-12-31,,45883718,Maps to,Mapped from,1970-01-01,2099-12-31,
-Private,2000001304,mimiciv_obs_insurance,Meas Value,Answer,,Private,1970-01-01,2099-12-31,,21498514,Maps to,Mapped from,1970-01-01,2099-12-31,
-Self Pay,2000001305,mimiciv_obs_insurance,Meas Value,Answer,,Self Pay,1970-01-01,2099-12-31,,21499435,Maps to,Mapped from,1970-01-01,2099-12-31,
