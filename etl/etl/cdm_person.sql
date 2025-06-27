@@ -7,56 +7,48 @@
 -- Populate cdm_person table
 -- 
 -- Dependencies: run after st_core.sql
--- on Demo: 12.4 sec
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
 -- Known issues / Open points:
 --
--- TRUNCATE TABLE is not supported, organize "create or replace"
--- @etl_project.@etl_dataset.cdm_person;
+-- negative unique id from FARM_FINGERPRINT()
 --
--- negative unique id from FARM_FINGERPRINT(GENERATE_UUID())
---
--- loaded custom mapping: 
---      gcpt_ethnicity_to_concept -> mimiciv_per_ethnicity
---
--- Why don't we want to use subject_id as person_id and hadm_id as visit_occurrence_id?
---      ask analysts
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- tmp_subject_ethnicity
+-- tmp_subject_race
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_subject_ethnicity AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_subject_race AS
 SELECT DISTINCT
     src.subject_id                      AS subject_id,
-    FIRST_VALUE(src.ethnicity) OVER (
+    FIRST_VALUE(src.race) OVER (
         PARTITION BY src.subject_id 
-        ORDER BY src.admittime ASC)     AS ethnicity_first
+        ORDER BY src.admittime ASC)     AS race_first
 FROM
     @etl_project.@etl_dataset.src_admissions src
 ;
 
 -- -------------------------------------------------------------------
--- lk_pat_ethnicity_concept
+-- lk_pat_race_concept
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_pat_ethnicity_concept AS
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_pat_race_concept AS
 SELECT DISTINCT
-    src.ethnicity_first     AS source_code,
+    src.race_first     AS source_code,
     vc.concept_id           AS source_concept_id,
+    vc.domain_id            AS domain_id,
     vc.vocabulary_id        AS source_vocabulary_id,
     vc1.concept_id          AS target_concept_id,
-    vc1.vocabulary_id       AS target_vocabulary_id -- look here to distinguish Race and Ethnicity
+    vc1.vocabulary_id       AS target_vocabulary_id
 FROM
-    @etl_project.@etl_dataset.tmp_subject_ethnicity src
+    @etl_project.@etl_dataset.tmp_subject_race src
 LEFT JOIN
-    -- gcpt_ethnicity_to_concept -> mimiciv_per_ethnicity
     @etl_project.@etl_dataset.voc_concept vc
-        ON UPPER(vc.concept_code) = UPPER(src.ethnicity_first) -- do the custom mapping
+        ON UPPER(vc.concept_name) = UPPER(src.race_first) -- do the custom mapping
         AND vc.domain_id IN ('Race', 'Ethnicity')
+        AND vc.concept_class_id = 'mimic-race'
 LEFT JOIN
     @etl_project.@etl_dataset.voc_concept_relationship cr1
         ON  cr1.concept_id_1 = vc.concept_id
@@ -103,7 +95,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_person
 
 INSERT INTO @etl_project.@etl_dataset.cdm_person
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID()) AS person_id,
+    FARM_FINGERPRINT(CAST(p.subject_id AS STRING)) AS person_id,
     CASE 
         WHEN p.gender = 'F' THEN 8532 -- FEMALE
         WHEN p.gender = 'M' THEN 8507 -- MALE
@@ -115,45 +107,29 @@ SELECT
     CAST(NULL AS DATETIME)          AS birth_datetime,
     COALESCE(
         CASE
-            WHEN map_eth.target_vocabulary_id <> 'Ethnicity'
-                THEN map_eth.target_concept_id
+            WHEN map_rc.domain_id = 'Race'
+                THEN map_rc.target_concept_id
             ELSE NULL
-        END, 0)                               AS race_concept_id,
+        END, 0)                     AS race_concept_id,
+    -- MIMIC only has a race column. For HISPANIC OR LATINO the domain_id = 'Ethnicity'. For other "races" which contain
+    -- HISPANIC/LATINO map ethnicity_concept_id to 38003563.
     COALESCE(
         CASE
-            WHEN map_eth.target_vocabulary_id = 'Ethnicity'
-                THEN map_eth.target_concept_id
+            WHEN map_rc.domain_id = 'Ethnicity' THEN map_rc.target_concept_id
+            WHEN map_rc.domain_id = 'Race' AND map_rc.source_code LIKE '%HISPANIC/LATINO%' THEN 38003563
             ELSE NULL
-        END, 0)                     AS ethnicity_concept_id,
+        END, 38003564)              AS ethnicity_concept_id,
     CAST(NULL AS INT64)             AS location_id,
     CAST(NULL AS INT64)             AS provider_id,
     CAST(NULL AS INT64)             AS care_site_id,
     CAST(p.subject_id AS STRING)    AS person_source_value,
     p.gender                        AS gender_source_value,
     0                               AS gender_source_concept_id,
-    CASE
-        WHEN map_eth.target_vocabulary_id <> 'Ethnicity'
-            THEN eth.ethnicity_first
-        ELSE NULL
-    END                             AS race_source_value,
-    COALESCE(
-        CASE
-            WHEN map_eth.target_vocabulary_id <> 'Ethnicity'
-                THEN map_eth.source_concept_id
-            ELSE NULL
-        END, 0)                        AS race_source_concept_id,
-    CASE
-        WHEN map_eth.target_vocabulary_id = 'Ethnicity'
-            THEN eth.ethnicity_first
-        ELSE NULL
-    END                             AS ethnicity_source_value,
-    COALESCE(
-        CASE
-            WHEN map_eth.target_vocabulary_id = 'Ethnicity'
-                THEN map_eth.source_concept_id
-            ELSE NULL
-        END, 0)                     AS ethnicity_source_concept_id,
-    -- 
+    rc.race_first                   AS race_source_value,
+    map_rc.source_concept_id        AS race_source_concept_id,
+    CAST(NULL AS STRING)            AS ethnicity_source_value,
+    CAST(NULL AS INT64)             AS ethnicity_source_concept_id,
+    --
     'person.patients'               AS unit_id,
     p.load_table_id                 AS load_table_id,
     p.load_row_id                   AS load_row_id,
@@ -161,11 +137,11 @@ SELECT
 FROM 
     @etl_project.@etl_dataset.src_patients p
 LEFT JOIN 
-    @etl_project.@etl_dataset.tmp_subject_ethnicity eth 
-        ON  p.subject_id = eth.subject_id
+    @etl_project.@etl_dataset.tmp_subject_race rc
+        ON  p.subject_id = rc.subject_id
 LEFT JOIN
-    @etl_project.@etl_dataset.lk_pat_ethnicity_concept map_eth
-        ON  eth.ethnicity_first = map_eth.source_code
+    @etl_project.@etl_dataset.lk_pat_race_concept map_rc
+        ON  rc.race_first = map_rc.source_code
 ;
 
 
@@ -173,4 +149,4 @@ LEFT JOIN
 -- cleanup
 -- -------------------------------------------------------------------
 
-DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_subject_ethnicity;
+DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_subject_race;
