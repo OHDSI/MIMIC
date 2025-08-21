@@ -7,6 +7,7 @@ import sys
 import getopt
 import json
 import datetime
+import subprocess
 
 # ----------------------------------------------------
 # default config values
@@ -233,7 +234,7 @@ def main():
             print('No such file or directory: {file}\n'.format(file=s_filename))
 
     else:
-        bq_command = "bq query --use_legacy_sql=false \"{query}\""
+        bq_base_cmd = ["bq", "query", "--use_legacy_sql=false"]
         s_done = []
         s_done.append(nice_message('start...', 0, ''))
 
@@ -247,13 +248,19 @@ def main():
             query_no = 0
             for s_query in s_queries:
 
-                bqc = bq_command.format(
-                    query=troubleshooting_bqc_format(format_query(s_query, config))
-                )
+                formatted_query = troubleshooting_bqc_format(format_query(s_query, config))
+                cmd = bq_base_cmd + [formatted_query]
                 query_no += 1
                 print('Starting query...')
-
-                rc = os.system(bqc)
+                try:
+                    completed = subprocess.run(cmd, capture_output=True, text=True)
+                    rc = completed.returncode
+                    if rc != 0:
+                        print('bq stdout:\n' + completed.stdout)
+                        print('bq stderr:\n' + completed.stderr)
+                except FileNotFoundError:
+                    rc = 127
+                    print('Error: bq CLI not found in PATH')
 
                 if rc != 0:
                     break
