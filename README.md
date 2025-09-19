@@ -52,6 +52,7 @@ python vocabulary_refresh.py -s20
 python vocabulary_refresh.py -s30
 cd ../
 python scripts/wf_read.py -e conf/<env>.etlconf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_setup.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ddl.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_staging.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_etl.conf

@@ -23,12 +23,25 @@
         "@atlas_project": "lcp-internal",
         "@atlas_dataset": "mimiciv_chorus_year1_update_atlas",
 
-        "@waveforms_csv_path":  ""
+        "@waveforms_csv_path":  "gs://bucket...",
 
+        "@obf_c": "2654435761",            
+        "@obf_o": "1013904223",            
+        "@obf_function_name": "obf_id",    
+        "@obf_enable": "true",             
+        "@obf_comment": "Deterministic 32-bit permutation: (x * @obf_c + @obf_o) mod 2^32; C odd, O any."
     },
 
     "workflows":
     [
+        
+        {
+            "workflow": "setup",
+            "comment": "setup code needed to run the etl",
+            "type": "sql",
+            "conf": "workflow_setup.conf"
+        },
+
         {
             "workflow": "ddl",
             "comment": "use the same dataset templates as in etl section",
