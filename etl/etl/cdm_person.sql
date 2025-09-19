@@ -95,7 +95,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_person
 
 INSERT INTO @etl_project.@etl_dataset.cdm_person
 SELECT
-    FARM_FINGERPRINT(CAST(p.subject_id AS STRING)) AS person_id,
+    `@etl_project.@etl_dataset`.obf_id(p.subject_id) AS person_id,
     CASE 
         WHEN p.gender = 'F' THEN 8532 -- FEMALE
         WHEN p.gender = 'M' THEN 8507 -- MALE
