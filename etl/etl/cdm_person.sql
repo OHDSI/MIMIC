@@ -118,7 +118,7 @@ SELECT
             WHEN map_rc.domain_id = 'Ethnicity' THEN map_rc.target_concept_id
             WHEN map_rc.domain_id = 'Race' AND map_rc.source_code LIKE '%HISPANIC/LATINO%' THEN 38003563
             ELSE NULL
-        END, 38003564)              AS ethnicity_concept_id,
+        END, 0)                     AS ethnicity_concept_id,
     CAST(NULL AS INT64)             AS location_id,
     CAST(NULL AS INT64)             AS provider_id,
     CAST(NULL AS INT64)             AS care_site_id,
