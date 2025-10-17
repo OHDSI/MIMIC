@@ -9,12 +9,6 @@
 -- Dependencies: run after st_core.sql
 -- -------------------------------------------------------------------
 
--- -------------------------------------------------------------------
--- Known issues / Open points:
---
--- negative unique id from FARM_FINGERPRINT()
---
--- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
 -- tmp_subject_race
@@ -125,10 +119,30 @@ SELECT
     CAST(p.subject_id AS STRING)    AS person_source_value,
     p.gender                        AS gender_source_value,
     0                               AS gender_source_concept_id,
-    rc.race_first                   AS race_source_value,
-    map_rc.source_concept_id        AS race_source_concept_id,
-    CAST(NULL AS STRING)            AS ethnicity_source_value,
-    CAST(NULL AS INT64)             AS ethnicity_source_concept_id,
+    COALESCE(
+        CASE
+            WHEN map_rc.domain_id = 'Race'
+                THEN map_rc.source_code
+            ELSE NULL
+    END, CAST(NULL AS STRING))      AS race_source_value,
+    COALESCE(
+        CASE
+            WHEN map_rc.domain_id = 'Race'
+                THEN map_rc.source_concept_id
+            ELSE NULL
+    END, 0)                         AS race_source_concept_id,
+    COALESCE(
+        CASE
+            WHEN map_rc.domain_id = 'Ethnicity' THEN map_rc.source_code
+            WHEN map_rc.domain_id = 'Race' AND map_rc.source_code LIKE '%HISPANIC/LATINO%' THEN map_rc.source_code
+            ELSE NULL
+        END, CAST(NULL AS STRING))  AS ethnicity_source_value,
+    COALESCE(
+    CASE
+        WHEN map_rc.domain_id = 'Ethnicity' THEN map_rc.source_concept_id
+        WHEN map_rc.domain_id = 'Race' AND map_rc.source_code LIKE '%HISPANIC/LATINO%' THEN map_rc.source_concept_id
+        ELSE NULL
+    END, 0)                         AS ethnicity_source_concept_id,
     --
     'person.patients'               AS unit_id,
     p.load_table_id                 AS load_table_id,
