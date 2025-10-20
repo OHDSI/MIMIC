@@ -126,7 +126,7 @@ SELECT
     CASE
         WHEN map_eth.source_code LIKE '%HISPANIC/LATINO%' OR map_eth.source_code LIKE '%HISPANIC OR LATINO%'
             THEN 38003563
-        ELSE 38003564
+        ELSE 0
     END                             AS ethnicity_concept_id,
     CAST(NULL AS INT64)             AS location_id,
     CAST(NULL AS INT64)             AS provider_id,
