@@ -135,7 +135,7 @@ INNER JOIN
     @etl_project.@etl_dataset.src_patients pat
         ON  pat.subject_id = src.subject_id
 WHERE
-    EXTRACT(YEAR FROM src.value) >= pat.anchor_year
+    EXTRACT(YEAR FROM src.value) >= pat.anchor_year - pat.anchor_year
 ;
 
 
