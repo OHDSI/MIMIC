@@ -51,6 +51,8 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_measurement
     measurement_source_concept_id INT64              ,
     unit_source_value             STRING             ,
     value_source_value            STRING             ,
+    measurement_event_id          INT64              ,
+    meas_event_field_concept_id   INT64              ,
     -- 
     unit_id                       STRING,
     load_table_id                 STRING,
@@ -87,6 +89,8 @@ SELECT
     src.source_concept_id                   AS measurement_source_concept_id,
     src.unit_source_value                   AS unit_source_value,
     src.value_source_value                  AS value_source_value,
+    CAST(NULL AS INT64)                     AS measurement_event_id,
+    CAST(NULL AS INT64)                     AS meas_event_field_concept_id,
     --
     CONCAT('measurement.', src.unit_id)     AS unit_id,
     src.load_table_id               AS load_table_id,

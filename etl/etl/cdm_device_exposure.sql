@@ -36,12 +36,16 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_device_exposure
     device_exposure_end_datetime    DATETIME             ,
     device_type_concept_id          INT64       not null ,
     unique_device_id                STRING               ,
+    production_id                   STRING               ,
     quantity                        INT64                ,
     provider_id                     INT64                ,
     visit_occurrence_id             INT64                ,
     visit_detail_id                 INT64                ,
     device_source_value             STRING               ,
     device_source_concept_id        INT64                ,
+    unit_concept_id                 INT64                ,
+    unit_source_value               STRING               ,
+    unit_source_concept_id          INT64                ,
     -- 
     unit_id                       STRING,
     load_table_id                 STRING,
@@ -62,6 +66,7 @@ SELECT
     src.end_datetime                            AS device_exposure_end_datetime,
     src.type_concept_id                         AS device_type_concept_id,
     CAST(NULL AS STRING)                        AS unique_device_id,
+    CAST(NULL AS STRING)                        AS production_id,
     CAST(
         IF(ROUND(src.quantity) = src.quantity, src.quantity, NULL)
         AS INT64)                               AS quantity,
@@ -70,6 +75,9 @@ SELECT
     CAST(NULL AS INT64)                         AS visit_detail_id,
     src.source_code                             AS device_source_value,
     src.source_concept_id                       AS device_source_concept_id,
+    CAST(NULL AS INT64)                         AS unit_concept_id,
+    CAST(NULL AS STRING)                        AS unit_source_value,
+    CAST(NULL AS INT64)                         AS unit_source_concept_id
     -- 
     CONCAT('device.', src.unit_id)  AS unit_id,
     src.load_table_id               AS load_table_id,
