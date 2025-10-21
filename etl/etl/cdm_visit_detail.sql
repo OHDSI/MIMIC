@@ -41,14 +41,14 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_detail
     visit_detail_type_concept_id       INT64     not null , -- detail! -- this typo still exists in v.5.3.1(???)
     provider_id                        INT64              ,
     care_site_id                       INT64              ,
-    admitting_source_concept_id        INT64              ,
-    discharge_to_concept_id            INT64              ,
+    admitted_from_concept_id           INT64              ,
+    discharged_to_concept_id           INT64              ,
     preceding_visit_detail_id          INT64              ,
     visit_detail_source_value          STRING             ,
     visit_detail_source_concept_id     INT64              , -- detail! -- this typo still exists in v.5.3.1(???)
-    admitting_source_value             STRING             ,
-    discharge_to_source_value          STRING             ,
-    visit_detail_parent_id             INT64              ,
+    admitted_from_source_value         STRING             ,
+    discharged_to_source_value         STRING             ,
+    parent_visit_detail_id             INT64              ,
     visit_occurrence_id                INT64     not null ,
     -- 
     unit_id                       STRING,
@@ -83,18 +83,18 @@ SELECT
     IF(
         src.admission_location IS NOT NULL,
         COALESCE(la.target_concept_id, 0),
-        NULL)                               AS admitting_source_concept_id,
+        NULL)                               AS admitted_from_concept_id,
     IF(
         src.discharge_location IS NOT NULL,
         COALESCE(ld.target_concept_id, 0),
-        NULL)                               AS discharge_to_concept_id,
+        NULL)                               AS discharged_to_concept_id,
 
     src.preceding_visit_detail_id           AS preceding_visit_detail_id,
     src.source_value                        AS visit_detail_source_value,
     COALESCE(vdc.source_concept_id, 0)      AS visit_detail_source_concept_id,
-    src.admission_location                  AS admitting_source_value,
-    src.discharge_location                  AS discharge_to_source_value,
-    CAST(NULL AS INT64)                     AS visit_detail_parent_id,
+    src.admission_location                  AS admitted_from_source_value,
+    src.discharge_location                  AS discharged_to_source_value,
+    CAST(NULL AS INT64)                     AS parent_visit_detail_id,
     vis.visit_occurrence_id                 AS visit_occurrence_id,
     -- 
     CONCAT('visit_detail.', src.unit_id)    AS unit_id,
