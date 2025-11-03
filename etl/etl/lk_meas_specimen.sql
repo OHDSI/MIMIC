@@ -279,7 +279,7 @@ LEFT JOIN
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_organism_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
+    obf_id_str(src.trace_id, 64)               AS measurement_id,
     src.subject_id                              AS subject_id,
     COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
     CAST(src.start_datetime AS DATE)            AS date_id,
@@ -328,7 +328,7 @@ LEFT JOIN
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_ab_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
+    obf_id_str(src.trace_id, 64)                AS measurement_id,
     src.subject_id                              AS subject_id,
     COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
     CAST(src.start_datetime AS DATE)            AS date_id,

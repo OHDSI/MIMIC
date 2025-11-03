@@ -286,7 +286,11 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_era
 -- -------------------------------------------------------------------
 INSERT INTO @etl_project.@etl_dataset.cdm_drug_era
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())                                   AS drug_era_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        CAST(person_id AS STRING), '|',
+        CAST(ingredient_concept_id AS STRING), '|',
+        CAST(drug_era_end_date AS STRING)
+    ), 32)                                                              AS drug_era_id,
     person_id                                                           AS person_id,
     ingredient_concept_id                                               AS drug_concept_id,
     MIN (drug_sub_exposure_start_date)                                  AS drug_era_start_date,

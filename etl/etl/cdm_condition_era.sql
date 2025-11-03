@@ -145,7 +145,11 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_era
 -- -------------------------------------------------------------------
 INSERT INTO @etl_project.@etl_dataset.cdm_condition_era
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS condition_era_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        CAST(person_id AS STRING), '|',
+        CAST(condition_concept_id AS STRING), '|', 
+        CAST(era_end_date AS STRING)
+    ), 32)                                          AS condition_era_id,
     person_id                                       AS person_id,
     condition_concept_id                            AS condition_concept_id,
     MIN(condition_start_date)                       AS condition_era_start_date,

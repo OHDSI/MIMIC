@@ -91,9 +91,22 @@ FROM
     @etl_project.@etl_dataset.lk_meas_ab_mapped src
 WHERE
     src.hadm_id IS NULL
-;
+UNION ALL
 -- waveforms
-
+SELECT
+    src.subject_id                                  AS subject_id,
+    CAST(src.start_datetime AS DATE)                AS date_id,
+    src.start_datetime                              AS start_datetime,
+    -- 
+    src.unit_id                     AS unit_id,
+    src.load_table_id               AS load_table_id,
+    src.load_row_id                 AS load_row_id,
+    src.trace_id                    AS trace_id
+FROM
+    @etl_project.@etl_dataset.lk_meas_waveform_mapped src
+WHERE
+    src.hadm_id IS NULL
+;
 
 -- -------------------------------------------------------------------
 -- lk_visit_no_hadm_dist
@@ -131,46 +144,72 @@ GROUP BY
 --      lk_meas_waveform_mapped
 -- -------------------------------------------------------------------
 
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_detail_waveform_dist AS
+SELECT
+    src.subject_id                                  AS subject_id,
+    src.hadm_id                                     AS hadm_id,
+    CAST(MIN(src.start_datetime) AS DATE)           AS date_id,
+    MIN(src.start_datetime)                         AS start_datetime,
+    MAX(src.start_datetime)                         AS end_datetime,
+    'AMBULATORY OBSERVATION'                        AS current_location, -- outpatient visit
+    src.reference_id                                AS reference_id,
+    -- 
+    'waveforms'                     AS unit_id,
+    'lk_meas_waveform_mapped'       AS load_table_id,
+    0                               AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        src.subject_id AS subject_id,
+        src.hadm_id AS hadm_id,
+        src.reference_id AS reference_id
+    ))                                  AS trace_id
+FROM
+    @etl_project.@etl_dataset.lk_meas_waveform_mapped src
+GROUP BY
+    src.subject_id,
+    src.hadm_id,
+    src.reference_id
+;
+
 -- -------------------------------------------------------------------
 -- lk_visit_clean
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_clean AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS visit_occurrence_id,
-    src.subject_id                                  AS subject_id,
-    src.hadm_id                                     AS hadm_id,
-    CAST(NULL AS DATE)                              AS date_id,
-    src.start_datetime                              AS start_datetime,
-    src.end_datetime                                AS end_datetime,
-    src.admission_type                              AS admission_type, -- current location
-    src.admission_location                          AS admission_location, -- to hospital
-    src.discharge_location                          AS discharge_location, -- from hospital
-    CAST(src.hadm_id AS STRING)                     AS source_value,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS visit_occurrence_id,
+    src.subject_id                                              AS subject_id,
+    src.hadm_id                                                 AS hadm_id,
+    CAST(NULL AS DATE)                                          AS date_id,
+    src.start_datetime                                          AS start_datetime,
+    src.end_datetime                                            AS end_datetime,
+    src.admission_type                                          AS admission_type, -- current location
+    src.admission_location                                      AS admission_location, -- to hospital
+    src.discharge_location                                      AS discharge_location, -- from hospital
+    CAST(src.hadm_id AS STRING)                                 AS source_value,
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_admissions_clean src -- adm
 UNION ALL
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS visit_occurrence_id,
-    src.subject_id                                  AS subject_id,
-    CAST(NULL AS INT64)                             AS hadm_id,
-    src.date_id                                     AS date_id,
-    src.start_datetime                              AS start_datetime,
-    src.end_datetime                                AS end_datetime,
-    src.admission_type                              AS admission_type, -- current location
-    src.admission_location                          AS admission_location, -- to hospital
-    src.discharge_location                          AS discharge_location, -- from hospital
-    CAST(NULL AS STRING)                            AS source_value,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS visit_occurrence_id,
+    src.subject_id                                              AS subject_id,
+    CAST(NULL AS INT64)                                         AS hadm_id,
+    src.date_id                                                 AS date_id,
+    src.start_datetime                                          AS start_datetime,
+    src.end_datetime                                            AS end_datetime,
+    src.admission_type                                          AS admission_type, -- current location
+    src.admission_location                                      AS admission_location, -- to hospital
+    src.discharge_location                                      AS discharge_location, -- from hospital
+    CAST(NULL AS STRING)                                        AS source_value,
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_visit_no_hadm_dist src -- adm
 ;
@@ -184,19 +223,19 @@ FROM
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_visit_detail_clean AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
-    src.subject_id                                  AS subject_id,
-    src.hadm_id                                     AS hadm_id,
-    src.date_id                                     AS date_id,
-    src.start_datetime                              AS start_datetime,
-    src.end_datetime                                AS end_datetime,  -- if null, populate with next start_datetime
-    CAST(src.hadm_id AS STRING)                     AS source_value,
-    src.current_location                            AS current_location, -- find prev and next for adm and disch location
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS visit_detail_id,
+    src.subject_id                                              AS subject_id,
+    src.hadm_id                                                 AS hadm_id,
+    src.date_id                                                 AS date_id,
+    src.start_datetime                                          AS start_datetime,
+    src.end_datetime                                            AS end_datetime,  -- if null, populate with next start_datetime
+    CAST(src.hadm_id AS STRING)                                 AS source_value,
+    src.current_location                                        AS current_location, -- find prev and next for adm and disch location
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM 
     @etl_project.@etl_dataset.lk_transfers_clean src
 WHERE
@@ -211,19 +250,19 @@ WHERE
 -- -------------------------------------------------------------------
 INSERT INTO @etl_project.@etl_dataset.lk_visit_detail_clean
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
-    src.subject_id                                  AS subject_id,
-    src.hadm_id                                     AS hadm_id,
-    CAST(src.start_datetime AS DATE)                AS date_id,
-    src.start_datetime                              AS start_datetime,
-    CAST(NULL AS DATETIME)                          AS end_datetime,  -- if null, populate with next start_datetime
-    CAST(src.hadm_id AS STRING)                     AS source_value,
-    src.admission_type                              AS current_location, -- find prev and next for adm and disch location
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS visit_detail_id,
+    src.subject_id                                              AS subject_id,
+    src.hadm_id                                                 AS hadm_id,
+    CAST(src.start_datetime AS DATE)                            AS date_id,
+    src.start_datetime                                          AS start_datetime,
+    CAST(NULL AS DATETIME)                                      AS end_datetime,  -- if null, populate with next start_datetime
+    CAST(src.hadm_id AS STRING)                                 AS source_value,
+    src.admission_type                                          AS current_location, -- find prev and next for adm and disch location
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM 
     @etl_project.@etl_dataset.lk_admissions_clean src
 WHERE
@@ -238,23 +277,48 @@ WHERE
 -- -------------------------------------------------------------------
 INSERT INTO @etl_project.@etl_dataset.lk_visit_detail_clean
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())               AS visit_detail_id,
-    src.subject_id                                  AS subject_id,
-    src.hadm_id                                     AS hadm_id,
-    CAST(src.start_datetime AS DATE)                AS date_id,
-    src.start_datetime                              AS start_datetime,
-    src.end_datetime                                AS end_datetime,
-    CAST(src.hadm_id AS STRING)                     AS source_value,
-    src.curr_service                                AS current_location,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS visit_detail_id,
+    src.subject_id                                              AS subject_id,
+    src.hadm_id                                                 AS hadm_id,
+    CAST(src.start_datetime AS DATE)                            AS date_id,
+    src.start_datetime                                          AS start_datetime,
+    src.end_datetime                                            AS end_datetime,
+    CAST(src.hadm_id AS STRING)                                 AS source_value,
+    src.curr_service                                            AS current_location,
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM 
     @etl_project.@etl_dataset.lk_services_clean src
 WHERE
     src.prev_service = src.lag_service -- ensure that the services sequence is still consistent after removing duplicates
+;
+
+-- -------------------------------------------------------------------
+-- lk_visit_detail_clean
+--
+-- Rule 4.
+-- waveforms
+-- -------------------------------------------------------------------
+INSERT INTO @etl_project.@etl_dataset.lk_visit_detail_clean
+SELECT
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS visit_detail_id,
+    src.subject_id                                              AS subject_id,
+    src.hadm_id                                                 AS hadm_id,
+    src.date_id                                                 AS date_id,
+    src.start_datetime                                          AS start_datetime,
+    src.end_datetime                                            AS end_datetime,  -- if null, populate with next start_datetime
+    CAST(src.hadm_id AS STRING)                                 AS source_value,
+    src.current_location                                        AS current_location, -- find prev and next for adm and disch location
+    -- 
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
+FROM 
+    @etl_project.@etl_dataset.lk_visit_detail_waveform_dist src
 ;
 
 -- -------------------------------------------------------------------
