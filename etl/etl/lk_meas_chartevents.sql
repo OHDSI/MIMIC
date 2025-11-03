@@ -155,7 +155,7 @@ DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_chartevents_code_dist;
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_chartevents_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
+    obf_id_str(src.trace_id, 64)                AS measurement_id,
     src.subject_id                              AS subject_id,
     src.hadm_id                                 AS hadm_id,
     src.stay_id                                 AS stay_id,

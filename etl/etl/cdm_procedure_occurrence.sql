@@ -58,7 +58,10 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_procedure_occurrence
 
 INSERT INTO @etl_project.@etl_dataset.cdm_procedure_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS procedure_occurrence_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        src.trace_id, '|', 
+        COALESCE(src.source_code, '')
+    ), 32)                                      AS procedure_occurrence_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS procedure_concept_id,
     CAST(src.start_datetime AS DATE)            AS procedure_date,
@@ -99,7 +102,10 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_procedure_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS procedure_occurrence_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        src.trace_id, '|', 
+        COALESCE(src.source_code, '')
+    ), 32)                                      AS procedure_occurrence_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS procedure_concept_id,
     CAST(src.start_datetime AS DATE)            AS procedure_date,
@@ -138,7 +144,7 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_procedure_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS procedure_occurrence_id,
+    src.specimen_id                             AS procedure_occurrence_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS procedure_concept_id,
     CAST(src.start_datetime AS DATE)            AS procedure_date,
@@ -154,9 +160,9 @@ SELECT
     CAST(NULL AS STRING)                        AS modifier_source_value,
     -- 
     CONCAT('procedure.', src.unit_id)           AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.load_table_id                           AS load_table_id,
+    src.load_row_id                             AS load_row_id,
+    src.trace_id                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_specimen_mapped src
 INNER JOIN
@@ -179,25 +185,25 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_procedure_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS procedure_occurrence_id,
-    per.person_id                               AS person_id,
-    src.target_concept_id                       AS procedure_concept_id,
-    CAST(src.start_datetime AS DATE)            AS procedure_date,
-    src.start_datetime                          AS procedure_datetime,
-    src.type_concept_id                         AS procedure_type_concept_id,
-    0                                           AS modifier_concept_id,
-    CAST(NULL AS INT64)                         AS quantity,
-    CAST(NULL AS INT64)                         AS provider_id,
-    vis.visit_occurrence_id                     AS visit_occurrence_id,
-    CAST(NULL AS INT64)                         AS visit_detail_id,
-    src.source_code                             AS procedure_source_value,
-    src.source_concept_id                       AS procedure_source_concept_id,
-    CAST(NULL AS STRING)                        AS modifier_source_value,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS procedure_occurrence_id,
+    per.person_id                                               AS person_id,
+    src.target_concept_id                                       AS procedure_concept_id,
+    CAST(src.start_datetime AS DATE)                            AS procedure_date,
+    src.start_datetime                                          AS procedure_datetime,
+    src.type_concept_id                                         AS procedure_type_concept_id,
+    0                                                           AS modifier_concept_id,
+    CAST(NULL AS INT64)                                         AS quantity,
+    CAST(NULL AS INT64)                                         AS provider_id,
+    vis.visit_occurrence_id                                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                                         AS visit_detail_id,
+    src.source_code                                             AS procedure_source_value,
+    src.source_concept_id                                       AS procedure_source_concept_id,
+    CAST(NULL AS STRING)                                        AS modifier_source_value,
     -- 
-    CONCAT('procedure.', src.unit_id)           AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    CONCAT('procedure.', src.unit_id)                           AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_chartevents_mapped src
 INNER JOIN
