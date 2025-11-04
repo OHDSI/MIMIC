@@ -247,7 +247,6 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_observation
 SELECT
-    CAST(NULL AS STRING)                        AS observation_id,
     src.specimen_id                             AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
