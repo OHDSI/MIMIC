@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate lookups for cdm_observation table
+-- Populate lookups for observation table
 -- 
 -- Dependencies: run after 
 --      st_core.sql,

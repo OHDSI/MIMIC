@@ -3,10 +3,10 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate cdm_specimen table
+-- Populate specimen table
 -- 
 -- Dependencies: run after 
---      cdm_person.sql,
+--      person.sql,
 --      lk_meas_specimen.sql
 --      
 -- -------------------------------------------------------------------
@@ -23,11 +23,11 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- cdm_specimen
+-- specimen
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_specimen
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.specimen
 (
     specimen_id                 INT64     not null ,
     person_id                   INT64     not null ,
@@ -53,7 +53,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_specimen
 ;
 
 
-INSERT INTO @etl_project.@etl_dataset.cdm_specimen
+INSERT INTO @etl_project.@etl_dataset.specimen
 SELECT
     src.specimen_id                             AS specimen_id,
     per.person_id                               AS person_id,
@@ -78,7 +78,7 @@ SELECT
 FROM
     @etl_project.@etl_dataset.lk_specimen_mapped src
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 WHERE
     src.target_domain_id = 'Specimen'

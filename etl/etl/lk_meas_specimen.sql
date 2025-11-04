@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate lookup tables for cdm_specimen and cdm_measurement tables
+-- Populate lookup tables for specimen and measurement tables
 -- 
 -- Dependencies: run after 
 --      st_hosp

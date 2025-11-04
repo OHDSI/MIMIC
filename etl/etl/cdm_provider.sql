@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_provider table
+-- Populate provider table
 -- 
 -- Dependencies: run after st_core.sql
 -- -------------------------------------------------------------------
@@ -13,7 +13,7 @@
 -- Known issues / Open points:
 --
 -- MIMIC IV does not contain table "caregivers" which was used in MIMIC III OMOP
--- Find replacement or leave cdm_provider empty
+-- Find replacement or leave provider empty
 -- -------------------------------------------------------------------
 
 -- MIMIC III code for reference:

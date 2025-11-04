@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_condition_era table
+-- Populate condition_era table
 -- "standard" script
 -- -------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ AS SELECT
     -- - to set condition_era_end_date to same condition_era_start_date
           -- or condition_era_start_date + INTERVAL '1 day', when condition_end_date IS NULL
 FROM
-    @etl_project.@etl_dataset.cdm_condition_occurrence co
+    @etl_project.@etl_dataset.condition_occurrence co
 WHERE
     co.condition_concept_id != 0
 ;
@@ -122,7 +122,7 @@ GROUP BY
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.condition_era
 (
     condition_era_id            INT64     not null ,
     person_id                   INT64     not null ,
@@ -143,7 +143,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_era
 -- a standardized algorithm.
 -- 30 days window is allowed.
 -- -------------------------------------------------------------------
-INSERT INTO @etl_project.@etl_dataset.cdm_condition_era
+INSERT INTO @etl_project.@etl_dataset.condition_era
 SELECT
     `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
         CAST(person_id AS STRING), '|',

@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate cdm_drug_exposure table
+-- Populate drug_exposure table
 -- 
 -- Dependencies: run after 
 --      st_core.sql

@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate lookups for cdm_visit_occurrence and cdm_visit_detail
+-- Populate lookups for visit_occurrence and visit_detail
 -- 
 -- Dependencies: run after 
 --      st_core.sql

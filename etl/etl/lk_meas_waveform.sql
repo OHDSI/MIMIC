@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate lookups for cdm_measurement table
+-- Populate lookups for measurement table
 -- Rule 10 waveforms
 -- Dependencies: run after 
 --      st_waveform_poc2.sql,

@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_care_site table
+-- Populate care_site table
 -- 
 -- Dependencies: run after st_core.sql
 -- on Demo: 
@@ -18,10 +18,10 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- cdm_location
+-- location
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_location
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.location
 (
     location_id           INT64     not null ,
     address_1             STRING             ,
@@ -43,7 +43,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_location
 )
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_location
+INSERT INTO @etl_project.@etl_dataset.location
 SELECT
     1                           AS location_id,
     CAST(NULL AS STRING)        AS address_1,

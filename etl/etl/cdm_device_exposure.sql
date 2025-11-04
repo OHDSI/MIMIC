@@ -3,13 +3,13 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate cdm_device_exposure table
+-- Populate device_exposure table
 -- 
 -- Dependencies: run after 
 --      lk_drug_prescriptions.sql
 --      lk_meas_chartevents.sql
---      cdm_person.sql
---      cdm_visit_occurrence.sql
+--      person.sql
+--      visit_occurrence.sql
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -20,12 +20,12 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- cdm_device_exposure
+-- device_exposure
 -- Rule 1 lk_drug_mapped
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_device_exposure
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.device_exposure
 (
     device_exposure_id              INT64       not null ,
     person_id                       INT64       not null ,
@@ -55,7 +55,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_device_exposure
 ;
 
 
-INSERT INTO @etl_project.@etl_dataset.cdm_device_exposure
+INSERT INTO @etl_project.@etl_dataset.device_exposure
 SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS device_exposure_id,
     per.person_id                                               AS person_id,
@@ -86,10 +86,10 @@ SELECT
 FROM
     @etl_project.@etl_dataset.lk_drug_mapped src
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE
@@ -97,7 +97,7 @@ WHERE
 ;
 
 
-INSERT INTO @etl_project.@etl_dataset.cdm_device_exposure
+INSERT INTO @etl_project.@etl_dataset.device_exposure
 SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS device_exposure_id,
     per.person_id                                               AS person_id,
@@ -124,10 +124,10 @@ SELECT
 FROM
     @etl_project.@etl_dataset.lk_chartevents_mapped src
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
 WHERE

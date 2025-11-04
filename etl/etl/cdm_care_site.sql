@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_care_site table
+-- Populate care_site table
 -- 
 -- Dependencies: run after st_core.sql
 -- on Demo: 
@@ -43,10 +43,10 @@ GROUP BY
 
 
 -- -------------------------------------------------------------------
--- cdm_care_site
+-- care_site
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_care_site
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.care_site
 (
     care_site_id                  INT64       not null ,
     care_site_name                STRING               ,
@@ -62,7 +62,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_care_site
 )
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_care_site
+INSERT INTO @etl_project.@etl_dataset.care_site
 SELECT
     FARM_FINGERPRINT(GENERATE_UUID())   AS care_site_id,
     src.source_code                     AS care_site_name,

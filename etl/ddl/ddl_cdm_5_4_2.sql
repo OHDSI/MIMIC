@@ -6,7 +6,7 @@
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_person
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.person
 (
   person_id                   INT64     not null ,
   gender_concept_id           INT64     not null ,
@@ -31,7 +31,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_person
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation_period
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.observation_period
 (
   observation_period_id             INT64   not null ,
   person_id                         INT64   not null ,
@@ -43,7 +43,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation_period
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_occurrence
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.visit_occurrence
 (
   visit_occurrence_id           INT64     not null ,
   person_id                     INT64     not null ,
@@ -67,7 +67,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_occurrence
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_detail
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.visit_detail
 (
   visit_detail_id                    INT64     not null ,
   person_id                          INT64     not null ,
@@ -93,7 +93,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_detail
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_occurrence
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.condition_occurrence
 (
   condition_occurrence_id       INT64     not null ,
   person_id                     INT64     not null ,
@@ -116,7 +116,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_occurrence
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_exposure
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.drug_exposure
 (
   drug_exposure_id              INT64       not null ,
   person_id                     INT64       not null ,
@@ -146,7 +146,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_exposure
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_procedure_occurrence
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.procedure_occurrence
 (
   procedure_occurrence_id     INT64     not null ,
   person_id                   INT64     not null ,
@@ -169,7 +169,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_procedure_occurrence
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_device_exposure
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.device_exposure
 (
   device_exposure_id              INT64       not null ,
   person_id                       INT64       not null ,
@@ -195,7 +195,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_device_exposure
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_measurement
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.measurement
 (
   measurement_id                INT64     not null ,
   person_id                     INT64     not null ,
@@ -225,7 +225,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_measurement
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.observation
 (
   observation_id                INT64     not null ,
   person_id                     INT64     not null ,
@@ -253,7 +253,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_death
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.death
 (
   person_id               INT64     not null ,
   death_date              DATE      not null ,
@@ -267,7 +267,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_death
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_note
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.note
 (
   note_id                     INT64       not null ,
   person_id                   INT64       not null ,
@@ -289,7 +289,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_note
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_note_nlp
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.note_nlp
 (
   note_nlp_id                 INT64                ,
   note_id                     INT64                ,
@@ -310,7 +310,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_note_nlp
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_specimen
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.specimen
 (
   specimen_id                 INT64     not null ,
   person_id                   INT64     not null ,
@@ -331,7 +331,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_specimen
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_fact_relationship
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.fact_relationship
 (
   domain_concept_id_1     INT64     not null ,
   fact_id_1               INT64     not null ,
@@ -342,7 +342,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_fact_relationship
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_location
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.location
 (
   location_id           INT64     not null ,
   address_1             STRING             ,
@@ -360,7 +360,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_location
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_care_site
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.care_site
 (
   care_site_id                  INT64       not null ,
   care_site_name                STRING               ,
@@ -372,7 +372,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_care_site
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_provider
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.provider
 (
   provider_id                 INT64       not null ,
   provider_name               STRING               ,
@@ -392,7 +392,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_provider
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_payer_plan_period
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.payer_plan_period
 (
   payer_plan_period_id          INT64     not null ,
   person_id                     INT64     not null ,
@@ -415,7 +415,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_payer_plan_period
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cost
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cost
 (
   cost_id                   INT64     not null ,
   cost_event_id             INT64     not null ,
@@ -444,7 +444,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cost
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.drug_era
 (
   drug_era_id         INT64     not null ,
   person_id           INT64     not null ,
@@ -458,7 +458,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_era
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_dose_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.dose_era
 (
   dose_era_id           INT64     not null ,
   person_id             INT64     not null ,
@@ -472,7 +472,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_dose_era
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.condition_era
 (
   condition_era_id            INT64     not null ,
   person_id                   INT64     not null ,
@@ -485,7 +485,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_era
 
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_episode
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.episode
 (
   episode_id                INT64     not null ,
   person_id                 INT64     not null ,
@@ -504,7 +504,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_episode
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_episode_event
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.episode_event
 (
   episode_id                     INT64     not null ,
   event_id                       INT64     not null ,
@@ -513,7 +513,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_episode_event
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_metadata
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.metadata
 (
   metadata_id               INT64       not null ,
   metadata_concept_id       INT64       not null ,
@@ -528,18 +528,18 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_metadata
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cdm_source
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.source
 (
-  cdm_source_name                 STRING     not null ,
-  cdm_source_abbreviation         STRING     not null,
-  cdm_holder                      STRING     not null,
+  source_name                 STRING     not null ,
+  source_abbreviation         STRING     not null,
+  holder                      STRING     not null,
   source_description              STRING             ,
   source_documentation_reference  STRING             ,
-  cdm_etl_reference               STRING             ,
+  etl_reference               STRING             ,
   source_release_date             DATE       not null,
-  cdm_release_date                DATE       not null,
-  cdm_version                     STRING             ,
-  cdm_version_concept_id          INT64     not null ,
+  release_date                DATE       not null,
+  version                     STRING             ,
+  version_concept_id          INT64     not null ,
   vocabulary_version              STRING    not null
 )
 ;

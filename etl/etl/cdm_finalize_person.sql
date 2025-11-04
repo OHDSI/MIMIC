@@ -3,12 +3,12 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Remove patients from cdm_person which have no records in cdm_observation_period 
+-- Remove patients from person which have no records in observation_period
 -- (DQD requirement)
 -- 
 -- Dependencies: run after 
---      cdm_person
---      cdm_observation_period
+--      person
+--      observation_period
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -16,21 +16,21 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- cdm_person
+-- person
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.tmp_person AS
 SELECT per.*
 FROM 
-    @etl_project.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.person per
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_observation_period op
+    @etl_project.@etl_dataset.observation_period op
         ON  per.person_id = op.person_id
 ;
 
-TRUNCATE TABLE @etl_project.@etl_dataset.cdm_person;
+TRUNCATE TABLE @etl_project.@etl_dataset.person;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_person
+INSERT INTO @etl_project.@etl_dataset.person
 SELECT per.*
 FROM
     @etl_project.@etl_dataset.tmp_person per

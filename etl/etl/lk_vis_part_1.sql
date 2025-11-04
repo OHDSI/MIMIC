@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate first part of lookups for cdm_visit_occurrence and cdm_visit_detail
+-- Populate first part of lookups for visit_occurrence and visit_detail
 -- to use it for lk_meas_* tables and then vise versa
 -- 
 -- Dependencies: run after 

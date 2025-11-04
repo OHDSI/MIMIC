@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate lookups for cdm_procedure_occurrence table
+-- Populate lookups for procedure_occurrence table
 -- 
 -- Dependencies: run after 
 --      st_core.sql,

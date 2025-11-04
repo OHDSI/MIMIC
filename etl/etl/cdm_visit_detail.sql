@@ -4,15 +4,15 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_visit_detail table
+-- Populate visit_detail table
 -- 
 -- Dependencies: run after 
 --      st_core.sql,
 --      st_hosp.sql,
 --      st_waveform.sql,
 --      lk_vis_adm_transfers.sql,
---      cdm_person.sql,
---      cdm_visit_occurrence.sql
+--      person.sql,
+--      visit_occurrence.sql
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -25,11 +25,11 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- cdm_visit_detail
+-- visit_detail
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_detail
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.visit_detail
 (
     visit_detail_id                    INT64     not null ,
     person_id                          INT64     not null ,
@@ -66,7 +66,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_visit_detail
 
 
 
-INSERT INTO @etl_project.@etl_dataset.cdm_visit_detail
+INSERT INTO @etl_project.@etl_dataset.visit_detail
 SELECT
     src.visit_detail_id                     AS visit_detail_id,
     per.person_id                           AS person_id,
@@ -104,15 +104,15 @@ SELECT
 FROM
     @etl_project.@etl_dataset.lk_visit_detail_prev_next src
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_person per 
+    @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis 
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
 LEFT JOIN
-    @etl_project.@etl_dataset.cdm_care_site cs
+    @etl_project.@etl_dataset.care_site cs
         ON cs.care_site_source_value = src.current_location
 LEFT JOIN
     @etl_project.@etl_dataset.lk_visit_concept vdc

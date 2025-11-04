@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_person table
+-- Populate person table
 -- 
 -- Dependencies: run after st_core.sql
 -- on Demo: 12.4 sec
@@ -14,7 +14,7 @@
 -- Known issues / Open points:
 --
 -- TRUNCATE TABLE is not supported, organize "create or replace"
--- @etl_project.@etl_dataset.cdm_person;
+-- @etl_project.@etl_dataset.person;
 --
 -- negative unique id from FARM_FINGERPRINT(GENERATE_UUID())
 --
@@ -71,11 +71,11 @@ WHERE
 ;
 
 -- -------------------------------------------------------------------
--- cdm_person
+-- person
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_person
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.person
 (
     person_id                   INT64     not null ,
     gender_concept_id           INT64     not null ,
@@ -103,7 +103,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_person
 )
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_person
+INSERT INTO @etl_project.@etl_dataset.person
 SELECT
     `@etl_project.@etl_dataset`.obf_id(p.subject_id, 32)    AS person_id,
     CASE 

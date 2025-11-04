@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate lookup tables for cdm_measurement table
+-- Populate lookup tables for measurement table
 --      lk_meas_operator_concept
 --      lk_meas_unit_concept
 -- 

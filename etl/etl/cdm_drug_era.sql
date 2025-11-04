@@ -4,7 +4,7 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_drug_era table
+-- Populate drug_era table
 -- "standard" script
 -- -------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ AS SELECT
     d.days_supply               AS days_supply,
     d.drug_exposure_end_date    AS drug_exposure_end_date
 FROM
-    @etl_project.@etl_dataset.cdm_drug_exposure d
+    @etl_project.@etl_dataset.drug_exposure d
 JOIN
     @etl_project.@etl_dataset.lk_join_voc_drug v
         ON v.descendant_concept_id = d.drug_concept_id
@@ -265,7 +265,7 @@ GROUP BY
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.drug_era
 (
     drug_era_id         INT64     not null ,
     person_id           INT64     not null ,
@@ -284,7 +284,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_era
 -- -------------------------------------------------------------------
 -- @summary: 30 days window is allowed
 -- -------------------------------------------------------------------
-INSERT INTO @etl_project.@etl_dataset.cdm_drug_era
+INSERT INTO @etl_project.@etl_dataset.drug_era
 SELECT
     `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
         CAST(person_id AS STRING), '|',

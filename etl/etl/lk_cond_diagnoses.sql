@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate cdm_condition_occurrence table
+-- Populate condition_occurrence table
 -- 
 -- Dependencies: run after 
 --      st_core.sql,

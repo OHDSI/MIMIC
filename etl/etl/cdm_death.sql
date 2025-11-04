@@ -4,11 +4,11 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_death table
+-- Populate death table
 -- 
 -- Dependencies: run after 
 --      st_core.sql,
---      cdm_person.sql
+--      person.sql
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -46,11 +46,11 @@ WHERE
 ;
 
 -- -------------------------------------------------------------------
--- cdm_death
+-- death
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_death
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.death
 (
     person_id               INT64     not null ,
     death_date              DATE      not null ,
@@ -67,7 +67,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_death
 )
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_death
+INSERT INTO @etl_project.@etl_dataset.death
 SELECT
     per.person_id       AS person_id,
     CAST(IF(
@@ -90,6 +90,6 @@ SELECT
 FROM
     @etl_project.@etl_dataset.lk_death_adm_mapped src
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_person per
+    @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 ;

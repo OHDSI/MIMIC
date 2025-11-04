@@ -111,7 +111,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.voc_drug_strength (
 ;
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cohort
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cohort
 (
   cohort_definition_id  INT64     not null ,
   subject_id            INT64     not null ,

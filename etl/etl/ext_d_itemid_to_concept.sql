@@ -220,19 +220,19 @@ ORDER BY
 --     d_source_concept sc
 --         ON sc.itemid = src.itemid
 -- LEFT JOIN
---     `odysseus-mimic-dev`.mimiciv_full_current_cdm_531.concept vc
+--     `odysseus-mimic-dev`.mimiciv_full_current_531.concept vc
 --         ON  sc.source_concept_id = vc.concept_id
 -- LEFT JOIN
---     `odysseus-mimic-dev`.mimiciv_full_current_cdm_531.concept_relationship vcr
+--     `odysseus-mimic-dev`.mimiciv_full_current_531.concept_relationship vcr
 --         ON  vc.concept_id = vcr.concept_id_1
 --         AND vcr.relationship_id = 'Maps to'
 -- LEFT JOIN
---     `odysseus-mimic-dev`.mimiciv_full_current_cdm_531.concept vc2
+--     `odysseus-mimic-dev`.mimiciv_full_current_531.concept vc2
 --         ON vc2.concept_id = vcr.concept_id_2
 --         AND vc2.standard_concept = 'S'
 --         AND vc2.invalid_reason IS NULL
 -- LEFT JOIN
---     `odysseus-mimic-dev`.mimiciv_full_current_cdm_531.concept vc_unit
+--     `odysseus-mimic-dev`.mimiciv_full_current_531.concept vc_unit
 --         ON vc_unit.concept_id = cl.unit_concept_id
 --         AND vc_unit.standard_concept = 'S'
 --         AND vc_unit.invalid_reason IS NULL

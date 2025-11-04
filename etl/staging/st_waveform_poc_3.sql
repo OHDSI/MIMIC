@@ -48,7 +48,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_header_3
     trace_id                STRING
 );
 
--- parsed codes to be targeted to table cdm_measurement
+-- parsed codes to be targeted to table measurement
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_mx_3
 (

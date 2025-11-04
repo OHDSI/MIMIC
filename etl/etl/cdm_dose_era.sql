@@ -4,12 +4,12 @@
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
--- Populate cdm_dose_era table
+-- Populate dose_era table
 -- "standard" script
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_dose_era
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.dose_era
 (
     dose_era_id           INT64     not null ,
     person_id             INT64     not null ,
@@ -54,7 +54,7 @@ SELECT
     ds.denominator_value                    AS denominator_value,
     ds.denominator_unit_concept_id          AS denominator_unit_concept_id,
     c.concept_class_id                      AS concept_class_id
-FROM @etl_project.@etl_dataset.cdm_drug_exposure de
+FROM @etl_project.@etl_dataset.drug_exposure de
 INNER JOIN @etl_project.@etl_dataset.voc_drug_strength ds
     ON de.drug_concept_id = ds.drug_concept_id
 INNER JOIN @etl_project.@etl_dataset.voc_concept_ancestor ca
@@ -330,14 +330,14 @@ GROUP BY
 ;
 
 -- -------------------------------------------------------------------
--- Load Table: cdm_dose_era
+-- Load Table: dose_era
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
 -- final Dose Eras
 -- -------------------------------------------------------------------
 
-INSERT INTO @etl_project.@etl_dataset.cdm_dose_era
+INSERT INTO @etl_project.@etl_dataset.dose_era
 SELECT
     `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
         CAST(person_id AS STRING), '|',

@@ -3,12 +3,12 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate cdm_observation_period table
+-- Populate observation_period table
 -- 
 -- Dependencies: run after 
---      cdm_visit_occurrence
+--      visit_occurrence
 --      all event tables
---      cdm_death
+--      death
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -29,7 +29,7 @@ SELECT
     MAX(src.visit_end_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_visit_occurrence src
+    @etl_project.@etl_dataset.visit_occurrence src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -41,7 +41,7 @@ SELECT
     MAX(src.condition_end_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_condition_occurrence src
+    @etl_project.@etl_dataset.condition_occurrence src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -53,7 +53,7 @@ SELECT
     MAX(src.procedure_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_procedure_occurrence src
+    @etl_project.@etl_dataset.procedure_occurrence src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -65,7 +65,7 @@ SELECT
     MAX(src.drug_exposure_end_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_drug_exposure src
+    @etl_project.@etl_dataset.drug_exposure src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -77,7 +77,7 @@ SELECT
     MAX(src.device_exposure_end_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_device_exposure src
+    @etl_project.@etl_dataset.device_exposure src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -89,7 +89,7 @@ SELECT
     MAX(src.measurement_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_measurement src
+    @etl_project.@etl_dataset.measurement src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -101,7 +101,7 @@ SELECT
     MAX(src.specimen_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_specimen src
+    @etl_project.@etl_dataset.specimen src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -113,7 +113,7 @@ SELECT
     MAX(src.observation_date)     AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_observation src
+    @etl_project.@etl_dataset.observation src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -125,7 +125,7 @@ SELECT
     MAX(src.death_date)         AS end_date,
     src.unit_id                 AS unit_id
 FROM
-    @etl_project.@etl_dataset.cdm_death src
+    @etl_project.@etl_dataset.death src
 GROUP BY
     src.person_id, src.unit_id
 ;
@@ -148,11 +148,11 @@ GROUP BY
 ;
 
 -- -------------------------------------------------------------------
--- cdm_observation_period
+-- observation_period
 -- -------------------------------------------------------------------
 
 --HINT DISTRIBUTE_ON_KEY(person_id)
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation_period
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.observation_period
 (
     observation_period_id             INT64   not null ,
     person_id                         INT64   not null ,
@@ -167,7 +167,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation_period
 )
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_observation_period
+INSERT INTO @etl_project.@etl_dataset.observation_period
 SELECT
     `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
         CAST(src.person_id AS STRING), '|',

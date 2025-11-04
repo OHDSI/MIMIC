@@ -40,7 +40,7 @@
 
 -- If we derive observations like AFib and Tachycardia - we can further map these to the condition_occurrence table as [4064452] ECG: atrial fibrillation using the same reference time and source
 --
--- parsed codes targeted to clinical findings, target cdm table - cdm_condition_occurrence
+-- parsed codes targeted to clinical findings, target cdm table - condition_occurrence
 -- -------------------------------------------------------------------
 
 -- -------------------------------------------------------------------
@@ -100,7 +100,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_dx
     trace_id                STRING
 );
 
--- parsed codes to be targeted to table cdm_measurement
+-- parsed codes to be targeted to table measurement
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_waveform_mx
 (

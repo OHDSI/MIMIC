@@ -3,7 +3,7 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate lookup tables for cdm_measurement table
+-- Populate lookup tables for measurement table
 -- Rule 1
 -- Labs from labevents
 -- 

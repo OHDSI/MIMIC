@@ -3,14 +3,14 @@
 -- MIMIC IV CDM Conversion
 -- -------------------------------------------------------------------
 -- -------------------------------------------------------------------
--- Populate cdm_observation table
+-- Populate observation table
 -- 
 -- Dependencies: run after 
 --      lk_meas_specimen
 -- -------------------------------------------------------------------
 
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_fact_relationship
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.fact_relationship
 (
     domain_concept_id_1     INT64     not null ,
     fact_id_1               INT64     not null ,
@@ -26,7 +26,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_fact_relationship
 -- specimen to test-organism
 -- -------------------------------------------------------------------
 
-INSERT INTO @etl_project.@etl_dataset.cdm_fact_relationship
+INSERT INTO @etl_project.@etl_dataset.fact_relationship
 SELECT
     36                      AS domain_concept_id_1, -- Specimen
     spec.specimen_id        AS fact_id_1,
@@ -41,7 +41,7 @@ INNER JOIN
         ON org.trace_id_spec = spec.trace_id
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_fact_relationship
+INSERT INTO @etl_project.@etl_dataset.fact_relationship
 SELECT
     21                      AS domain_concept_id_1, -- Measurement
     org.measurement_id      AS fact_id_1,
@@ -60,7 +60,7 @@ INNER JOIN
 -- test-organism to antibiotic
 -- -------------------------------------------------------------------
 
-INSERT INTO @etl_project.@etl_dataset.cdm_fact_relationship
+INSERT INTO @etl_project.@etl_dataset.fact_relationship
 SELECT
     21                      AS domain_concept_id_1, -- Measurement
     org.measurement_id      AS fact_id_1,
@@ -75,7 +75,7 @@ INNER JOIN
         ON ab.trace_id_org = org.trace_id
 ;
 
-INSERT INTO @etl_project.@etl_dataset.cdm_fact_relationship
+INSERT INTO @etl_project.@etl_dataset.fact_relationship
 SELECT
     21                      AS domain_concept_id_1, -- Measurement
     ab.measurement_id       AS fact_id_1,
