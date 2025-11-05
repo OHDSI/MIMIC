@@ -20,7 +20,7 @@
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_procedureevents AS
 SELECT
-    hadm_id                             AS hadm_id,
+    p.hadm_id                             AS hadm_id,
     subject_id                          AS subject_id,
     stay_id                             AS stay_id,
     itemid                              AS itemid,
@@ -32,11 +32,13 @@ SELECT
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
         subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        p.hadm_id AS hadm_id,
         starttime AS starttime
     ))                                  AS trace_id
 FROM
-    @source_project.@icu_dataset.procedureevents
+    @source_project.@icu_dataset.procedureevents p
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include h
+ON p.hadm_id = h.hadm_id
 ;
 
 -- -------------------------------------------------------------------
@@ -72,7 +74,7 @@ FROM
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_datetimeevents AS
 SELECT
     subject_id  AS subject_id,
-    hadm_id     AS hadm_id,
+    d.hadm_id     AS hadm_id,
     stay_id     AS stay_id,
     itemid      AS itemid,
     charttime   AS charttime,
@@ -82,19 +84,21 @@ SELECT
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
         subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        d.hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
 FROM
-    @source_project.@icu_dataset.datetimeevents
+    @source_project.@icu_dataset.datetimeevents d
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include h
+ON d.hadm_id = h.hadm_id
 ;
 
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_chartevents AS
 SELECT
     subject_id  AS subject_id,
-    hadm_id     AS hadm_id,
+    c.hadm_id     AS hadm_id,
     stay_id     AS stay_id,
     itemid      AS itemid,
     charttime   AS charttime,
@@ -106,18 +110,20 @@ SELECT
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
         subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        c.hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
 FROM
-    @source_project.@icu_dataset.chartevents
+    @source_project.@icu_dataset.chartevents c
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include h
+ON c.hadm_id = h.hadm_id
 ;
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_outputevents AS
 SELECT
     subject_id  AS subject_id,
-    hadm_id     AS hadm_id,
+    o.hadm_id     AS hadm_id,
     stay_id     AS stay_id,
     charttime   AS charttime,
     storetime   AS storetime,
@@ -129,10 +135,12 @@ SELECT
     FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
     TO_JSON_STRING(STRUCT(
         subject_id AS subject_id,
-        hadm_id AS hadm_id,
+        o.hadm_id AS hadm_id,
         stay_id AS stay_id,
         charttime AS charttime
     ))                                  AS trace_id
 FROM
-    @source_project.@icu_dataset.outputevents
+    @source_project.@icu_dataset.outputevents o
+JOIN @etl_project.@etl_dataset.hadm_ids_to_include h
+ON o.hadm_id = h.hadm_id
 ;
