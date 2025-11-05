@@ -69,10 +69,10 @@ SELECT
     src.visit_occurrence_id                 AS visit_occurrence_id,
     per.person_id                           AS person_id,
     COALESCE(lat.target_concept_id, 0)      AS visit_concept_id,
-    CAST(src.start_datetime AS DATE)        AS visit_start_date,
-    src.start_datetime                      AS visit_start_datetime,
-    CAST(src.end_datetime AS DATE)          AS visit_end_date,
-    src.end_datetime                        AS visit_end_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS visit_start_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS visit_start_datetime,
+    DATE_ADD(CAST(src.end_datetime AS DATE), INTERVAL ds.offset_days DAY) AS visit_end_date,
+    DATETIME_ADD(src.end_datetime, INTERVAL ds.offset_days DAY) AS visit_end_datetime,
     32817                                   AS visit_type_concept_id,   -- EHR   Type Concept    Standard                          
     CAST(NULL AS INT64)                     AS provider_id,
     cs.care_site_id                         AS care_site_id,
@@ -114,4 +114,7 @@ LEFT JOIN
 LEFT JOIN 
     @etl_project.@etl_dataset.care_site cs
         ON care_site_name = 'BIDMC' -- Beth Israel hospital for all
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 ;

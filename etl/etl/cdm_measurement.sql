@@ -72,8 +72,8 @@ SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
     COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
-    CAST(src.start_datetime AS DATE)        AS measurement_date,
-    src.start_datetime                      AS measurement_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS measurement_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
     32856                                   AS measurement_type_concept_id, -- OMOP4976929 Lab
     src.operator_concept_id                 AS operator_concept_id,
@@ -106,6 +106,9 @@ INNER JOIN
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Measurement' -- 115,272
 ;
@@ -120,8 +123,8 @@ SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
     COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
-    CAST(src.start_datetime AS DATE)        AS measurement_date,
-    src.start_datetime                      AS measurement_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS measurement_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
     src.type_concept_id                     AS measurement_type_concept_id,
     CAST(NULL AS INT64)                     AS operator_concept_id,
@@ -151,6 +154,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Measurement'
 ;
@@ -165,8 +171,8 @@ SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
     COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
-    CAST(src.start_datetime AS DATE)        AS measurement_date,
-    src.start_datetime                      AS measurement_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS measurement_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
     src.type_concept_id                     AS measurement_type_concept_id,
     CAST(NULL AS INT64)                     AS operator_concept_id,
@@ -197,6 +203,9 @@ INNER JOIN
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Measurement'
 ;
@@ -211,8 +220,8 @@ SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
     COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
-    CAST(src.start_datetime AS DATE)        AS measurement_date,
-    src.start_datetime                      AS measurement_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS measurement_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
     src.type_concept_id                     AS measurement_type_concept_id,
     src.operator_concept_id                 AS operator_concept_id, -- dilution comparison
@@ -243,6 +252,9 @@ INNER JOIN
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Measurement'
 ;
@@ -263,8 +275,8 @@ SELECT
     src.measurement_id                      AS measurement_id,
     per.person_id                           AS person_id,
     COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
-    CAST(src.start_datetime AS DATE)        AS measurement_date,
-    src.start_datetime                      AS measurement_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS measurement_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS measurement_datetime,
     CAST(NULL AS STRING)                    AS measurement_time,
     src.type_concept_id                     AS measurement_type_concept_id,
     CAST(NULL AS INT64)                     AS operator_concept_id,
@@ -294,4 +306,7 @@ INNER JOIN
     `@etl_project`.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value =
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 ;

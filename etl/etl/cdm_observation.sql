@@ -68,8 +68,8 @@ SELECT
     ), 32)                                      AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
-    CAST(src.start_datetime AS DATE)            AS observation_date,
-    src.start_datetime                          AS observation_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS observation_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS observation_datetime,
     src.type_concept_id                         AS observation_type_concept_id,
     CAST(NULL AS FLOAT64)                       AS value_as_number,
     src.value_as_string                         AS value_as_string,
@@ -102,6 +102,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -116,8 +119,8 @@ SELECT
     src.measurement_id                          AS observation_id, -- id is generated already
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
-    CAST(src.start_datetime AS DATE)            AS observation_date,
-    src.start_datetime                          AS observation_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS observation_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS observation_datetime,
     src.type_concept_id                         AS observation_type_concept_id,
     src.value_as_number                         AS value_as_number,
     src.value_source_value                      AS value_as_string,
@@ -147,6 +150,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -164,8 +170,8 @@ SELECT
     ), 32)                                      AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
-    CAST(src.start_datetime AS DATE)            AS observation_date,
-    src.start_datetime                          AS observation_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS observation_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS observation_datetime,
     src.type_concept_id                         AS observation_type_concept_id,
     CAST(NULL AS FLOAT64)                       AS value_as_number,
     CAST(NULL AS STRING)                        AS value_as_string,
@@ -193,6 +199,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -207,8 +216,8 @@ SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS observation_id,
     per.person_id                                               AS person_id,
     src.target_concept_id                                       AS observation_concept_id, -- to rename fields in *_mapped
-    CAST(src.start_datetime AS DATE)                            AS observation_date,
-    src.start_datetime                                          AS observation_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS observation_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS observation_datetime,
     src.type_concept_id                                         AS observation_type_concept_id,
     CAST(NULL AS FLOAT64)                                       AS value_as_number,
     CAST(NULL AS STRING)                                        AS value_as_string,
@@ -236,6 +245,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -250,8 +262,8 @@ SELECT
     src.specimen_id                             AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
-    CAST(src.start_datetime AS DATE)            AS observation_date,
-    src.start_datetime                          AS observation_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS observation_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS observation_datetime,
     src.type_concept_id                         AS observation_type_concept_id,
     CAST(NULL AS FLOAT64)                       AS value_as_number,
     CAST(NULL AS STRING)                        AS value_as_string,
@@ -280,6 +292,9 @@ INNER JOIN
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', 
                 COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Observation'
 ;

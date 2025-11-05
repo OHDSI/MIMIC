@@ -69,14 +69,20 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.death
 
 INSERT INTO @etl_project.@etl_dataset.death
 SELECT
-    per.person_id       AS person_id,
-    CAST(IF(
-        src.deathtime <= src.dischtime, 
-            src.deathtime, src.dischtime
-    ) AS DATE)                              AS death_date,
-    IF(
-        src.deathtime <= src.dischtime, 
-            src.deathtime, src.dischtime
+    per.person_id                           AS person_id,
+    DATE_ADD(
+        CAST(IF(
+            src.deathtime <= src.dischtime, 
+                src.deathtime, src.dischtime
+        ) AS DATE), 
+        INTERVAL ds.offset_days DAY
+    )                                       AS death_date,
+    DATETIME_ADD(
+        IF(
+            src.deathtime <= src.dischtime, 
+                src.deathtime, src.dischtime
+        ), 
+        INTERVAL ds.offset_days DAY
     )                                       AS death_datetime,
     src.type_concept_id                     AS death_type_concept_id,
     0                                       AS cause_concept_id,
@@ -92,4 +98,7 @@ FROM
 INNER JOIN
     @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 ;

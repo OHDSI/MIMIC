@@ -60,10 +60,10 @@ SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS drug_exposure_id,
     per.person_id                                               AS person_id,
     src.target_concept_id                                       AS drug_concept_id,
-    CAST(src.start_datetime AS DATE)                            AS drug_exposure_start_date,
-    src.start_datetime                                          AS drug_exposure_start_datetime,
-    CAST(src.end_datetime AS DATE)                              AS drug_exposure_end_date,
-    src.end_datetime                                            AS drug_exposure_end_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS drug_exposure_start_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS drug_exposure_start_datetime,
+    DATE_ADD(CAST(src.end_datetime AS DATE), INTERVAL ds.offset_days DAY) AS drug_exposure_end_date,
+    DATETIME_ADD(src.end_datetime, INTERVAL ds.offset_days DAY) AS drug_exposure_end_datetime,
     CAST(NULL AS DATE)                                          AS verbatim_end_date,
     src.type_concept_id                                         AS drug_type_concept_id,
     CAST(NULL AS STRING)                                        AS stop_reason,
@@ -94,6 +94,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Drug'
 ;

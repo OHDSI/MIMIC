@@ -65,10 +65,10 @@ SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS condition_occurrence_id,
     per.person_id                                               AS person_id,
     COALESCE(src.target_concept_id, 0)                          AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)                            AS condition_start_date,
-    src.start_datetime                                          AS condition_start_datetime,
-    CAST(src.end_datetime AS DATE)                              AS condition_end_date,
-    src.end_datetime                                            AS condition_end_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS condition_start_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS condition_start_datetime,
+    DATE_ADD(CAST(src.end_datetime AS DATE), INTERVAL ds.offset_days DAY) AS condition_end_date,
+    DATETIME_ADD(src.end_datetime, INTERVAL ds.offset_days DAY) AS condition_end_datetime,
     src.type_concept_id                                         AS condition_type_concept_id,
     CAST(NULL AS STRING)                                        AS stop_reason,
     CAST(NULL AS INT64)                                         AS provider_id,
@@ -92,6 +92,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Condition'
 ;
@@ -106,10 +109,10 @@ SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS condition_occurrence_id,
     per.person_id                                               AS person_id,
     COALESCE(src.target_concept_id, 0)                          AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)                            AS condition_start_date,
-    src.start_datetime                                          AS condition_start_datetime,
-    CAST(src.start_datetime AS DATE)                            AS condition_end_date,
-    src.start_datetime                                          AS condition_end_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS condition_start_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS condition_start_datetime,
+    DATE_ADD(CAST(src.end_datetime AS DATE), INTERVAL ds.offset_days DAY) AS condition_end_date,
+    DATETIME_ADD(src.end_datetime, INTERVAL ds.offset_days DAY) AS condition_end_datetime,
     32817                                                       AS condition_type_concept_id, -- EHR  Type Concept    Type Concept
     CAST(NULL AS STRING)                                        AS stop_reason,
     CAST(NULL AS INT64)                                         AS provider_id,
@@ -133,6 +136,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Condition'
 ;
@@ -149,10 +155,10 @@ SELECT
     `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS condition_occurrence_id,
     per.person_id                                               AS person_id,
     COALESCE(src.target_concept_id, 0)                          AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)                            AS condition_start_date,
-    src.start_datetime                                          AS condition_start_datetime,
-    CAST(src.start_datetime AS DATE)                            AS condition_end_date,
-    src.start_datetime                                          AS condition_end_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS condition_start_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS condition_start_datetime,
+    DATE_ADD(CAST(src.end_datetime AS DATE), INTERVAL ds.offset_days DAY) AS condition_end_date,
+    DATETIME_ADD(src.end_datetime, INTERVAL ds.offset_days DAY) AS condition_end_datetime,
     src.type_concept_id                                         AS condition_type_concept_id,
     CAST(NULL AS STRING)                                        AS stop_reason,
     CAST(NULL AS INT64)                                         AS provider_id,
@@ -176,6 +182,9 @@ INNER JOIN
     @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = 
             CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Condition'
 ;

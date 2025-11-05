@@ -59,8 +59,8 @@ SELECT
     per.person_id                               AS person_id,
     COALESCE(src.target_concept_id, 0)          AS specimen_concept_id,
     32856                                       AS specimen_type_concept_id, -- OMOP4976929 Lab
-    CAST(src.start_datetime AS DATE)            AS specimen_date,
-    src.start_datetime                          AS specimen_datetime,
+    DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS specimen_date,
+    DATETIME_ADD(src.start_datetime, INTERVAL ds.offset_days DAY) AS specimen_datetime,
     CAST(NULL AS FLOAT64)                       AS quantity,
     CAST(NULL AS INT64)                         AS unit_concept_id,
     0                                           AS anatomic_site_concept_id,
@@ -80,6 +80,9 @@ FROM
 INNER JOIN
     @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
+LEFT JOIN 
+    @etl_project.@etl_dataset.person_date_shift_lookup ds
+        ON per.person_id = ds.person_id
 WHERE
     src.target_domain_id = 'Specimen'
 ;
