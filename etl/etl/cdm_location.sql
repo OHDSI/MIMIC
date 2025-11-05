@@ -53,10 +53,10 @@ SELECT
     CAST(NULL AS STRING)        AS zip,
     CAST(NULL AS STRING)        AS county,
     'Beth Israel Hospital'      AS location_source_value,
-    '4330442'                   AS country_concept_id,
+    4330442                     AS country_concept_id,
     'United States of America'  AS country_source_value,
-    '42.33979'                  AS latitude,
-    '-71.10488'                 AS longitude,
+    42.33979                    AS latitude,
+    -71.10488                   AS longitude,
     -- 
     'location.null'             AS unit_id,
     'null'                      AS load_table_id,
