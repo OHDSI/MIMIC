@@ -89,7 +89,7 @@ SELECT
         NULL)                               AS discharged_to_concept_id,
     src.discharge_location                  AS discharged_to_source_value,
     LAG(src.visit_occurrence_id) OVER ( 
-        PARTITION BY subject_id, hadm_id 
+        PARTITION BY src.subject_id, src.hadm_id 
         ORDER BY start_datetime
     )                                   AS preceding_visit_occurrence_id,
     --
