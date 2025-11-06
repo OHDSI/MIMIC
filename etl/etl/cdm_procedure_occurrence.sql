@@ -89,8 +89,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 WHERE
     src.target_domain_id = 'Procedure'
 ;
@@ -133,8 +132,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 WHERE
     src.target_domain_id = 'Procedure'
 ;
@@ -174,9 +172,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', 
-                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+        ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 WHERE
     src.target_domain_id = 'Procedure'
 ;
@@ -217,8 +213,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 WHERE
     src.target_domain_id = 'Procedure'
 ;
