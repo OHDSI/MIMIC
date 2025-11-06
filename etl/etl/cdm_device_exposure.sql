@@ -66,6 +66,7 @@ SELECT
     DATETIME_ADD(src.end_datetime, INTERVAL ds.offset_days DAY) AS device_exposure_end_datetime,
     src.type_concept_id                                         AS device_type_concept_id,
     CAST(NULL AS STRING)                                        AS unique_device_id,
+    CAST(NULL AS STRING)                                        AS production_id,
     CAST(
         IF(ROUND(src.quantity) = src.quantity, src.quantity, NULL)
         AS INT64)                                               AS quantity,
@@ -74,6 +75,9 @@ SELECT
     CAST(NULL AS INT64)                                         AS visit_detail_id,
     src.source_code                                             AS device_source_value,
     src.source_concept_id                                       AS device_source_concept_id,
+    CAST(NULL AS INT64)                                         AS unit_concept_id,
+    CAST(NULL AS STRING)                                        AS unit_source_value,
+    CAST(NULL AS INT64)                                         AS unit_source_concept_id,
     -- 
     CONCAT('device.', src.unit_id)                             AS unit_id,
     src.load_table_id                                          AS load_table_id,
