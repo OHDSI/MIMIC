@@ -53,11 +53,11 @@ SELECT
     src.trace_id                                                AS trace_id
 FROM
     `@etl_project`.@etl_dataset.lk_outputevents src
-LEFT JOIN `@etl_project`.@etl_dataset.concept c
+LEFT JOIN `@etl_project`.@etl_dataset.voc_concept c
     ON src.source_code = c.concept_code AND c.vocabulary_id = 'mimiciv_outputevents'
-LEFT JOIN `@etl_project`.@etl_dataset.concept_relationship cr
+LEFT JOIN `@etl_project`.@etl_dataset.voc_concept_relationship cr
     ON  c.concept_id = cr.concept_id_1
-LEFT JOIN `@etl_project`.@etl_dataset.concept c2
+LEFT JOIN `@etl_project`.@etl_dataset.voc_concept c2
     ON cr.concept_id_2 = c2.concept_id
     AND c2.standard_concept = 'S'
     AND c2.invalid_reason IS NULL
