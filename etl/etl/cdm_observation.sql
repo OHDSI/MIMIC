@@ -136,6 +136,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     src.unit_source_value                       AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    src.value_source_value                      AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -185,6 +188,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                        AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                        AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -231,6 +237,9 @@ SELECT
     src.source_concept_id                                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                                        AS unit_source_value,
     CAST(NULL AS STRING)                                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                                        AS value_source_value,
+    CAST(NULL AS INT64)                                         AS observation_event_id,
+    CAST(NULL AS INT64)                                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)                         AS unit_id,
     src.load_table_id                                           AS load_table_id,
@@ -277,6 +286,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                        AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                        AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id                           AS load_table_id,
