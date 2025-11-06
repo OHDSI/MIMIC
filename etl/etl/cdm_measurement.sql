@@ -102,7 +102,7 @@ INNER JOIN
     @etl_project.@etl_dataset.person per -- 110,849
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 LEFT JOIN
     @etl_project.@etl_dataset.person_date_shift_lookup ds
@@ -151,7 +151,7 @@ INNER JOIN
     @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 LEFT JOIN
     @etl_project.@etl_dataset.person_date_shift_lookup ds
@@ -200,7 +200,7 @@ INNER JOIN
     @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 LEFT JOIN
     @etl_project.@etl_dataset.person_date_shift_lookup ds
@@ -249,7 +249,7 @@ INNER JOIN
     @etl_project.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 LEFT JOIN
     @etl_project.@etl_dataset.person_date_shift_lookup ds
@@ -304,7 +304,7 @@ INNER JOIN
     `@etl_project`.@etl_dataset.person per
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis
+    @etl_project.@etl_dataset.visit_occurrence vis
         ON  vis.visit_source_value = CAST(src.hadm_id AS STRING)
 LEFT JOIN
     @etl_project.@etl_dataset.person_date_shift_lookup ds
