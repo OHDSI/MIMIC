@@ -111,9 +111,7 @@ SELECT
         WHEN p.gender = 'M' THEN 8507 -- MALE
         ELSE 0
     END                                                     AS gender_concept_id,
-    EXTRACT(YEAR FROM DATE_ADD(
-        DATE(p.anchor_year - p.anchor_age, 1, 1), 
-        INTERVAL COALESCE(d.offset_days, 0) DAY))           AS year_of_birth,
+    EXTRACT(YEAR FROM DATE_ADD(DATE(p.anchor_year, 1, 1), INTERVAL d.offset_days DAY)) - p.anchor_age AS year_of_birth,
     CAST(NULL AS INT64)                                     AS month_of_birth,
     CAST(NULL AS INT64)                                     AS day_of_birth,
     CAST(NULL AS DATETIME)                                  AS birth_datetime,
