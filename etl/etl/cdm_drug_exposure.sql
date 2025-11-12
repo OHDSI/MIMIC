@@ -57,7 +57,10 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.drug_exposure
 
 INSERT INTO @etl_project.@etl_dataset.drug_exposure
 SELECT
-    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS drug_exposure_id,
+  `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        src.trace_id, '|',
+        CAST(src.target_concept_id AS STRING)
+    ), 32)                                                      AS drug_exposure_id,
     per.person_id                                               AS person_id,
     src.target_concept_id                                       AS drug_concept_id,
     DATE_ADD(CAST(src.start_datetime AS DATE), INTERVAL ds.offset_days DAY) AS drug_exposure_start_date,
