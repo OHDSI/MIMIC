@@ -22,12 +22,28 @@
         "@atlas_project": "odysseus-mimic-dev",
         "@atlas_dataset": "mimiciv_full_current_cdm_*",
 
-        "@waveforms_csv_path":  "gs://bucket..."
+        "@waveforms_csv_path":  "gs://bucket...",
+
+        "@obf_c": "2654435761",            
+        "@obf_o": "1013904223",
+        "@obf64_c": "1073741827",
+        "@obf64_o": "847261935",
+        "@obf_function_name": "obf_id",    
+        "@obf_enable": "true",             
+        "@obf_comment": "Deterministic permutation: 32-bit (x * @obf_c + @obf_o) mod 2^32; 64-bit (x * @obf64_c + @obf64_o) mod 2^64; C values odd, O values any."
 
     },
 
     "workflows":
     [
+        
+        {
+            "workflow": "setup",
+            "comment": "setup code needed to run the etl",
+            "type": "sql",
+            "conf": "workflow_setup.conf"
+        },
+
         {
             "workflow": "ddl",
             "comment": "use the same dataset templates as in etl section",
