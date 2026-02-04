@@ -44,6 +44,9 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation
     observation_source_concept_id INT64          ,
     unit_source_value             STRING         ,
     qualifier_source_value        STRING         ,
+    value_source_value            STRING         ,
+    observation_event_id          INT64          ,
+    obs_event_field_concept_id    INT64          ,
     -- 
     unit_id                       STRING,
     load_table_id                 STRING,
@@ -79,6 +82,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                        AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                        AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id               AS load_table_id,
