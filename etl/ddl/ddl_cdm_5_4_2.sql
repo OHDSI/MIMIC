@@ -543,3 +543,26 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cdm_source
   vocabulary_version              STRING    not null
 )
 ;
+
+
+--HINT DISTRIBUTE_ON_KEY(subject_id)
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cohort
+(
+  cohort_definition_id  INT64     not null ,
+  subject_id            INT64     not null ,
+  cohort_start_date     DATE      not null ,
+  cohort_end_date       DATE      not null
+)
+;
+
+
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_cohort_definition (
+  cohort_definition_id            INT64       not null,
+  cohort_definition_name          STRING      not null,
+  cohort_definition_description   STRING              ,
+  definition_type_concept_id      INT64       not null,
+  cohort_definition_syntax        STRING              ,
+  subject_concept_id              INT64       not null,
+  cohort_initiation_date          DATE
+)
+;
