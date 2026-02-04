@@ -185,7 +185,7 @@ SELECT
     src.admission_type                              AS admission_type, -- current location
     src.admission_location                          AS admission_location, -- to hospital
     src.discharge_location                          AS discharge_location, -- from hospital
-    CAST(src.hadm_id AS STRING)                     AS source_value,
+    src.admission_type                              AS source_value,
     -- 
     src.unit_id                     AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -204,7 +204,7 @@ SELECT
     src.admission_type                              AS admission_type, -- current location
     src.admission_location                          AS admission_location, -- to hospital
     src.discharge_location                          AS discharge_location, -- from hospital
-    CAST(NULL AS STRING)                            AS source_value,
+    src.admission_type                              AS source_value,
     -- 
     src.unit_id                     AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -229,7 +229,7 @@ SELECT
     src.date_id                                     AS date_id,
     src.start_datetime                              AS start_datetime,
     src.end_datetime                                AS end_datetime,  -- if null, populate with next start_datetime
-    CAST(src.hadm_id AS STRING)                     AS source_value,
+    src.current_location                            AS source_value,
     src.current_location                            AS current_location, -- find prev and next for adm and disch location
     -- 
     src.unit_id                     AS unit_id,
@@ -256,7 +256,7 @@ SELECT
     CAST(src.start_datetime AS DATE)                AS date_id,
     src.start_datetime                              AS start_datetime,
     CAST(NULL AS DATETIME)                          AS end_datetime,  -- if null, populate with next start_datetime
-    CAST(src.hadm_id AS STRING)                     AS source_value,
+    src.admission_type                              AS source_value,
     src.admission_type                              AS current_location, -- find prev and next for adm and disch location
     -- 
     src.unit_id                     AS unit_id,
@@ -283,7 +283,7 @@ SELECT
     CAST(src.start_datetime AS DATE)                AS date_id,
     src.start_datetime                              AS start_datetime,
     src.end_datetime                                AS end_datetime,
-    CAST(src.hadm_id AS STRING)                     AS source_value,
+    src.curr_service                                AS source_value,
     src.curr_service                                AS current_location,
     -- 
     src.unit_id                     AS unit_id,
@@ -310,7 +310,7 @@ SELECT
     src.date_id                                     AS date_id,
     src.start_datetime                              AS start_datetime,
     src.end_datetime                                AS end_datetime,  -- if null, populate with next start_datetime
-    CAST(src.hadm_id AS STRING)                     AS source_value,
+    src.current_location                            AS source_value,
     src.current_location                            AS current_location, -- find prev and next for adm and disch location
     -- 
     src.unit_id                     AS unit_id,

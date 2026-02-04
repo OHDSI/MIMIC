@@ -107,10 +107,12 @@ INNER JOIN
     @etl_project.@etl_dataset.cdm_person per 
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.cdm_visit_occurrence vis 
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', 
-                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+    @etl_project.@etl_dataset.lk_visit_clean vis 
+        ON  vis.subject_id = src.subject_id
+        AND (
+            vis.hadm_id = src.hadm_id
+            OR vis.hadm_id IS NULL AND vis.date_id = src.date_id
+        )
 LEFT JOIN
     @etl_project.@etl_dataset.cdm_care_site cs
         ON cs.care_site_source_value = src.current_location
