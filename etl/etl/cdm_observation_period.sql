@@ -169,11 +169,15 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation_period
 
 INSERT INTO @etl_project.@etl_dataset.cdm_observation_period
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS observation_period_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        CAST(src.person_id AS STRING), '|',
+        CAST(MIN(src.start_date) AS STRING), '|',
+        CAST(MAX(src.end_date) AS STRING)
+    ), 32)                                          AS observation_period_id,
     src.person_id                               AS person_id,
     MIN(src.start_date)                         AS observation_period_start_date,
     MAX(src.end_date)                           AS observation_period_end_date,
-    32828                                       AS period_type_concept_id,  -- 32828    OMOP4976901 EHR episode record
+    32828                                       AS period_type_concept_id,  -- 32828    OMOP4976901 EHR episode record,
     --
     'observation_period'                        AS unit_id,
     'event tables'                              AS load_table_id,

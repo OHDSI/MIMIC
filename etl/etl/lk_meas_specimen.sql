@@ -245,23 +245,23 @@ LEFT JOIN
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_specimen_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS specimen_id,
-    src.subject_id                              AS subject_id,
-    COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
-    CAST(src.start_datetime AS DATE)            AS date_id,
-    32856                                       AS type_concept_id, -- Lab
-    src.start_datetime                          AS start_datetime,
-    src.spec_itemid                             AS spec_itemid,
-    mc.source_code                              AS source_code,
-    mc.source_vocabulary_id                     AS source_vocabulary_id,
-    mc.source_concept_id                        AS source_concept_id,
-    COALESCE(mc.target_domain_id, 'Specimen')   AS target_domain_id,
-    mc.target_concept_id                        AS target_concept_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS specimen_id,
+    src.subject_id                                              AS subject_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)                         AS hadm_id,
+    CAST(src.start_datetime AS DATE)                            AS date_id,
+    32856                                                       AS type_concept_id, -- Lab
+    src.start_datetime                                          AS start_datetime,
+    src.spec_itemid                                             AS spec_itemid,
+    mc.source_code                                              AS source_code,
+    mc.source_vocabulary_id                                     AS source_vocabulary_id,
+    mc.source_concept_id                                        AS source_concept_id,
+    COALESCE(mc.target_domain_id, 'Specimen')                   AS target_domain_id,
+    mc.target_concept_id                                        AS target_concept_id,
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_specimen_clean src
 INNER JOIN
@@ -279,29 +279,29 @@ LEFT JOIN
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_organism_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
-    src.subject_id                              AS subject_id,
-    COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
-    CAST(src.start_datetime AS DATE)            AS date_id,
-    32856                                       AS type_concept_id, -- Lab
-    src.start_datetime                          AS start_datetime,
-    src.test_itemid                             AS test_itemid,
-    src.spec_itemid                             AS spec_itemid,
-    src.org_itemid                              AS org_itemid,
-    CONCAT(tc.source_code, '|', sc.source_code)     AS source_code, -- test itemid plus specimen itemid
-    tc.source_vocabulary_id                     AS source_vocabulary_id,
-    tc.source_concept_id                        AS source_concept_id,
-    COALESCE(tc.target_domain_id, 'Measurement')    AS target_domain_id,
-    tc.target_concept_id                        AS target_concept_id,
-    oc.source_code                              AS value_source_value,
-    oc.target_concept_id                        AS value_as_concept_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 64)    AS measurement_id,
+    src.subject_id                                              AS subject_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)                         AS hadm_id,
+    CAST(src.start_datetime AS DATE)                            AS date_id,
+    32856                                                       AS type_concept_id, -- Lab
+    src.start_datetime                                          AS start_datetime,
+    src.test_itemid                                             AS test_itemid,
+    src.spec_itemid                                             AS spec_itemid,
+    src.org_itemid                                              AS org_itemid,
+    CONCAT(tc.source_code, '|', sc.source_code)                 AS source_code, -- test itemid plus specimen itemid
+    tc.source_vocabulary_id                                     AS source_vocabulary_id,
+    tc.source_concept_id                                        AS source_concept_id,
+    COALESCE(tc.target_domain_id, 'Measurement')                AS target_domain_id,
+    tc.target_concept_id                                        AS target_concept_id,
+    oc.source_code                                              AS value_source_value,
+    oc.target_concept_id                                        AS value_as_concept_id,
     -- fields to link to specimen and test-organism
-    src.trace_id_spec                           AS trace_id_spec,
+    src.trace_id_spec                                           AS trace_id_spec,
     --
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_meas_organism_clean src
 INNER JOIN
@@ -328,29 +328,29 @@ LEFT JOIN
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_ab_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
-    src.subject_id                              AS subject_id,
-    COALESCE(src.hadm_id, hadm.hadm_id)         AS hadm_id,
-    CAST(src.start_datetime AS DATE)            AS date_id,
-    32856                                       AS type_concept_id, -- Lab
-    src.start_datetime                          AS start_datetime,
-    src.ab_itemid                               AS ab_itemid,
-    ac.source_code                              AS source_code,
-    COALESCE(ac.target_concept_id, 0)           AS target_concept_id,
-    COALESCE(ac.source_concept_id, 0)           AS source_concept_id,
-    rc.target_concept_id                        AS value_as_concept_id,
-    src.interpretation                          AS value_source_value,
-    src.dilution_value                          AS value_as_number,
-    src.dilution_comparison                     AS operator_source_value,
-    opc.target_concept_id                       AS operator_concept_id,
-    COALESCE(ac.target_domain_id, 'Measurement')    AS target_domain_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 64)    AS measurement_id,
+    src.subject_id                                              AS subject_id,
+    COALESCE(src.hadm_id, hadm.hadm_id)                         AS hadm_id,
+    CAST(src.start_datetime AS DATE)                            AS date_id,
+    32856                                                       AS type_concept_id, -- Lab
+    src.start_datetime                                          AS start_datetime,
+    src.ab_itemid                                               AS ab_itemid,
+    ac.source_code                                              AS source_code,
+    COALESCE(ac.target_concept_id, 0)                           AS target_concept_id,
+    COALESCE(ac.source_concept_id, 0)                           AS source_concept_id,
+    rc.target_concept_id                                        AS value_as_concept_id,
+    src.interpretation                                          AS value_source_value,
+    src.dilution_value                                          AS value_as_number,
+    src.dilution_comparison                                     AS operator_source_value,
+    opc.target_concept_id                                       AS operator_concept_id,
+    COALESCE(ac.target_domain_id, 'Measurement')                AS target_domain_id,
     -- fields to link test-organism and antibiotics
-    src.trace_id_org                            AS trace_id_org,
+    src.trace_id_org                                            AS trace_id_org,
     -- 
-    src.unit_id                     AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.unit_id                                                 AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_meas_ab_clean src
 INNER JOIN

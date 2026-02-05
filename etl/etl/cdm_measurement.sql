@@ -255,31 +255,31 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_measurement
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
-    per.person_id                           AS person_id,
-    COALESCE(src.target_concept_id, 0)      AS measurement_concept_id,
-    CAST(src.start_datetime AS DATE)        AS measurement_date,
-    src.start_datetime                      AS measurement_datetime,
-    CAST(NULL AS STRING)                    AS measurement_time, -- deprecated, to be removed in later versions
-    32817                                   AS measurement_type_concept_id, -- OMOP4976890 EHR
-    CAST(NULL AS INT64)                     AS operator_concept_id,
-    src.value_as_number                     AS value_as_number,
-    CAST(NULL AS INT64)                     AS value_as_concept_id, -- to add values
-    src.unit_concept_id                     AS unit_concept_id,
-    CAST(NULL AS FLOAT64)                   AS range_low,
-    CAST(NULL AS FLOAT64)                   AS range_high,
-    CAST(NULL AS INT64)                     AS provider_id,
-    vd.visit_occurrence_id                  AS visit_occurrence_id,
-    vd.visit_detail_id                      AS visit_detail_id,
-    CONCAT(src.source_code)                 AS measurement_source_value,  -- source value is changed
-    src.source_concept_id                           AS measurement_source_concept_id,
-    src.unit_source_value                   AS unit_source_value,
-    CAST(src.value_as_number AS STRING)     AS value_source_value, -- ?
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 64)    AS measurement_id,
+    per.person_id                                               AS person_id,
+    COALESCE(src.target_concept_id, 0)                          AS measurement_concept_id,
+    CAST(src.start_datetime AS DATE)                            AS measurement_date,
+    src.start_datetime                                          AS measurement_datetime,
+    CAST(NULL AS STRING)                                        AS measurement_time, -- deprecated, to be removed in later versions
+    32817                                                       AS measurement_type_concept_id, -- OMOP4976890 EHR
+    CAST(NULL AS INT64)                                         AS operator_concept_id,
+    src.value_as_number                                         AS value_as_number,
+    CAST(NULL AS INT64)                                         AS value_as_concept_id, -- to add values
+    src.unit_concept_id                                         AS unit_concept_id,
+    CAST(NULL AS FLOAT64)                                       AS range_low,
+    CAST(NULL AS FLOAT64)                                       AS range_high,
+    CAST(NULL AS INT64)                                         AS provider_id,
+    vd.visit_occurrence_id                                      AS visit_occurrence_id,
+    vd.visit_detail_id                                          AS visit_detail_id,
+    CONCAT(src.source_code)                                     AS measurement_source_value,  -- source value is changed
+    src.source_concept_id                                       AS measurement_source_concept_id,
+    src.unit_source_value                                       AS unit_source_value,
+    CAST(src.value_as_number AS STRING)                         AS value_source_value, -- ?
     -- 
-    CONCAT('measurement.', src.unit_id)     AS unit_id,
-    src.load_table_id                       AS load_table_id,
-    src.load_row_id                         AS load_row_id,
-    src.trace_id                            AS trace_id
+    CONCAT('measurement.', src.unit_id)                         AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_meas_waveform_mapped src
 INNER JOIN
