@@ -57,7 +57,10 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_drug_exposure
 
 INSERT INTO @etl_project.@etl_dataset.cdm_drug_exposure
 SELECT
-    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS drug_exposure_id,
+  `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        src.trace_id, '|',
+        CAST(src.target_concept_id AS STRING)
+    ), 32)                                                      AS drug_exposure_id,
     per.person_id                                               AS person_id,
     src.target_concept_id                                       AS drug_concept_id,
     CAST(src.start_datetime AS DATE)                            AS drug_exposure_start_date,
@@ -92,8 +95,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.subject_id = src.subject_id AND vis.hadm_id = src.hadm_id
 WHERE
     src.target_domain_id = 'Drug'
 ;

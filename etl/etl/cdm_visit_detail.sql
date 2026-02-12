@@ -107,7 +107,7 @@ INNER JOIN
     @etl_project.@etl_dataset.cdm_person per 
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
-    @etl_project.@etl_dataset.lk_visit_clean vis 
+    @etl_project.@etl_dataset.lk_visit_clean vis
         ON  vis.subject_id = src.subject_id
         AND (
             vis.hadm_id = src.hadm_id

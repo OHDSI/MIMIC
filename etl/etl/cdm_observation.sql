@@ -100,8 +100,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.subject_id = src.subject_id AND vis.hadm_id = src.hadm_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -148,8 +147,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.subject_id = src.subject_id AND vis.hadm_id = src.hadm_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -197,8 +195,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.subject_id = src.subject_id AND vis.hadm_id = src.hadm_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -243,8 +240,7 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', CAST(src.hadm_id AS STRING))
+        ON  vis.subject_id = src.subject_id AND vis.hadm_id = src.hadm_id
 WHERE
     src.target_domain_id = 'Observation'
 ;
@@ -289,9 +285,12 @@ INNER JOIN
         ON CAST(src.subject_id AS STRING) = per.person_source_value
 INNER JOIN
     @etl_project.@etl_dataset.cdm_visit_occurrence vis
-        ON  vis.visit_source_value = 
-            CONCAT(CAST(src.subject_id AS STRING), '|', 
-                COALESCE(CAST(src.hadm_id AS STRING), CAST(src.date_id AS STRING)))
+        ON  vis.subject_id = src.subject_id
+        AND (
+            vis.hadm_id = src.hadm_id
+            OR vis.hadm_id IS NULL AND vis.date_id = src.date_id
+        )
+
 WHERE
     src.target_domain_id = 'Observation'
 ;
