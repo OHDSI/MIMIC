@@ -47,11 +47,20 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
         * in the workflow commands <env> is the "environment" name, which equals "dev" for the demo dataset and "full" for the full set
 
 * set the project root (location of this file) as the current directory
+
+NOTE: the standard process for combining Athena and custom vocab (_delta talbes) going forward
+was set in: https://github.com/OHDSI/MIMIC/pull/37 . However, since the _delta tables are evolving 
+regularly, I've come up with a new temporary process which adds the master Athena tables to a 
+BQ dataset and any _delta tables to their own datasets. I then combine the Athena and all _delta tables
+by using a BQ VIEW. The workflow below reflects this based on scripts checked into `dev` in my 
+forked MIMIC-OHDSI repo.
 ```
-cd vocabulary_refresh
-python vocabulary_refresh.py -s10
-python vocabulary_refresh.py -s20
-python vocabulary_refresh.py -s30
+# cd vocabulary_refresh
+# python vocabulary_refresh.py -s10
+# python vocabulary_refresh.py -s20
+# python vocabulary_refresh.py -s30
+python scripts/upload_vocab_to_bq.py # do this for Athena and all custom vocabs one at a time, adding each to it's own BQ dataset
+scripts/create_vocab_views.sql # run this directly in BigQuery to setup a single view of all the vocabs
 cd ../
 python scripts/wf_read.py -e conf/<env>.etlconf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_setup.conf
