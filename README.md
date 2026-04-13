@@ -47,6 +47,11 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
         * in the workflow commands <env> is the "environment" name, which equals "dev" for the demo dataset and "full" for the full set
 
 * set the project root (location of this file) as the current directory
+
+#### Waveforms
+- Use python script, process_transfer_waveforms.py from chorus-dev to generate year3_waveform_registry.csv and year3_waveform_channels_cut.csv. Upload to BigQuery as waveform_files and waveform_channels tables, respectively.
+- Run `etl/cdm_waveform_occurrence.sql`, `cdm_waveform_registry.sql`, `cdm_waveform_channel_metadata.sql` with `python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms.conf`
+
 ```
 cd vocabulary_refresh
 python vocabulary_refresh.py -s10
@@ -57,6 +62,7 @@ python scripts/wf_read.py -e conf/<env>.etlconf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ddl.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_staging.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_etl.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ut.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_metrics.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_unload.conf
