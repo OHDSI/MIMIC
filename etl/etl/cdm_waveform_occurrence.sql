@@ -36,8 +36,7 @@ SELECT
   COUNT(*)                                            AS num_of_files,
   'WFDB'                                              AS waveform_format_source_value
 
-  FROM @etl_project.@etl_dataset.waveform_files f
+  FROM @etl_project.@etl_dataset.waveform_files_all f
   GROUP BY
-    f.group_id;
+    f.group_id
 ;
-
