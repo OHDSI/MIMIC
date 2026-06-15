@@ -42,16 +42,20 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 * set variables in vocabulary_refresh/README.md
     * run vocabulary refresh commands given below from directory "vocabulary_refresh"
 * set the project variables in `conf/*.etlconf`
-    * run script "wf_read" to load waveform sample data if needed
     * run workflow commands below in the given sequence 
         * in the workflow commands <env> is the "environment" name, which equals "dev" for the demo dataset and "full" for the full set
 
 * set the project root (location of this file) as the current directory
 
 #### Waveforms
-- Use python script, process_transfer_waveforms.py from chorus-dev to generate year3_waveform_registry.csv and year3_waveform_channels_cut.csv. Upload to BigQuery as waveform_files and waveform_channels tables, respectively.
+- Generate your source data in the format of the `data/waveform_files_all.csv` and `data/waveform_channels_all.csv` or use those files them when performing a dummy build. Upload to BigQuery as waveform_files_all and waveform_channels_all tables, respectively.
 - Run `etl/cdm_waveform_occurrence.sql`, `cdm_waveform_registry.sql`, `cdm_waveform_channel_metadata.sql` with `python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms.conf`
 
+NOTE: the standard process for combining Athena and custom vocab (_delta talbes) going forward
+was set in: https://github.com/OHDSI/MIMIC/pull/37 . However, since the _delta tables are evolving 
+regularly, you can use temporary process which adds the master Athena tables to a 
+BQ dataset and any _delta tables to their own datasets. You can then combine the Athena and all _delta tables
+by using a BQ VIEW.
 ```
 cd vocabulary_refresh
 python vocabulary_refresh.py -s10
