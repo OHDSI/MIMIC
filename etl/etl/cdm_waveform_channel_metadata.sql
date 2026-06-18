@@ -59,13 +59,13 @@ WITH channel_metadata_unpivoted AS (
     person_id, visit_occurrence_id, group_id, trg_file, channel_name, sample_units,
     'SEGMENTLENGTH' AS metadata_type,
     segment_length AS value_as_number,
-    CAST(NULL AS INT64) AS value_as_number,
+    CAST(NULL AS INT64) AS value_as_concept_id,
     CAST(NULL AS STRING) AS value_as_string,
     'samples' AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels_all
 )
 SELECT
-  `@etl_project.@etl_dataset.obf_id_str`(CONCAT(meta.trg_file, meta.channel_name, meta.metadata_type), 32)  AS waveform_channel_metadata_id,
+  `@etl_project.@etl_dataset.obf_id_str`(CONCAT(meta.trg_file, meta.channel_name, meta.metadata_type), 64)  AS waveform_channel_metadata_id,
   `@etl_project.@etl_dataset.obf_id_str`(meta.trg_file, 32)  AS waveform_registry_id,
   CAST(NULL AS INT64)                                        AS procedure_occurrence_id,
   CAST(NULL AS INT64)                                        AS device_exposure_id,
