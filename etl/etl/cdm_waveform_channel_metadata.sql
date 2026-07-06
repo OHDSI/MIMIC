@@ -20,6 +20,37 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_waveform_channel_metadata
 )
 ;
 
+-- Preflight 1: each channel trg_file must resolve to exactly one registry row (1:1)
+DECLARE bad_registry_link INT64;
+SET bad_registry_link = (
+  SELECT COUNT(*) FROM (
+    SELECT meta.trg_file
+    FROM @etl_project.@etl_dataset.waveform_channels_all meta
+    LEFT JOIN @etl_project.@etl_dataset.cdm_waveform_registry r
+      ON r.waveform_target_file_uri = meta.trg_file
+    GROUP BY meta.trg_file
+    HAVING COUNTIF(r.waveform_registry_id IS NULL) > 0
+       OR COUNT(DISTINCT r.waveform_registry_id) != 1
+  )
+);
+ASSERT bad_registry_link = 0 AS 'each channel trg_file must resolve to exactly one registry row';
+
+-- Preflight 2: channel person/visit must be consistent with occurrence via registry
+DECLARE person_visit_mismatch INT64;
+SET person_visit_mismatch = (
+  SELECT COUNT(*) FROM (
+    SELECT 1
+    FROM @etl_project.@etl_dataset.waveform_channels_all meta
+    JOIN @etl_project.@etl_dataset.cdm_waveform_registry r
+      ON r.waveform_target_file_uri = meta.trg_file
+    JOIN @etl_project.@etl_dataset.cdm_waveform_occurrence o
+      ON o.waveform_occurrence_id = r.waveform_occurrence_id
+    WHERE meta.person_id != o.person_id
+       OR meta.visit_occurrence_id != o.visit_occurrence_id
+  )
+);
+ASSERT person_visit_mismatch = 0 AS 'channel staging person/visit must match occurrence via registry';
+
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_channel_metadata
 WITH channel_metadata_unpivoted AS (
   SELECT
@@ -66,7 +97,7 @@ WITH channel_metadata_unpivoted AS (
 )
 SELECT
   `@etl_project.@etl_dataset.obf_id_str`(CONCAT(meta.trg_file, meta.channel_name, meta.metadata_type), 64)  AS waveform_channel_metadata_id,
-  `@etl_project.@etl_dataset.obf_id_str`(meta.trg_file, 32)  AS waveform_registry_id,
+  r.waveform_registry_id AS waveform_registry_id             AS waveform_registry_id,
   CAST(NULL AS INT64)                                        AS procedure_occurrence_id,
   CAST(NULL AS INT64)                                        AS device_exposure_id,
   meta.channel_name                                          AS waveform_channel_source_value,
@@ -92,6 +123,11 @@ SELECT
   
 FROM
     channel_metadata_unpivoted meta
+
+-- Join 0: Resolve waveform_registry_id from populated WAVEFORM_REGISTRY by target URI 
+-- (1:1 on trg_file).
+JOIN @etl_project.@etl_dataset.cdm_waveform_registry r
+  ON r.waveform_target_file_uri = meta.trg_file
 
 -- Join 1w: Map channel_name to channel_concept_id from custom vocab concept_code (preferred)
 LEFT JOIN

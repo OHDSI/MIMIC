@@ -19,7 +19,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_waveform_registry
 )
 ;
 
--- Preflight: trg_file must be present for all rows
+-- Preflight 1: trg_file must be present for all rows
 DECLARE missing_trg INT64;
 SET missing_trg = (
   SELECT COUNT(*)
@@ -29,13 +29,29 @@ SET missing_trg = (
 ASSERT missing_trg = 0 AS 'staging contains rows with empty trg_file; canonical target URI is required'
 ;
 
+-- Preflight 2: every group_id used for registry must resolve to exactly one occurrence
+DECLARE missing_occ INT64;
+SET missing_occ = (
+  SELECT COUNT(*) FROM (
+    SELECT `@etl_project.@etl_dataset.obf_id`(group_id, 32) AS occ_id
+    FROM @etl_project.@etl_dataset.waveform_files_all
+    GROUP BY occ_id
+    HAVING NOT EXISTS (
+      SELECT 1
+      FROM @etl_project.@etl_dataset.cdm_waveform_occurrence o
+      WHERE o.waveform_occurrence_id = occ_id
+    )
+  )
+);
+ASSERT missing_occ = 0 AS 'registry rows must resolve to an existing occurrence (1:1 by group_id)';
+
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_registry
 -- Make one registry row per target file (trg_file); preserve raw extension; map via normalized extension
 WITH files_with_extensions AS (
   SELECT
     f.*,
-    REGEXP_EXTRACT(TRIM(f.trg_file), r'(.[^\.]+)$') AS raw_trg_ext,
-    UPPER(REGEXP_EXTRACT(TRIM(f.trg_file), r'.([^\.]+)$')) AS norm_trg_ext
+    REGEXP_EXTRACT(TRIM(f.trg_file), r'(\.[^.]+)$') AS raw_trg_ext,
+    UPPER(REGEXP_EXTRACT(TRIM(f.trg_file), r'\.([^.]+)$')) AS norm_trg_ext
   FROM @etl_project.@etl_dataset.waveform_files_all f
 ),
 file_rows AS (
@@ -58,11 +74,11 @@ SELECT
   fr.waveform_registry_id                                   AS waveform_registry_id,
   fr.waveform_occurrence_id,
   fr.waveform_feature_id,
-  fr.person_id,
+  o.person_id,
   fr.waveform_file_start_datetime,
   fr.waveform_file_end_datetime,
-  fr.visit_occurrence_id,
-  fr.visit_detail_id,
+  o.visit_occurrence_id,
+  o.visit_detail_id,
   wc1.concept_id                                            AS file_extension_concept_id,
   fr.extracted_extension                                    AS file_extension_source_value,
   fr.waveform_source_file_uri                               AS waveform_source_file_uri,
@@ -87,4 +103,6 @@ SELECT
     ON wc1.concept_id = cr1.concept_id_2 
     AND wc1.invalid_reason IS NULL 
     AND wc1.standard_concept = 'S'
+  LEFT JOIN @etl_project.@etl_dataset.cdm_waveform_occurrence o
+    ON o.waveform_occurrence_id = fr.waveform_occurrence_id
 ;
