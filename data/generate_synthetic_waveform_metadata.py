@@ -114,7 +114,7 @@ for i in range(1, N_SUBJECTS + 1):
             seg_start = seg_end  # next segment starts immediately
 
 # --- write files ---
-with open("waveform_files_all.csv", "w", newline="") as f:
+with open("waveform_files.csv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow([
         "subject_id","person_id","hadm_id","visit_occurrence_id","visit_detail_id",
@@ -124,7 +124,7 @@ with open("waveform_files_all.csv", "w", newline="") as f:
     ])
     writer.writerows(waveform_files)
 
-with open("waveform_channels_all.csv", "w", newline="") as f:
+with open("waveform_channels.csv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow([
         "person_id","visit_occurrence_id","visit_detail_id","group_id",
@@ -134,4 +134,4 @@ with open("waveform_channels_all.csv", "w", newline="") as f:
     ])
     writer.writerows(waveform_channels)
 
-print("Generated waveform_files_all.csv and waveform_channels_all.csv")
+print("Generated waveform_files.csv and waveform_channels.csv")
