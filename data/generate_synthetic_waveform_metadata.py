@@ -94,13 +94,14 @@ for i in range(1, N_SUBJECTS + 1):
             channels = choose_channels(i, s)
 
             for ext in ["dat", "hea"]:
-                for ch_name, unit, gain, gain_unit in channels:
+                for channel_index, (ch_name, unit, gain, gain_unit) in enumerate(channels):
                     waveform_channels.append([
                         person_id, visit_occ, visit_detail, group_id,
                         fmt(t0_real), fmt(session_end_real),
                         fmt(seg_start), fmt(seg_end),
                         f"{waveform_folder}/{seg_name}.{ext}",
                         f"{person_id}/Waveforms/{group_id}/{seg_name}.{ext}",
+                        channel_index,
                         ch_name,
                         unit,
                         125,
@@ -128,7 +129,7 @@ with open("waveform_channels_all.csv", "w", newline="") as f:
     writer.writerow([
         "person_id","visit_occurrence_id","visit_detail_id","group_id",
         "session_start","session_end","file_start","file_end",
-        "src_file","trg_file","channel_name","sample_units",
+        "src_file","trg_file","channel_index","channel_name","sample_units",
         "sample_rate","sample_rate_units","gain","gain_units","segment_length"
     ])
     writer.writerows(waveform_channels)
