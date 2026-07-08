@@ -97,7 +97,7 @@ WITH channel_metadata_unpivoted AS (
 )
 SELECT
   `@etl_project.@etl_dataset.obf_id_str`(CONCAT(meta.trg_file, meta.channel_name, meta.metadata_type), 64)  AS waveform_channel_metadata_id,
-  r.waveform_registry_id AS waveform_registry_id             AS waveform_registry_id,
+  r.waveform_registry_id                                     AS waveform_registry_id,
   CAST(NULL AS INT64)                                        AS procedure_occurrence_id,
   CAST(NULL AS INT64)                                        AS device_exposure_id,
   meta.channel_name                                          AS waveform_channel_source_value,
