@@ -51,10 +51,30 @@ SET person_visit_mismatch = (
 );
 ASSERT person_visit_mismatch = 0 AS 'channel staging person/visit must match occurrence via registry';
 
+---- Preflight 3: channel_index must uniquely identify channels within each registry file
+DECLARE duplicate_channel_index INT64;
+SET duplicate_channel_index = (
+  SELECT COUNT(*) FROM (
+    SELECT
+      reg.waveform_registry_id,
+      m.channel_index
+    FROM @etl_project.@etl_dataset.waveform_channels m
+    JOIN @etl_project.@etl_dataset.cdm_waveform_registry reg
+      ON reg.waveform_target_file_uri = m.trg_file
+    GROUP BY
+      reg.waveform_registry_id,
+      m.channel_index
+    HAVING COUNT(*) > 1
+  )
+);
+ASSERT duplicate_channel_index = 0 AS 'duplicate channel_index within registry file';
+
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_channel_metadata
 WITH channel_metadata_unpivoted AS (
+  -- channel_index is source-derived from WFDB channel order and used to disambiguate 
+  -- duplicate labels within a file
   SELECT
-    person_id, visit_occurrence_id, group_id, trg_file, channel_name, sample_units,
+    person_id, visit_occurrence_id, group_id, trg_file, channel_index, channel_name, sample_units,
     'AMPLITUDE' AS metadata_type,
     CAST(NULL AS FLOAT64) AS value_as_number,
     CAST(NULL AS INT64) AS value_as_concept_id,
@@ -65,7 +85,7 @@ WITH channel_metadata_unpivoted AS (
   UNION ALL
   
   SELECT
-    person_id, visit_occurrence_id, group_id, trg_file, channel_name, sample_units,
+    person_id, visit_occurrence_id, group_id, trg_file, channel_index, channel_name, sample_units,
     'SAMPLERATE' AS metadata_type,
     sample_rate AS value_as_number,
     CAST(NULL AS INT64) AS value_as_concept_id,
@@ -76,7 +96,7 @@ WITH channel_metadata_unpivoted AS (
   UNION ALL
 
   SELECT 
-    person_id, visit_occurrence_id, group_id, trg_file, channel_name, sample_units,
+    person_id, visit_occurrence_id, group_id, trg_file, channel_index, channel_name, sample_units,
     'RESOLUTION' AS metadata_type,
     gain AS value_as_number,
     CAST(NULL AS INT64) AS value_as_concept_id,
@@ -87,7 +107,7 @@ WITH channel_metadata_unpivoted AS (
   UNION ALL
 
   SELECT 
-    person_id, visit_occurrence_id, group_id, trg_file, channel_name, sample_units,
+    person_id, visit_occurrence_id, group_id, trg_file, channel_index, channel_name, sample_units,
     'SEGMENTLENGTH' AS metadata_type,
     segment_length AS value_as_number,
     CAST(NULL AS INT64) AS value_as_concept_id,
@@ -96,7 +116,14 @@ WITH channel_metadata_unpivoted AS (
   FROM @etl_project.@etl_dataset.waveform_channels
 )
 SELECT
-  `@etl_project.@etl_dataset.obf_id_str`(CONCAT(meta.trg_file, meta.channel_name, meta.metadata_type), 64)  AS waveform_channel_metadata_id,
+  `@etl_project.@etl_dataset.obf_id_str`(
+    TO_JSON_STRING(STRUCT(
+      r.waveform_registry_id AS waveform_registry_id,
+      meta.channel_index AS channel_index,
+      meta.metadata_type AS metadata_type
+    )),
+    64
+  )                                                          AS waveform_channel_metadata_id,
   r.waveform_registry_id                                     AS waveform_registry_id,
   CAST(NULL AS INT64)                                        AS procedure_occurrence_id,
   CAST(NULL AS INT64)                                        AS device_exposure_id,
