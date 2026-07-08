@@ -81,6 +81,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS STRING) AS value_as_string,
     sample_units AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE sample_units IS NOT NULL
   
   UNION ALL
   
@@ -92,6 +93,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS STRING) AS value_as_string,
     sample_rate_units AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE sample_rate IS NOT NULL
 
   UNION ALL
 
@@ -103,6 +105,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS STRING) AS value_as_string,
     gain_units AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE gain IS NOT NULL
   
   UNION ALL
 
@@ -114,6 +117,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS STRING) AS value_as_string,
     'samples' AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE segment_length IS NOT NULL
 )
 SELECT
   `@etl_project.@etl_dataset.obf_id_str`(
@@ -130,11 +134,13 @@ SELECT
   meta.channel_name                                          AS waveform_channel_source_value,
   
   -- Map channel_name to channel_concept_id (prefer custom concept_code, then custom concept_name, then standard Athena mappings)
-  COALESCE(vc_channel_custom_code.concept_id, vc_channel_custom_name.concept_id, vc_channel_voc.concept_id, vc_channel_syn_full.concept_id, vc_channel_syn_parsed.concept_id, 0)  AS channel_concept_id,
+  COALESCE(vc_channel_custom_code.concept_id, vc_channel_custom_name.concept_id, 
+  vc_channel_voc.concept_id, vc_channel_syn_full.concept_id, 
+  vc_channel_syn_parsed.concept_id)                          AS channel_concept_id,
   
   -- Map metadata_type to metadata_concept_id
   meta.metadata_type                                         AS metadata_source_value,
-  COALESCE(vc_metadata.concept_id, 0)                        AS metadata_concept_id,
+  vc_metadata.concept_id                                     AS metadata_concept_id,
   
   meta.value_as_number                                       AS value_as_number,
   meta.value_as_concept_id                                   AS value_as_concept_id,
