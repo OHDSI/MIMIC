@@ -48,7 +48,7 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 * set the project root (location of this file) as the current directory
 
 #### Waveforms
-- Generate your source data in the format of the `data/waveform_files_all.csv` and `data/waveform_channels_all.csv` or use those files them when performing a dummy build. Upload to BigQuery as waveform_files_all and waveform_channels_all tables, respectively.
+- Generate your source data in the format of the `data/waveform_files.csv` and `data/waveform_channels.csv` or use those files when performing a dummy build. Upload to BigQuery as waveform_files and waveform_channels tables, respectively.
 - Run `etl/cdm_waveform_occurrence.sql`, `cdm_waveform_registry.sql`, `cdm_waveform_channel_metadata.sql` with `python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms.conf`
 
 NOTE: the standard process for combining Athena and custom vocab (_delta talbes) going forward

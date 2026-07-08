@@ -25,7 +25,7 @@ DECLARE bad_groups INT64;
 SET bad_groups = (
   SELECT COUNT(*) FROM (
     SELECT group_id
-    FROM @etl_project.@etl_dataset.waveform_files_all
+    FROM @etl_project.@etl_dataset.waveform_files
     GROUP BY group_id
     HAVING COUNT(DISTINCT person_id) > 1
        OR COUNT(DISTINCT visit_occurrence_id) > 1
@@ -43,7 +43,7 @@ SET bad_time = (
     SELECT
       MIN(DATETIME(file_start)) AS s,
       MAX(DATETIME(file_end))   AS e
-    FROM @etl_project.@etl_dataset.waveform_files_all
+    FROM @etl_project.@etl_dataset.waveform_files
     GROUP BY group_id
     HAVING e < s
   )
@@ -67,7 +67,7 @@ SELECT
   COUNT(*)                                            AS num_of_files,
   'WFDB'                                              AS waveform_format_source_value
 
-  FROM @etl_project.@etl_dataset.waveform_files_all f
+  FROM @etl_project.@etl_dataset.waveform_files f
   GROUP BY
     f.group_id
 ;

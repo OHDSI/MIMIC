@@ -23,7 +23,7 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_waveform_registry
 DECLARE missing_trg INT64;
 SET missing_trg = (
   SELECT COUNT(*)
-  FROM @etl_project.@etl_dataset.waveform_files_all
+  FROM @etl_project.@etl_dataset.waveform_files
   WHERE trg_file IS NULL OR TRIM(trg_file) = ''
 );
 ASSERT missing_trg = 0 AS 'staging contains rows with empty trg_file; canonical target URI is required'
@@ -34,7 +34,7 @@ DECLARE missing_occ INT64;
 SET missing_occ = (
   SELECT COUNT(*) FROM (
     SELECT `@etl_project.@etl_dataset.obf_id`(group_id, 32) AS occ_id
-    FROM @etl_project.@etl_dataset.waveform_files_all
+    FROM @etl_project.@etl_dataset.waveform_files
     GROUP BY occ_id
     HAVING NOT EXISTS (
       SELECT 1
@@ -52,7 +52,7 @@ WITH files_with_extensions AS (
     f.*,
     REGEXP_EXTRACT(TRIM(f.trg_file), r'(\.[^.]+)$') AS raw_trg_ext,
     UPPER(REGEXP_EXTRACT(TRIM(f.trg_file), r'\.([^.]+)$')) AS norm_trg_ext
-  FROM @etl_project.@etl_dataset.waveform_files_all f
+  FROM @etl_project.@etl_dataset.waveform_files f
 ),
 file_rows AS (
   SELECT

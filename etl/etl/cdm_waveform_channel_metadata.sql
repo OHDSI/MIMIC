@@ -25,7 +25,7 @@ DECLARE bad_registry_link INT64;
 SET bad_registry_link = (
   SELECT COUNT(*) FROM (
     SELECT meta.trg_file
-    FROM @etl_project.@etl_dataset.waveform_channels_all meta
+    FROM @etl_project.@etl_dataset.waveform_channels meta
     LEFT JOIN @etl_project.@etl_dataset.cdm_waveform_registry r
       ON r.waveform_target_file_uri = meta.trg_file
     GROUP BY meta.trg_file
@@ -40,7 +40,7 @@ DECLARE person_visit_mismatch INT64;
 SET person_visit_mismatch = (
   SELECT COUNT(*) FROM (
     SELECT 1
-    FROM @etl_project.@etl_dataset.waveform_channels_all meta
+    FROM @etl_project.@etl_dataset.waveform_channels meta
     JOIN @etl_project.@etl_dataset.cdm_waveform_registry r
       ON r.waveform_target_file_uri = meta.trg_file
     JOIN @etl_project.@etl_dataset.cdm_waveform_occurrence o
@@ -60,7 +60,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS INT64) AS value_as_concept_id,
     CAST(NULL AS STRING) AS value_as_string,
     sample_units AS unit_source_value
-  FROM @etl_project.@etl_dataset.waveform_channels_all
+  FROM @etl_project.@etl_dataset.waveform_channels
   
   UNION ALL
   
@@ -71,7 +71,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS INT64) AS value_as_concept_id,
     CAST(NULL AS STRING) AS value_as_string,
     sample_rate_units AS unit_source_value
-  FROM @etl_project.@etl_dataset.waveform_channels_all
+  FROM @etl_project.@etl_dataset.waveform_channels
 
   UNION ALL
 
@@ -82,7 +82,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS INT64) AS value_as_concept_id,
     CAST(NULL AS STRING) AS value_as_string,
     gain_units AS unit_source_value
-  FROM @etl_project.@etl_dataset.waveform_channels_all
+  FROM @etl_project.@etl_dataset.waveform_channels
   
   UNION ALL
 
@@ -93,7 +93,7 @@ WITH channel_metadata_unpivoted AS (
     CAST(NULL AS INT64) AS value_as_concept_id,
     CAST(NULL AS STRING) AS value_as_string,
     'samples' AS unit_source_value
-  FROM @etl_project.@etl_dataset.waveform_channels_all
+  FROM @etl_project.@etl_dataset.waveform_channels
 )
 SELECT
   `@etl_project.@etl_dataset.obf_id_str`(CONCAT(meta.trg_file, meta.channel_name, meta.metadata_type), 64)  AS waveform_channel_metadata_id,
