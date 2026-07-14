@@ -177,6 +177,61 @@ SET selected_channel_ambiguity = (
 );
 ASSERT selected_channel_ambiguity = 0 AS 'ambiguous selected-tier channel mappings';
 
+-- Build valid standard Unit-domain candidates once and fail only on ambiguous source units.
+CREATE TEMP TABLE tmp_unit_candidates_distinct AS
+WITH unit_values AS (
+  SELECT DISTINCT UPPER(unit_source_value) AS unit_source_value_u
+  FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE unit_source_value IS NOT NULL
+),
+unit_candidates AS (
+  SELECT
+    uv.unit_source_value_u,
+    c.concept_id
+  FROM unit_values uv
+  JOIN @etl_project.@etl_dataset.voc_concept c
+    ON UPPER(c.concept_name) = uv.unit_source_value_u
+   AND c.vocabulary_id IN ('WAVEFORM', 'MIMIC4', 'UCUM', 'SNOMED')
+   AND c.domain_id = 'Unit'
+   AND c.standard_concept = 'S'
+   AND c.invalid_reason IS NULL
+
+  UNION ALL
+
+  SELECT
+    uv.unit_source_value_u,
+    c.concept_id
+  FROM unit_values uv
+  JOIN @etl_project.@etl_dataset.voc_concept c
+    ON UPPER(c.concept_code) = uv.unit_source_value_u
+   AND c.vocabulary_id IN ('WAVEFORM', 'MIMIC4', 'UCUM', 'SNOMED')
+   AND c.domain_id = 'Unit'
+   AND c.standard_concept = 'S'
+   AND c.invalid_reason IS NULL
+)
+SELECT DISTINCT
+  unit_source_value_u,
+  concept_id
+FROM unit_candidates
+;
+
+CREATE TEMP TABLE tmp_unit_summary AS
+SELECT
+  unit_source_value_u,
+  ARRAY_AGG(DISTINCT concept_id ORDER BY concept_id) AS concept_ids,
+  COUNT(DISTINCT concept_id) AS concept_count
+FROM tmp_unit_candidates_distinct
+GROUP BY unit_source_value_u
+;
+
+DECLARE ambiguous_unit_mappings INT64;
+SET ambiguous_unit_mappings = (
+  SELECT COUNT(*)
+  FROM tmp_unit_summary
+  WHERE concept_count > 1
+);
+ASSERT ambiguous_unit_mappings = 0 AS 'ambiguous unit mappings';
+
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_channel_metadata
 WITH channel_metadata_unpivoted AS (
   -- channel_index is source-derived from WFDB channel order and used to disambiguate 
@@ -223,7 +278,7 @@ WITH channel_metadata_unpivoted AS (
     segment_length AS value_as_number,
     CAST(NULL AS INT64) AS value_as_concept_id,
     CAST(NULL AS STRING) AS value_as_string,
-    'samples' AS unit_source_value
+    CAST(NULL AS STRING) AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels
   WHERE segment_length IS NOT NULL
 ),
@@ -236,6 +291,13 @@ channel_map AS (
     ON summary.channel_name_u = selected.channel_name_u
    AND summary.vocabulary_tier = selected.selected_tier
   WHERE summary.concept_count = 1
+),
+unit_map AS (
+  SELECT
+    unit_source_value_u,
+    concept_ids[SAFE_OFFSET(0)] AS concept_id
+  FROM tmp_unit_summary
+  WHERE concept_count = 1
 )
 SELECT
   `@etl_project.@etl_dataset.obf_id_str`(
@@ -262,12 +324,8 @@ SELECT
   meta.value_as_concept_id                                   AS value_as_concept_id,
   meta.value_as_string                                       AS value_as_string,
   
-  -- Map unit_source_value to unit_concept_id (hardcoded for 'samples', then try name/code)
-  COALESCE(
-    CASE WHEN UPPER(meta.unit_source_value) = 'SAMPLES' THEN 2061509816 END,
-    vc_unit_name.concept_id, 
-    vc_unit_code.concept_id
-  ) AS unit_concept_id,
+  -- Map unit_source_value to unit_concept_id using valid standard Unit-domain concepts only
+  unit_map.concept_id                                             AS unit_concept_id,
   meta.unit_source_value                                          AS unit_source_value
   
 FROM
@@ -291,21 +349,7 @@ LEFT JOIN
   ) vc_metadata
       ON UPPER(vc_metadata.concept_name) = UPPER(meta.metadata_type)
       
--- Join 3a: Map unit_source_value to unit_concept_id by concept_name
-LEFT JOIN
-  (SELECT DISTINCT concept_id, UPPER(concept_name) AS concept_name
-   FROM @etl_project.@etl_dataset.voc_concept
-   WHERE vocabulary_id IN ('WAVEFORM', 'MIMIC4', 'UCUM', 'SNOMED')
-   QUALIFY ROW_NUMBER() OVER (PARTITION BY UPPER(concept_name) ORDER BY concept_id) = 1
-  ) vc_unit_name
-      ON vc_unit_name.concept_name = UPPER(meta.unit_source_value)
-      
--- Join 3b: Map unit_source_value to unit_concept_id by concept_code
-LEFT JOIN
-  (SELECT DISTINCT concept_id, UPPER(concept_code) AS concept_code
-   FROM @etl_project.@etl_dataset.voc_concept
-   WHERE vocabulary_id IN ('WAVEFORM', 'MIMIC4', 'UCUM', 'SNOMED')
-   QUALIFY ROW_NUMBER() OVER (PARTITION BY UPPER(concept_code) ORDER BY concept_id) = 1
-  ) vc_unit_code
-      ON vc_unit_code.concept_code = UPPER(meta.unit_source_value)
+-- Join 3: Map unit_source_value to unit_concept_id from resolved standard Unit-domain mappings
+LEFT JOIN unit_map
+  ON unit_map.unit_source_value_u = UPPER(meta.unit_source_value)
 ;
