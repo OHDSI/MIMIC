@@ -69,6 +69,114 @@ SET duplicate_channel_index = (
 );
 ASSERT duplicate_channel_index = 0 AS 'duplicate channel_index within registry file';
 
+
+-- Build all allowed channel concept candidates once, without applying vocabulary precedence.
+-- The tier-specific ASSERTs and final COALESCE below apply WAVEFORM -> MIMIC4 -> Athena precedence.
+CREATE TEMP TABLE tmp_channel_candidates_distinct AS
+WITH channel_names AS (
+  SELECT DISTINCT UPPER(channel_name) AS channel_name_u
+  FROM @etl_project.@etl_dataset.waveform_channels
+),
+channel_candidates AS (
+  SELECT
+    cn.channel_name_u,
+    c.concept_id,
+    c.vocabulary_id
+  FROM channel_names cn
+  JOIN @etl_project.@etl_dataset.voc_concept c
+    ON UPPER(c.concept_code) = cn.channel_name_u
+   AND c.domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
+   AND c.standard_concept = 'S'
+   AND c.invalid_reason IS NULL
+
+  UNION ALL
+
+  SELECT
+    cn.channel_name_u,
+    c.concept_id,
+    c.vocabulary_id
+  FROM channel_names cn
+  JOIN @etl_project.@etl_dataset.voc_concept c
+    ON UPPER(c.concept_name) = cn.channel_name_u
+   AND c.domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
+   AND c.standard_concept = 'S'
+   AND c.invalid_reason IS NULL
+
+  UNION ALL
+
+  SELECT
+    cn.channel_name_u,
+    c.concept_id,
+    c.vocabulary_id
+  FROM channel_names cn
+  JOIN @etl_project.@etl_dataset.voc_concept_synonym syn
+    ON UPPER(syn.concept_synonym_name) = cn.channel_name_u
+  JOIN @etl_project.@etl_dataset.voc_concept c
+    ON c.concept_id = syn.concept_id
+   AND c.domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
+   AND c.standard_concept = 'S'
+   AND c.invalid_reason IS NULL
+)
+SELECT DISTINCT
+  channel_name_u,
+  concept_id,
+  vocabulary_id
+FROM channel_candidates
+;
+
+-- Summarize candidate counts by vocabulary tier. The selected tier is the first tier with any candidates.
+CREATE TEMP TABLE tmp_channel_tier_summary AS
+SELECT
+  channel_name_u,
+  CASE
+    WHEN vocabulary_id = 'WAVEFORM' THEN 'WAVEFORM'
+    WHEN vocabulary_id = 'MIMIC4' THEN 'MIMIC4'
+    ELSE 'ATHENA'
+  END AS vocabulary_tier,
+  ARRAY_AGG(DISTINCT concept_id ORDER BY concept_id) AS concept_ids,
+  COUNT(DISTINCT concept_id) AS concept_count
+FROM tmp_channel_candidates_distinct
+GROUP BY
+  channel_name_u,
+  vocabulary_tier
+;
+
+CREATE TEMP TABLE tmp_channel_selected_tier AS
+WITH channel_names AS (
+  SELECT DISTINCT UPPER(channel_name) AS channel_name_u
+  FROM @etl_project.@etl_dataset.waveform_channels
+)
+SELECT
+  cn.channel_name_u,
+  CASE
+    WHEN COALESCE(waveform.concept_count, 0) > 0 THEN 'WAVEFORM'
+    WHEN COALESCE(mimic4.concept_count, 0) > 0 THEN 'MIMIC4'
+    WHEN COALESCE(athena.concept_count, 0) > 0 THEN 'ATHENA'
+  END AS selected_tier
+FROM channel_names cn
+LEFT JOIN tmp_channel_tier_summary waveform
+  ON waveform.channel_name_u = cn.channel_name_u
+ AND waveform.vocabulary_tier = 'WAVEFORM'
+LEFT JOIN tmp_channel_tier_summary mimic4
+  ON mimic4.channel_name_u = cn.channel_name_u
+ AND mimic4.vocabulary_tier = 'MIMIC4'
+LEFT JOIN tmp_channel_tier_summary athena
+  ON athena.channel_name_u = cn.channel_name_u
+ AND athena.vocabulary_tier = 'ATHENA'
+;
+
+-- Preflight 4: selected vocabulary tier must not contain ambiguous channel mappings
+DECLARE selected_channel_ambiguity INT64;
+SET selected_channel_ambiguity = (
+  SELECT COUNT(*)
+  FROM tmp_channel_selected_tier selected
+  JOIN tmp_channel_tier_summary summary
+    ON summary.channel_name_u = selected.channel_name_u
+   AND summary.vocabulary_tier = selected.selected_tier
+  WHERE summary.concept_count > 1
+);
+ASSERT selected_channel_ambiguity = 0 AS 'ambiguous selected-tier channel mappings';
+
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_channel_metadata
 WITH channel_metadata_unpivoted AS (
   -- channel_index is source-derived from WFDB channel order and used to disambiguate 
@@ -118,6 +226,16 @@ WITH channel_metadata_unpivoted AS (
     'samples' AS unit_source_value
   FROM @etl_project.@etl_dataset.waveform_channels
   WHERE segment_length IS NOT NULL
+),
+channel_map AS (
+  SELECT
+    selected.channel_name_u,
+    summary.concept_ids[SAFE_OFFSET(0)] AS concept_id
+  FROM tmp_channel_selected_tier selected
+  JOIN tmp_channel_tier_summary summary
+    ON summary.channel_name_u = selected.channel_name_u
+   AND summary.vocabulary_tier = selected.selected_tier
+  WHERE summary.concept_count = 1
 )
 SELECT
   `@etl_project.@etl_dataset.obf_id_str`(
@@ -133,10 +251,8 @@ SELECT
   CAST(NULL AS INT64)                                        AS device_exposure_id,
   meta.channel_name                                          AS waveform_channel_source_value,
   
-  -- Map channel_name to channel_concept_id (prefer custom concept_code, then custom concept_name, then standard Athena mappings)
-  COALESCE(vc_channel_custom_code.concept_id, vc_channel_custom_name.concept_id, 
-  vc_channel_voc.concept_id, vc_channel_syn_full.concept_id, 
-  vc_channel_syn_parsed.concept_id)                          AS channel_concept_id,
+  -- Map channel_name to channel_concept_id using selected vocabulary tier precedence WAVEFORM -> MIMIC4 -> Athena
+  channel_map.concept_id                                   AS channel_concept_id,
   
   -- Map metadata_type to metadata_concept_id
   meta.metadata_type                                         AS metadata_source_value,
@@ -162,64 +278,9 @@ FROM
 JOIN @etl_project.@etl_dataset.cdm_waveform_registry r
   ON r.waveform_target_file_uri = meta.trg_file
 
--- Join 1w: Map channel_name to channel_concept_id from custom vocab concept_code (preferred)
-LEFT JOIN
-  (SELECT DISTINCT concept_id, concept_code
-   FROM @etl_project.@etl_dataset.voc_concept
-   WHERE vocabulary_id IN ('WAVEFORM', 'MIMIC4')
-     AND domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
-   QUALIFY ROW_NUMBER() OVER (PARTITION BY concept_code ORDER BY concept_id) = 1
-  ) vc_channel_custom_code
-      ON UPPER(vc_channel_custom_code.concept_code) = UPPER(meta.channel_name)
-
--- Join 1x: Map channel_name to channel_concept_id from custom vocab concept_name
-LEFT JOIN
-  (SELECT DISTINCT concept_id, concept_name
-   FROM @etl_project.@etl_dataset.voc_concept
-   WHERE vocabulary_id IN ('WAVEFORM', 'MIMIC4')
-     AND domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
-   QUALIFY ROW_NUMBER() OVER (PARTITION BY concept_name ORDER BY concept_id) = 1
-  ) vc_channel_custom_name
-      ON UPPER(vc_channel_custom_name.concept_name) = UPPER(meta.channel_name)
-    
--- Join 1a: Map channel_name to channel_concept_id by concept_name (Athena vocabulary)
-LEFT JOIN
-  (SELECT DISTINCT concept_id, concept_name
-   FROM @etl_project.@etl_dataset.voc_concept
-   WHERE domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
-     AND standard_concept = 'S'
-   QUALIFY ROW_NUMBER() OVER (PARTITION BY concept_name ORDER BY concept_id) = 1
-  ) vc_channel_voc
-      ON UPPER(vc_channel_voc.concept_name) = UPPER(meta.channel_name)
-      
--- Join 1b: Map channel_name to channel_concept_id via full concept_synonym match (Athena vocabulary)
-LEFT JOIN
-    (SELECT DISTINCT 
-            UPPER(syn.concept_synonym_name) AS concept_synonym_name,
-            c.concept_id
-     FROM @etl_project.@etl_dataset.voc_concept_synonym syn
-     INNER JOIN @etl_project.@etl_dataset.voc_concept c
-       ON c.concept_id = syn.concept_id
-       AND c.domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
-       AND c.standard_concept = 'S'
-     QUALIFY ROW_NUMBER() OVER (PARTITION BY UPPER(syn.concept_synonym_name) ORDER BY c.concept_id) = 1
-    ) vc_channel_syn_full
-      ON vc_channel_syn_full.concept_synonym_name = UPPER(meta.channel_name)
-      
--- Join 1c: Map channel_name to channel_concept_id via parsed concept_synonym (Athena vocabulary)
--- Extracts abbreviation from synonyms like "ABP - Arterial blood pressure" by matching before the " - "
-LEFT JOIN
-    (SELECT DISTINCT 
-            UPPER(TRIM(SPLIT(syn.concept_synonym_name, ' - ')[OFFSET(0)])) AS parsed_value,
-            c.concept_id
-     FROM @etl_project.@etl_dataset.voc_concept_synonym syn
-     INNER JOIN @etl_project.@etl_dataset.voc_concept c
-       ON c.concept_id = syn.concept_id
-       AND c.domain_id IN ('Waveform Metadata', 'Measurement', 'Observation')
-       AND c.standard_concept = 'S'
-     QUALIFY ROW_NUMBER() OVER (PARTITION BY UPPER(TRIM(SPLIT(syn.concept_synonym_name, ' - ')[OFFSET(0)])) ORDER BY c.concept_id) = 1
-    ) vc_channel_syn_parsed
-      ON vc_channel_syn_parsed.parsed_value = UPPER(meta.channel_name)
+-- Join 1: Resolve channel_name to channel_concept_id from selected vocabulary tier
+LEFT JOIN channel_map
+  ON channel_map.channel_name_u = UPPER(meta.channel_name)
       
 -- Join 2: Map metadata_type (SAMPLERATE, GAIN, etc) to metadata_concept_id
 LEFT JOIN
