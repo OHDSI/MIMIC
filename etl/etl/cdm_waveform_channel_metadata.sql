@@ -314,7 +314,7 @@ SELECT
   meta.channel_name                                          AS waveform_channel_source_value,
   
   -- Map channel_name to channel_concept_id using selected vocabulary tier precedence WAVEFORM -> MIMIC4 -> Athena
-  channel_map.concept_id                                   AS channel_concept_id,
+  channel_map.concept_id                                     AS channel_concept_id,
   
   -- Map metadata_type to metadata_concept_id
   meta.metadata_type                                         AS metadata_source_value,
@@ -325,8 +325,8 @@ SELECT
   meta.value_as_string                                       AS value_as_string,
   
   -- Map unit_source_value to unit_concept_id using valid standard Unit-domain concepts only
-  unit_map.concept_id                                             AS unit_concept_id,
-  meta.unit_source_value                                          AS unit_source_value
+  unit_map.concept_id                                        AS unit_concept_id,
+  meta.unit_source_value                                     AS unit_source_value
   
 FROM
     channel_metadata_unpivoted meta
