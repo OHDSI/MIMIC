@@ -2,23 +2,6 @@
 -- MIMIC Waveform ETL
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_waveform_occurrence
-(
-  waveform_occurrence_id                  INT64     not null,
-  waveform_occurrence_concept_id          INT64     not null,
-  person_id                               INT64     not null,
-  waveform_occurrence_start_datetime      DATETIME  not null,
-  waveform_occurrence_end_datetime        DATETIME  not null,
-  visit_occurrence_id                     INT64     not null,
-  visit_detail_id                         INT64             ,
-  preceding_waveform_occurrence_id        INT64             ,
-  waveform_format_concept_id              INT64             ,
-  waveform_occurrence_source_value        STRING            ,
-  num_of_files                            INT64             ,
-  waveform_format_source_value            STRING
-)
-;
-
 -- Preflight 1: validate group_id grain is unique for person/visit/session interval
 DECLARE bad_groups INT64;
 
@@ -49,6 +32,8 @@ SET bad_time = (
   )
 );
 ASSERT bad_time = 0 AS 'occurrence end < start for at least one group_id';
+
+TRUNCATE TABLE @etl_project.@etl_dataset.cdm_waveform_occurrence;
 
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_occurrence
 SELECT

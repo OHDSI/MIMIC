@@ -2,24 +2,6 @@
 -- MIMIC Waveform ETL
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_waveform_channel_metadata
-(
-  waveform_channel_metadata_id            INT64     not null,
-  waveform_registry_id                    INT64     not null,
-  procedure_occurrence_id                 INT64             ,
-  device_exposure_id                      INT64             ,
-  waveform_channel_source_value           STRING            ,
-  channel_concept_id                      INT64     not null,
-  metadata_source_value                   STRING    not null,
-  metadata_concept_id                     INT64     not null,
-  value_as_number                         FLOAT64           ,
-  value_as_concept_id                     INT64             ,
-  value_as_string                         STRING            ,
-  unit_concept_id                         INT64             ,
-  unit_source_value                       STRING
-)
-;
-
 -- Preflight 1: each channel trg_file must resolve to exactly one registry row (1:1)
 DECLARE bad_registry_link INT64;
 SET bad_registry_link = (
@@ -231,6 +213,8 @@ SET ambiguous_unit_mappings = (
   WHERE concept_count > 1
 );
 ASSERT ambiguous_unit_mappings = 0 AS 'ambiguous unit mappings';
+
+TRUNCATE TABLE @etl_project.@etl_dataset.cdm_waveform_channel_metadata;
 
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_channel_metadata
 WITH channel_metadata_unpivoted AS (
