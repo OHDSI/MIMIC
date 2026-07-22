@@ -2,23 +2,6 @@
 -- MIMIC Waveform ETL
 -- -------------------------------------------------------------------
 
-CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_waveform_registry
-(
-  waveform_registry_id                    INT64     not null,
-  waveform_occurrence_id                  INT64     not null,
-  waveform_feature_id                     INT64             ,
-  person_id                               INT64     not null,
-  waveform_file_start_datetime	          DATETIME  not null,
-  waveform_file_end_datetime	          DATETIME  not null,
-  visit_occurrence_id                     INT64     not null,
-  visit_detail_id                         INT64             ,
-  file_extension_concept_id               INT64             ,
-  file_extension_source_value             STRING    not null,
-  waveform_source_file_uri                STRING            ,
-  waveform_target_file_uri                STRING    not null
-)
-;
-
 -- Preflight 1: trg_file must be present for all rows
 DECLARE missing_trg INT64;
 SET missing_trg = (
@@ -44,6 +27,8 @@ SET missing_occ = (
   )
 );
 ASSERT missing_occ = 0 AS 'registry rows must resolve to an existing occurrence (1:1 by group_id)';
+
+TRUNCATE TABLE @etl_project.@etl_dataset.cdm_waveform_registry;
 
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_registry
 -- Make one registry row per target file (trg_file); preserve raw extension; map via normalized extension

@@ -313,3 +313,19 @@ SET duplicate_channel_metadata_grain = (
   )
 );
 ASSERT duplicate_channel_metadata_grain = 0 AS 'duplicate channel metadata at intended natural grain';
+
+-- 16. Required hardcoded waveform vocabulary dependencies must exist and be valid.
+DECLARE invalid_hardcoded_waveform_concepts INT64;
+SET invalid_hardcoded_waveform_concepts = (
+  SELECT COUNT(*)
+  FROM (
+    SELECT 2081500001 AS concept_id
+    UNION ALL
+    SELECT 2082499975 AS concept_id
+  ) required_concepts
+  LEFT JOIN @etl_project.@etl_dataset.voc_concept c
+    ON c.concept_id = required_concepts.concept_id
+  WHERE c.concept_id IS NULL
+     OR c.invalid_reason IS NOT NULL
+);
+ASSERT invalid_hardcoded_waveform_concepts = 0 AS 'missing or invalid hardcoded waveform concept dependencies';
