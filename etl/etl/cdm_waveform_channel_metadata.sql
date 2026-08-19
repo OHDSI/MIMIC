@@ -2,8 +2,13 @@
 -- MIMIC Waveform ETL
 -- -------------------------------------------------------------------
 
--- Preflight 1: each channel trg_file must resolve to exactly one registry row (1:1)
 DECLARE bad_registry_link INT64;
+DECLARE person_visit_mismatch INT64;
+DECLARE duplicate_channel_index INT64;
+DECLARE selected_channel_ambiguity INT64;
+DECLARE ambiguous_unit_mappings INT64;
+
+-- Preflight 1: each channel trg_file must resolve to exactly one registry row (1:1)
 SET bad_registry_link = (
   SELECT COUNT(*) FROM (
     SELECT meta.trg_file
@@ -18,7 +23,6 @@ SET bad_registry_link = (
 ASSERT bad_registry_link = 0 AS 'each channel trg_file must resolve to exactly one registry row';
 
 -- Preflight 2: channel person/visit must be consistent with occurrence via registry
-DECLARE person_visit_mismatch INT64;
 SET person_visit_mismatch = (
   SELECT COUNT(*) FROM (
     SELECT 1
@@ -34,7 +38,6 @@ SET person_visit_mismatch = (
 ASSERT person_visit_mismatch = 0 AS 'channel staging person/visit must match occurrence via registry';
 
 ---- Preflight 3: channel_index must uniquely identify channels within each registry file
-DECLARE duplicate_channel_index INT64;
 SET duplicate_channel_index = (
   SELECT COUNT(*) FROM (
     SELECT
@@ -148,7 +151,6 @@ LEFT JOIN tmp_channel_tier_summary athena
 ;
 
 -- Preflight 4: selected vocabulary tier must not contain ambiguous channel mappings
-DECLARE selected_channel_ambiguity INT64;
 SET selected_channel_ambiguity = (
   SELECT COUNT(*)
   FROM tmp_channel_selected_tier selected
@@ -206,7 +208,6 @@ FROM tmp_unit_candidates_distinct
 GROUP BY unit_source_value_u
 ;
 
-DECLARE ambiguous_unit_mappings INT64;
 SET ambiguous_unit_mappings = (
   SELECT COUNT(*)
   FROM tmp_unit_summary

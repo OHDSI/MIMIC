@@ -2,8 +2,10 @@
 -- MIMIC Waveform ETL
 -- -------------------------------------------------------------------
 
--- Preflight 1: trg_file must be present for all rows
 DECLARE missing_trg INT64;
+DECLARE missing_occ INT64;
+
+-- Preflight 1: trg_file must be present for all rows
 SET missing_trg = (
   SELECT COUNT(*)
   FROM @etl_project.@etl_dataset.waveform_files
@@ -13,7 +15,6 @@ ASSERT missing_trg = 0 AS 'staging contains rows with empty trg_file; canonical 
 ;
 
 -- Preflight 2: every group_id used for registry must resolve to exactly one occurrence
-DECLARE missing_occ INT64;
 SET missing_occ = (
   SELECT COUNT(*) FROM (
     SELECT `@etl_project.@etl_dataset.obf_id`(group_id, 32) AS occ_id

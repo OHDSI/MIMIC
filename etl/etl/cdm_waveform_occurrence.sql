@@ -2,8 +2,10 @@
 -- MIMIC Waveform ETL
 -- -------------------------------------------------------------------
 
--- Preflight 1: validate group_id grain is unique for person/visit/session interval
 DECLARE bad_groups INT64;
+DECLARE bad_time INT64;
+
+-- Preflight 1: validate group_id grain is unique for person/visit/session interval
 
 SET bad_groups = (
   SELECT COUNT(*) FROM (
@@ -20,7 +22,6 @@ SET bad_groups = (
 ASSERT bad_groups = 0 AS 'group_id violates expected grain (person, visit, session_start/end)';
 
 -- Preflight 2: occurrence end must be >= start
-DECLARE bad_time INT64;
 SET bad_time = (
   SELECT COUNT(*) FROM (
     SELECT
