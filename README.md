@@ -84,6 +84,7 @@ python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms_
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_metrics.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_unload.conf
 ```
+NOTE: the legacy process for incorporating waveforms into this ETL has been removed since the current recommendation is to populate the official Waveform Extension tables by using workflow_waveforms.conf. If needed, the legacy process can be run with `python scripts/wf_read.py -e conf/<env>.etlconf`. 
 
 #### Waveform Source Schema 
 These examples describe more detail around what is expected for the source files that are required for the waveform build. 
