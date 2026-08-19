@@ -22,7 +22,7 @@ config_default = {
 
     "workflow": "ddl, staging, etl etc",
     "comment": "",
-    "type": "sql or py",
+    "type": "sql, sql_script, or py",
     "variables": 
     {
         "@etl_project": "target project name",
@@ -127,6 +127,13 @@ def main():
     config = read_config(params['etlconf_file'], params['config_file'])
 
     run_command_bq_script = "python scripts/bq_run_script.py {e} {etlconf_file} {c} {config_file} {script_file}"
+    run_command_bq_sql_script = "python scripts/bq_run_waveform_script.py {e} {etlconf_file} {c} {config_file} {script_file}"
+
+    if config['type'] == 'sql_script':
+        run_command_template = run_command_bq_sql_script
+    else:
+        run_command_template = run_command_bq_script
+
 
     to_run = \
         config['scripts'] \
@@ -134,7 +141,7 @@ def main():
         else params['script_files']
 
     # run all given scripts at a time
-    run_command = run_command_bq_script.format(
+    run_command = run_command_template.format(
         script_file= ' '.join(map( lambda s : s['script'], to_run)),
         e = ('-e' if len(params['etlconf_file'])> 0 else ''),
         etlconf_file= params['etlconf_file'],
