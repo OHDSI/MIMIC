@@ -164,17 +164,29 @@ ASSERT selected_channel_ambiguity = 0 AS 'ambiguous selected-tier channel mappin
 -- Build valid standard Unit-domain candidates once and fail only on ambiguous source units.
 CREATE TEMP TABLE tmp_unit_candidates_distinct AS
 WITH unit_values AS (
-  SELECT DISTINCT UPPER(unit_source_value) AS unit_source_value_u
+  SELECT DISTINCT TRIM(sample_units) AS unit_source_value_raw
   FROM @etl_project.@etl_dataset.waveform_channels
-  WHERE unit_source_value IS NOT NULL
+  WHERE sample_units IS NOT NULL
+
+  UNION DISTINCT
+
+  SELECT DISTINCT TRIM(sample_rate_units) AS unit_source_value_raw
+  FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE sample_rate_units IS NOT NULL
+
+  UNION DISTINCT
+
+  SELECT DISTINCT TRIM(gain_units) AS unit_source_value_raw
+  FROM @etl_project.@etl_dataset.waveform_channels
+  WHERE gain_units IS NOT NULL
 ),
 unit_candidates AS (
   SELECT
-    uv.unit_source_value_u,
+    uv.unit_source_value_raw,
     c.concept_id
   FROM unit_values uv
   JOIN @etl_project.@etl_dataset.voc_concept c
-    ON UPPER(c.concept_name) = uv.unit_source_value_u
+    ON UPPER(c.concept_name) = UPPER(uv.unit_source_value_raw)
    AND c.vocabulary_id IN ('WAVEFORM', 'MIMIC4', 'UCUM', 'SNOMED')
    AND c.domain_id = 'Unit'
    AND c.standard_concept = 'S'
@@ -183,29 +195,29 @@ unit_candidates AS (
   UNION ALL
 
   SELECT
-    uv.unit_source_value_u,
+    uv.unit_source_value_raw,
     c.concept_id
   FROM unit_values uv
   JOIN @etl_project.@etl_dataset.voc_concept c
-    ON UPPER(c.concept_code) = uv.unit_source_value_u
+    ON c.concept_code = uv.unit_source_value_raw
    AND c.vocabulary_id IN ('WAVEFORM', 'MIMIC4', 'UCUM', 'SNOMED')
    AND c.domain_id = 'Unit'
    AND c.standard_concept = 'S'
    AND c.invalid_reason IS NULL
 )
 SELECT DISTINCT
-  unit_source_value_u,
+  unit_source_value_raw,
   concept_id
 FROM unit_candidates
 ;
 
 CREATE TEMP TABLE tmp_unit_summary AS
 SELECT
-  unit_source_value_u,
+  unit_source_value_raw,
   ARRAY_AGG(DISTINCT concept_id ORDER BY concept_id) AS concept_ids,
   COUNT(DISTINCT concept_id) AS concept_count
 FROM tmp_unit_candidates_distinct
-GROUP BY unit_source_value_u
+GROUP BY unit_source_value_raw
 ;
 
 SET ambiguous_unit_mappings = (
@@ -279,7 +291,7 @@ channel_map AS (
 ),
 unit_map AS (
   SELECT
-    unit_source_value_u,
+    unit_source_value_raw,
     concept_ids[SAFE_OFFSET(0)] AS concept_id
   FROM tmp_unit_summary
   WHERE concept_count = 1
@@ -300,11 +312,11 @@ SELECT
   
   -- Map channel_name to channel_concept_id using selected vocabulary tier precedence WAVEFORM -> MIMIC4 -> Athena
   channel_map.concept_id                                     AS channel_concept_id,
-  
+
   -- Map metadata_type to metadata_concept_id
   meta.metadata_type                                         AS metadata_source_value,
   vc_metadata.concept_id                                     AS metadata_concept_id,
-  
+
   meta.value_as_number                                       AS value_as_number,
   meta.value_as_concept_id                                   AS value_as_concept_id,
   meta.value_as_string                                       AS value_as_string,
@@ -336,5 +348,5 @@ LEFT JOIN
       
 -- Join 3: Map unit_source_value to unit_concept_id from resolved standard Unit-domain mappings
 LEFT JOIN unit_map
-  ON unit_map.unit_source_value_u = UPPER(meta.unit_source_value)
+  ON unit_map.unit_source_value_raw = TRIM(meta.unit_source_value)
 ;
