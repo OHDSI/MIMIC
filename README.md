@@ -119,25 +119,26 @@ Timestamp note: timestamps in the waveform staging files are MIMIC date-shifted 
 |        trg_file                  | STRING    | NO       | REQUIRED |     The path to the final file location                                                 |
 
 ###### waveform_channels:
-| Field name                       | Type      | Optional | Mode     | Description                                                                             |
-|----------------------------------|-----------|----------|----------|-----------------------------------------------------------------------------------------|
-|        person_id                 | INTEGER   | NO       | REQUIRED |     OMOP person identifier                                                              |
-|        visit_occurrence_id       | INTEGER   | NO       | REQUIRED |     OMOP encounter identifier                                                           |
-|        visit_detail_id           | INTEGER   | NO       | NULLABLE |     OMOP identifier for more specific encounter details (e.g. exact   ICU ward)         |
-|        group_id                  | INTEGER   | NO       | REQUIRED |     OMOP recording identifier                                                           |
-|        session_start             | TIMESTAMP | NO       | REQUIRED |     The start of the recording, date shifted per OMOP                                   |
-|        session_end               | TIMESTAMP | NO       | REQUIRED |     The end of the recording, date shifted per OMOP                                     |
-|        file_start                | TIMESTAMP | NO       | REQUIRED |     The start time for a given file/segment                                             |
-|        file_end                  | TIMESTAMP | NO       | REQUIRED |     The end time for a given file/segment, calculated based on the   segment length     |
-|        src_file                  | STRING    | NO       | NULLABLE |     The path to the source file (e.g. original MIMIC file   structure)                  |
-|        trg_file                  | STRING    | NO       | REQUIRED | The path to the final file location                                                     |
-|        channel_name              | STRING    | NO       | NULLABLE |     The channel name (e.g. "II")                                                        |
-|        sample_units              | STRING    | NO       | NULLABLE |     The sample amplitude units                                                          |
-|        sample_rate               | INTEGER   | NO       | NULLABLE |     The sample rate                                                                     |
-|        sample_rate_units         | STRING    | NO       | NULLABLE |     The sample rate units                                                                |
-|        gain                      | FLOAT     | NO       | NULLABLE |     The ADC (analog to digital converter) gain                                           |
-|        gain_units                | STRING    | NO       | NULLABLE |     The ADC gain units                                                                  |
-|        segment_length            | INTEGER   | NO       | NULLABLE | The length of the segment as the number of samples                                      |
+| Field name            | Type      | Optional | Mode     | Description                                                                       |
+|-----------------------|-----------|----------|----------|-----------------------------------------------------------------------------------|
+| person_id             | INTEGER   | NO       | REQUIRED | OMOP person identifier                                                            |
+| visit_occurrence_id   | INTEGER   | NO       | REQUIRED | OMOP encounter identifier                                                         |
+| visit_detail_id       | INTEGER   | NO       | NULLABLE | OMOP identifier for more specific encounter details (e.g. exact   ICU ward)       |
+| group_id              | INTEGER   | NO       | REQUIRED | OMOP recording identifier                                                         |
+| session_start         | TIMESTAMP | NO       | REQUIRED | The start of the recording, date shifted per OMOP                                 |
+| session_end           | TIMESTAMP | NO       | REQUIRED | The end of the recording, date shifted per OMOP                                   |
+| file_start            | TIMESTAMP | NO       | REQUIRED | The start time for a given file/segment                                           |
+| file_end              | TIMESTAMP | NO       | REQUIRED | The end time for a given file/segment, calculated based on the   segment length   |
+| src_file              | STRING    | NO       | NULLABLE | The path to the source file (e.g. original MIMIC file   structure)                |
+| trg_file              | STRING    | NO       | REQUIRED | The path to the final file location                                               |
+| channel_index         | INTEGER   | NO       | REQUIRED | Stable channel ordinal from WFDB channel order within the file/segment            |
+| channel_name          | STRING    | NO       | NULLABLE | The channel name (e.g. "II")                                                      |
+| sample_units          | STRING    | NO       | NULLABLE | The sample amplitude units                                                        |
+| sample_rate           | INTEGER   | NO       | NULLABLE | The sample rate                                                                   |
+| sample_rate_units     | STRING    | NO       | NULLABLE | The sample rate units                                                             |
+| gain                  | FLOAT     | NO       | NULLABLE | The ADC (analog to digital converter) gain                                        |
+| gain_units            | STRING    | NO       | NULLABLE | The ADC gain units                                                                |
+| segment_length        | INTEGER   | NO       | NULLABLE | The length of the segment as the number of samples                                |
 
 Note: the build makes use of the inherent channel_index within the WFDB files/segments to disambiguate if duplicate channel names occur within a file. 
 
