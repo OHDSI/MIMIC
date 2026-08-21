@@ -37,31 +37,110 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 #### To run the ETL pipeline end-to-end
 * load the latest standard OMOP vocabularies from http://athena.ohdsi.org 
     * create a working copy of the loaded vocabularies, where custom mapping data will be added to
-* get custom mapping vocabulary _delta tables from https://github.com/TuftsCTSI/CVB/tree/main/MIMIC/Ontology
-* get other custom mapping vocabulary _delta tables, if needed
+* get custom MIMIC mapping vocabulary _delta tables from https://github.com/TuftsCTSI/CVB/tree/main/MIMIC/Ontology
+* get other custom mapping vocabulary _delta tables (e.g. https://github.com/TuftsCTSI/CVB/tree/main/WAVEFORM/Ontology), if needed
 * set variables in vocabulary_refresh/README.md
     * run vocabulary refresh commands given below from directory "vocabulary_refresh"
 * set the project variables in `conf/*.etlconf`
-    * run script "wf_read" to load waveform sample data if needed
     * run workflow commands below in the given sequence 
         * in the workflow commands <env> is the "environment" name, which equals "dev" for the demo dataset and "full" for the full set
 
 * set the project root (location of this file) as the current directory
+
+#### Waveforms
+- Generate your source data in the format of the `data/waveform_files.csv` and `data/waveform_channels.csv` or use those files when performing a dummy build. Upload to BigQuery as waveform_files and waveform_channels tables, respectively. See the Waveform Source Schema section below for more details.
+- The waveform build gets run when `python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms.conf` is executed, as outlined below. Tests should be run with `python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms_qa.conf`
+
+Vocabulary note: the standard process for combining Athena and custom vocab (_delta tables) going forward
+was set in: https://github.com/OHDSI/MIMIC/pull/37 . However, since the _delta tables are evolving 
+regularly, you can use temporary process which adds the master Athena tables to a 
+BigQuery dataset and any _delta tables to their own datasets. You can then combine the Athena and all _delta tables by using a BigQuery view. The current expectation is to use
+these sources for your vocabulary: 
+- Athena tables (Feb 2026)
+- CVB MIMIC _delta tables: https://github.com/TuftsCTSI/CVB/tree/main/MIMIC
+- CVB WAVEFORM _delta tables: https://github.com/TuftsCTSI/CVB/tree/main/WAVEFORM
+
+Hardcoded waveform concept dependencies currently used by the ETL:
+- 2081500001 — physiological monitoring concept
+- 2082499975 — WFDB waveform format concept
+
+These dependencies are validated by the waveform QA script.
+
+Timestamp note: timestamps in the waveform staging files are MIMIC date-shifted and represent local clinical time, not UTC. No timezone conversion is applied in the ETL.
+
+Procedure and device linkage note: the ETL does not currently link to waveforms to procedures or  devices. Additional investigation is needed to determine if this can be added to the ETL.
 ```
 cd vocabulary_refresh
 python vocabulary_refresh.py -s10
 python vocabulary_refresh.py -s20
 python vocabulary_refresh.py -s30
 cd ../
-python scripts/wf_read.py -e conf/<env>.etlconf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_setup.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ddl.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_staging.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_etl.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ut.conf
+python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_waveforms_qa.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_metrics.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_unload.conf
 ```
+NOTE: the legacy process for incorporating waveforms into this ETL has been removed since the current recommendation is to populate the official Waveform Extension tables by using workflow_waveforms.conf. If needed, the legacy process can be run with `python scripts/wf_read.py -e conf/<env>.etlconf`. 
+
+#### Waveform Source Schema 
+These examples describe more detail around what is expected for the source files that are required for the waveform build. 
+
+Some of these columns are only required for debug and have been marked as `YES` under the `Optional` column. 
+
+The `Mode` column indicates whether a given column can have `NULL` values or not as set
+by the table requirements. 
+
+Timestamp note: timestamps in the waveform staging files are MIMIC date-shifted and represent local clinical time, not UTC. No timezone conversion is applied in the ETL.
+
+##### waveform_files:
+| Field name                       | Type      | Optional | Mode     | Description                                                                             |
+|----------------------------------|-----------|----------|----------|-----------------------------------------------------------------------------------------|
+|        subject_id                | INTEGER   | YES      | NULLABLE |     Globally unique subject identifier from MIMIC                                        |
+|        person_id                 | INTEGER   | NO       | REQUIRED |     OMOP person identifier, 1:1 relationship to subject_id                              |
+|        hadm_id                   | INTEGER   | YES      | NULLABLE |     Globablly unique hospital admission identifier from MIMIC                            |
+|        visit_occurrence_id       | INTEGER   | NO       | REQUIRED |     OMOP encounter identifier, 1:1 relationship to hadm_id                              |
+|        visit_detail_id           | INTEGER   | NO       | NULLABLE |     OMOP identifier for more specific encounter details (e.g. exact   ICU ward)         |
+|        location                  | STRING    | YES      | NULLABLE |     Location field from WFDB header file which indicates ICU   location                 |
+|        waveform_folders          | STRING    | YES      | NULLABLE |     Path to WFDB files in PhysioNet WFDB project                                        |
+|        record_id                 | INTEGER   | YES      | REQUIRED |     Globally unique WFDB recording identifier                                           |
+|        group_id                  | INTEGER   | NO       | REQUIRED |     OMOP recording identifier, 1:1 relationship to record_id                            |
+|        mimic_start               | TIMESTAMP | YES      | NULLABLE |     The start of the recording, date shifted per MIMIC                                  |
+|        mimic_end                 | TIMESTAMP | YES      | NULLABLE |     The end of the recording, date shifted per MIMIC                                    |
+|        session_start             | TIMESTAMP | NO       | REQUIRED |     The start of the recording, date shifted per OMOP                                   |
+|        session_end               | TIMESTAMP | NO       | REQUIRED |     The end of the recording, date shifted per OMOP                                     |
+|        file_start                | TIMESTAMP | NO       | REQUIRED |     The start time for a given file/segment                                             |
+|        file_end                  | TIMESTAMP | NO       | REQUIRED |     The end time for a given file/segment, calculated based on the   segment length     |
+|        src_file                  | STRING    | NO       | NULLABLE |     The path to the source file (e.g. original MIMIC file   structure)                  |
+|        trg_file                  | STRING    | NO       | REQUIRED |     The path to the final file location                                                 |
+
+###### waveform_channels:
+| Field name            | Type      | Optional | Mode     | Description                                                                       |
+|-----------------------|-----------|----------|----------|-----------------------------------------------------------------------------------|
+| person_id             | INTEGER   | NO       | REQUIRED | OMOP person identifier                                                            |
+| visit_occurrence_id   | INTEGER   | NO       | REQUIRED | OMOP encounter identifier                                                         |
+| visit_detail_id       | INTEGER   | NO       | NULLABLE | OMOP identifier for more specific encounter details (e.g. exact   ICU ward)       |
+| group_id              | INTEGER   | NO       | REQUIRED | OMOP recording identifier                                                         |
+| session_start         | TIMESTAMP | NO       | REQUIRED | The start of the recording, date shifted per OMOP                                 |
+| session_end           | TIMESTAMP | NO       | REQUIRED | The end of the recording, date shifted per OMOP                                   |
+| file_start            | TIMESTAMP | NO       | REQUIRED | The start time for a given file/segment                                           |
+| file_end              | TIMESTAMP | NO       | REQUIRED | The end time for a given file/segment, calculated based on the   segment length   |
+| src_file              | STRING    | NO       | NULLABLE | The path to the source file (e.g. original MIMIC file   structure)                |
+| trg_file              | STRING    | NO       | REQUIRED | The path to the final file location                                               |
+| channel_index         | INTEGER   | NO       | REQUIRED | Stable channel ordinal from WFDB channel order within the file/segment            |
+| channel_name          | STRING    | NO       | NULLABLE | The channel name (e.g. "II")                                                      |
+| sample_units          | STRING    | NO       | NULLABLE | The sample amplitude units                                                        |
+| sample_rate           | INTEGER   | NO       | NULLABLE | The sample rate                                                                   |
+| sample_rate_units     | STRING    | NO       | NULLABLE | The sample rate units                                                             |
+| gain                  | FLOAT     | NO       | NULLABLE | The ADC (analog to digital converter) gain                                        |
+| gain_units            | STRING    | NO       | NULLABLE | The ADC gain units                                                                |
+| segment_length        | INTEGER   | NO       | NULLABLE | The length of the segment as the number of samples                                |
+
+Note: the build makes use of the inherent channel_index within the WFDB files/segments to disambiguate if duplicate channel names occur within a file. 
 
 #### To look at UT and Metrics reports
 * see metrics dataset name in the corresponding `.etlconf` file
