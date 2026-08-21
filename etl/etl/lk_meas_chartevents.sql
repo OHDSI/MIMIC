@@ -155,35 +155,35 @@ DROP TABLE IF EXISTS @etl_project.@etl_dataset.tmp_chartevents_code_dist;
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_chartevents_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS measurement_id,
-    src.subject_id                              AS subject_id,
-    src.hadm_id                                 AS hadm_id,
-    src.stay_id                                 AS stay_id,
-    src.start_datetime                          AS start_datetime,
-    32817                                       AS type_concept_id,  -- OMOP4976890 EHR
-    src.itemid                                  AS itemid,
-    src.source_code                             AS source_code,
-    src.source_label                            AS source_label,
-    c_main.source_vocabulary_id                 AS source_vocabulary_id,
-    c_main.source_domain_id                     AS source_domain_id,
-    c_main.source_concept_id                    AS source_concept_id,
-    c_main.target_domain_id                     AS target_domain_id,
-    c_main.target_concept_id                    AS target_concept_id,
-    src.value                                   AS value_source_value,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 64)  AS measurement_id,
+    src.subject_id                                            AS subject_id,
+    src.hadm_id                                               AS hadm_id,
+    src.stay_id                                               AS stay_id,
+    src.start_datetime                                        AS start_datetime,
+    32817                                                     AS type_concept_id,  -- OMOP4976890 EHR
+    src.itemid                                                AS itemid,
+    src.source_code                                           AS source_code,
+    src.source_label                                          AS source_label,
+    c_main.source_vocabulary_id                               AS source_vocabulary_id,
+    c_main.source_domain_id                                   AS source_domain_id,
+    c_main.source_concept_id                                  AS source_concept_id,
+    c_main.target_domain_id                                   AS target_domain_id,
+    c_main.target_concept_id                                  AS target_concept_id,
+    src.value                                                 AS value_source_value,
     IF(
         IF(src.valuenum IS NULL, src.value, NULL) IS NOT NULL,
         COALESCE(c_value.target_concept_id, 0), 
         NULL
-    )                                           AS value_as_concept_id,
-    src.valuenum                                AS value_as_number,
-    src.valueuom                                AS unit_source_value, -- unit of measurement
+    )                                                         AS value_as_concept_id,
+    src.valuenum                                              AS value_as_number,
+    src.valueuom                                              AS unit_source_value, -- unit of measurement
     IF(src.valueuom IS NOT NULL, 
-        COALESCE(uc.target_concept_id, 0), NULL)    AS unit_concept_id,
+        COALESCE(uc.target_concept_id, 0), NULL)              AS unit_concept_id,
     --
-    CONCAT('meas.', src.unit_id)                AS unit_id,
-    src.load_table_id       AS load_table_id,
-    src.load_row_id         AS load_row_id,
-    src.trace_id            AS trace_id
+    CONCAT('meas.', src.unit_id)                              AS unit_id,
+    src.load_table_id                                         AS load_table_id,
+    src.load_row_id                                           AS load_row_id,
+    src.trace_id                                              AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_chartevents_clean src -- ce
 LEFT JOIN

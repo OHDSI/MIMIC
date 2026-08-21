@@ -44,6 +44,9 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation
     observation_source_concept_id INT64          ,
     unit_source_value             STRING         ,
     qualifier_source_value        STRING         ,
+    value_source_value            STRING         ,
+    observation_event_id          INT64          ,
+    obs_event_field_concept_id    INT64          ,
     -- 
     unit_id                       STRING,
     load_table_id                 STRING,
@@ -59,7 +62,10 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_observation
 
 INSERT INTO @etl_project.@etl_dataset.cdm_observation
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS observation_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        src.trace_id, '|', 
+        COALESCE(src.value_as_string, '')
+    ), 32)                                      AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
     CAST(src.start_datetime AS DATE)            AS observation_date,
@@ -79,6 +85,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                        AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                        AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -124,6 +133,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     src.unit_source_value                       AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    src.value_source_value                      AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -149,7 +161,10 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_observation
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS observation_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        src.trace_id, '|', 
+        COALESCE(src.source_code, '')
+    ), 32)                                      AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
     CAST(src.start_datetime AS DATE)            AS observation_date,
@@ -167,6 +182,9 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                        AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                        AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
     src.load_table_id               AS load_table_id,
@@ -192,29 +210,32 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_observation
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS observation_id,
-    per.person_id                               AS person_id,
-    src.target_concept_id                       AS observation_concept_id, -- to rename fields in *_mapped
-    CAST(src.start_datetime AS DATE)            AS observation_date,
-    src.start_datetime                          AS observation_datetime,
-    src.type_concept_id                         AS observation_type_concept_id,
-    CAST(NULL AS FLOAT64)                       AS value_as_number,
-    CAST(NULL AS STRING)                        AS value_as_string,
-    CAST(NULL AS INT64)                         AS value_as_concept_id,
-    CAST(NULL AS INT64)                         AS qualifier_concept_id,
-    CAST(NULL AS INT64)                         AS unit_concept_id,
-    CAST(NULL AS INT64)                         AS provider_id,
-    vis.visit_occurrence_id                     AS visit_occurrence_id,
-    CAST(NULL AS INT64)                         AS visit_detail_id,
-    src.source_code                             AS observation_source_value,
-    src.source_concept_id                       AS observation_source_concept_id,
-    CAST(NULL AS STRING)                        AS unit_source_value,
-    CAST(NULL AS STRING)                        AS qualifier_source_value,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS observation_id,
+    per.person_id                                               AS person_id,
+    src.target_concept_id                                       AS observation_concept_id, -- to rename fields in *_mapped
+    CAST(src.start_datetime AS DATE)                            AS observation_date,
+    src.start_datetime                                          AS observation_datetime,
+    src.type_concept_id                                         AS observation_type_concept_id,
+    CAST(NULL AS FLOAT64)                                       AS value_as_number,
+    CAST(NULL AS STRING)                                        AS value_as_string,
+    CAST(NULL AS INT64)                                         AS value_as_concept_id,
+    CAST(NULL AS INT64)                                         AS qualifier_concept_id,
+    CAST(NULL AS INT64)                                         AS unit_concept_id,
+    CAST(NULL AS INT64)                                         AS provider_id,
+    vis.visit_occurrence_id                                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                                         AS visit_detail_id,
+    src.source_code                                             AS observation_source_value,
+    src.source_concept_id                                       AS observation_source_concept_id,
+    CAST(NULL AS STRING)                                        AS unit_source_value,
+    CAST(NULL AS STRING)                                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                                        AS value_source_value,
+    CAST(NULL AS INT64)                                         AS observation_event_id,
+    CAST(NULL AS INT64)                                         AS obs_event_field_concept_id,
     -- 
-    CONCAT('observation.', src.unit_id)         AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    CONCAT('observation.', src.unit_id)                         AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_diagnoses_icd_mapped src
 INNER JOIN
@@ -235,7 +256,7 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_observation
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())           AS observation_id,
+    src.specimen_id                             AS observation_id,
     per.person_id                               AS person_id,
     src.target_concept_id                       AS observation_concept_id,
     CAST(src.start_datetime AS DATE)            AS observation_date,
@@ -253,11 +274,14 @@ SELECT
     src.source_concept_id                       AS observation_source_concept_id,
     CAST(NULL AS STRING)                        AS unit_source_value,
     CAST(NULL AS STRING)                        AS qualifier_source_value,
+    CAST(NULL AS STRING)                        AS value_source_value,
+    CAST(NULL AS INT64)                         AS observation_event_id,
+    CAST(NULL AS INT64)                         AS obs_event_field_concept_id,
     -- 
     CONCAT('observation.', src.unit_id)         AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    src.load_table_id                           AS load_table_id,
+    src.load_row_id                             AS load_row_id,
+    src.trace_id                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_specimen_mapped src
 INNER JOIN

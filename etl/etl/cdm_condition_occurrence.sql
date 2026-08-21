@@ -62,27 +62,27 @@ CREATE OR REPLACE TABLE @etl_project.@etl_dataset.cdm_condition_occurrence
 
 INSERT INTO @etl_project.@etl_dataset.cdm_condition_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())       AS condition_occurrence_id,
-    per.person_id                           AS person_id,
-    COALESCE(src.target_concept_id, 0)      AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)        AS condition_start_date,
-    src.start_datetime                      AS condition_start_datetime,
-    CAST(src.end_datetime AS DATE)          AS condition_end_date,
-    src.end_datetime                        AS condition_end_datetime,
-    src.type_concept_id                     AS condition_type_concept_id,
-    CAST(NULL AS STRING)                    AS stop_reason,
-    CAST(NULL AS INT64)                     AS provider_id,
-    vis.visit_occurrence_id                 AS visit_occurrence_id,
-    CAST(NULL AS INT64)                     AS visit_detail_id,
-    src.source_code                         AS condition_source_value,
-    COALESCE(src.source_concept_id, 0)      AS condition_source_concept_id,
-    CAST(NULL AS STRING)                    AS condition_status_source_value,
-    CAST(NULL AS INT64)                     AS condition_status_concept_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS condition_occurrence_id,
+    per.person_id                                               AS person_id,
+    COALESCE(src.target_concept_id, 0)                          AS condition_concept_id,
+    CAST(src.start_datetime AS DATE)                            AS condition_start_date,
+    src.start_datetime                                          AS condition_start_datetime,
+    CAST(src.end_datetime AS DATE)                              AS condition_end_date,
+    src.end_datetime                                            AS condition_end_datetime,
+    src.type_concept_id                                         AS condition_type_concept_id,
+    CAST(NULL AS STRING)                                        AS stop_reason,
+    CAST(NULL AS INT64)                                         AS provider_id,
+    vis.visit_occurrence_id                                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                                         AS visit_detail_id,
+    src.source_code                                             AS condition_source_value,
+    COALESCE(src.source_concept_id, 0)                          AS condition_source_concept_id,
+    CAST(NULL AS STRING)                                        AS condition_status_source_value,
+    CAST(NULL AS INT64)                                         AS condition_status_concept_id,
     --
-    CONCAT('condition.', src.unit_id) AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    CONCAT('condition.', src.unit_id)                           AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_diagnoses_icd_mapped src
 INNER JOIN
@@ -103,27 +103,27 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_condition_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())       AS condition_occurrence_id,
-    per.person_id                           AS person_id,
-    COALESCE(src.target_concept_id, 0)      AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)        AS condition_start_date,
-    src.start_datetime                      AS condition_start_datetime,
-    CAST(src.start_datetime AS DATE)        AS condition_end_date,
-    src.start_datetime                      AS condition_end_datetime,
-    32817                                   AS condition_type_concept_id, -- EHR  Type Concept    Type Concept
-    CAST(NULL AS STRING)                    AS stop_reason,
-    CAST(NULL AS INT64)                     AS provider_id,
-    vis.visit_occurrence_id                 AS visit_occurrence_id,
-    CAST(NULL AS INT64)                     AS visit_detail_id,
-    src.source_code                         AS condition_source_value,
-    COALESCE(src.source_concept_id, 0)      AS condition_source_concept_id,
-    CAST(NULL AS STRING)                    AS condition_status_source_value,
-    CAST(NULL AS INT64)                     AS condition_status_concept_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS condition_occurrence_id,
+    per.person_id                                               AS person_id,
+    COALESCE(src.target_concept_id, 0)                          AS condition_concept_id,
+    CAST(src.start_datetime AS DATE)                            AS condition_start_date,
+    src.start_datetime                                          AS condition_start_datetime,
+    CAST(src.start_datetime AS DATE)                            AS condition_end_date,
+    src.start_datetime                                          AS condition_end_datetime,
+    32817                                                       AS condition_type_concept_id, -- EHR  Type Concept    Type Concept
+    CAST(NULL AS STRING)                                        AS stop_reason,
+    CAST(NULL AS INT64)                                         AS provider_id,
+    vis.visit_occurrence_id                                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                                         AS visit_detail_id,
+    src.source_code                                             AS condition_source_value,
+    COALESCE(src.source_concept_id, 0)                          AS condition_source_concept_id,
+    CAST(NULL AS STRING)                                        AS condition_status_source_value,
+    CAST(NULL AS INT64)                                         AS condition_status_concept_id,
     --
-    CONCAT('condition.', src.unit_id) AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    CONCAT('condition.', src.unit_id)                           AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_chartevents_condition_mapped src
 INNER JOIN
@@ -146,27 +146,27 @@ WHERE
 
 INSERT INTO @etl_project.@etl_dataset.cdm_condition_occurrence
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())       AS condition_occurrence_id,
-    per.person_id                           AS person_id,
-    COALESCE(src.target_concept_id, 0)      AS condition_concept_id,
-    CAST(src.start_datetime AS DATE)        AS condition_start_date,
-    src.start_datetime                      AS condition_start_datetime,
-    CAST(src.start_datetime AS DATE)        AS condition_end_date,
-    src.start_datetime                      AS condition_end_datetime,
-    src.type_concept_id                     AS condition_type_concept_id,
-    CAST(NULL AS STRING)                    AS stop_reason,
-    CAST(NULL AS INT64)                     AS provider_id,
-    vis.visit_occurrence_id                 AS visit_occurrence_id,
-    CAST(NULL AS INT64)                     AS visit_detail_id,
-    src.source_code                         AS condition_source_value,
-    COALESCE(src.source_concept_id, 0)      AS condition_source_concept_id,
-    CAST(NULL AS STRING)                    AS condition_status_source_value,
-    CAST(NULL AS INT64)                     AS condition_status_concept_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 32)    AS condition_occurrence_id,
+    per.person_id                                               AS person_id,
+    COALESCE(src.target_concept_id, 0)                          AS condition_concept_id,
+    CAST(src.start_datetime AS DATE)                            AS condition_start_date,
+    src.start_datetime                                          AS condition_start_datetime,
+    CAST(src.start_datetime AS DATE)                            AS condition_end_date,
+    src.start_datetime                                          AS condition_end_datetime,
+    src.type_concept_id                                         AS condition_type_concept_id,
+    CAST(NULL AS STRING)                                        AS stop_reason,
+    CAST(NULL AS INT64)                                         AS provider_id,
+    vis.visit_occurrence_id                                     AS visit_occurrence_id,
+    CAST(NULL AS INT64)                                         AS visit_detail_id,
+    src.source_code                                             AS condition_source_value,
+    COALESCE(src.source_concept_id, 0)                          AS condition_source_concept_id,
+    CAST(NULL AS STRING)                                        AS condition_status_source_value,
+    CAST(NULL AS INT64)                                         AS condition_status_concept_id,
     --
-    CONCAT('condition.', src.unit_id) AS unit_id,
-    src.load_table_id               AS load_table_id,
-    src.load_row_id                 AS load_row_id,
-    src.trace_id                    AS trace_id
+    CONCAT('condition.', src.unit_id)                           AS unit_id,
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_chartevents_mapped src
 INNER JOIN

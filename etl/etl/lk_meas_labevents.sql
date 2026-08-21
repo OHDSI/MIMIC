@@ -66,22 +66,22 @@ FROM
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_labevents_clean AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
-    src.subject_id                          AS subject_id,
-    src.charttime                           AS start_datetime, -- measurement_datetime,
-    src.hadm_id                             AS hadm_id,
-    src.itemid                              AS itemid,
-    src.value                               AS value, -- value_source_value
-    REGEXP_EXTRACT(src.value, r'^(\<=|\>=|\>|\<|=|)')   AS value_operator,
-    REGEXP_EXTRACT(src.value, r'[-]?[\d]+[.]?[\d]*')    AS value_number, -- assume "-0.34 etc"
-    IF(TRIM(src.valueuom) <> '', src.valueuom, NULL)    AS valueuom, -- unit_source_value,
-    src.ref_range_lower                     AS ref_range_lower,
-    src.ref_range_upper                     AS ref_range_upper,
-    'labevents'                             AS unit_id,
+    `@etl_project.@etl_dataset`.obf_id_str(src.trace_id, 64)    AS measurement_id,
+    src.subject_id                                              AS subject_id,
+    src.charttime                                               AS start_datetime, -- measurement_datetime,
+    src.hadm_id                                                 AS hadm_id,
+    src.itemid                                                  AS itemid,
+    src.value                                                   AS value, -- value_source_value
+    REGEXP_EXTRACT(src.value, r'^(\<=|\>=|\>|\<|=|)')           AS value_operator,
+    REGEXP_EXTRACT(src.value, r'[-]?[\d]+[.]?[\d]*')            AS value_number, -- assume "-0.34 etc"
+    IF(TRIM(src.valueuom) <> '', src.valueuom, NULL)            AS valueuom, -- unit_source_value,
+    src.ref_range_lower                                         AS ref_range_lower,
+    src.ref_range_upper                                         AS ref_range_upper,
+    'labevents'                                                 AS unit_id,
     --
-    src.load_table_id       AS load_table_id,
-    src.load_row_id         AS load_row_id,
-    src.trace_id            AS trace_id
+    src.load_table_id                                           AS load_table_id,
+    src.load_row_id                                             AS load_row_id,
+    src.trace_id                                                AS trace_id
 FROM
     @etl_project.@etl_dataset.src_labevents src
 INNER JOIN

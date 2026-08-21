@@ -339,7 +339,13 @@ GROUP BY
 
 INSERT INTO @etl_project.@etl_dataset.cdm_dose_era
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())   AS dose_era_id,
+    `@etl_project.@etl_dataset`.obf_id_str(CONCAT(
+        CAST(person_id AS STRING), '|',
+        CAST(drug_concept_id AS STRING), '|',
+        CAST(unit_concept_id AS STRING), '|',
+        CAST(dose_value AS STRING), '|',
+        CAST(drug_era_end_date AS STRING)
+    ), 32)                              AS dose_era_id,
     person_id                           AS person_id,
     drug_concept_id                     AS drug_concept_id,
     unit_concept_id                     AS unit_concept_id,

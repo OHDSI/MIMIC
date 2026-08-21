@@ -163,24 +163,24 @@ INNER JOIN
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_meas_waveform_mapped AS
 SELECT
-    FARM_FINGERPRINT(GENERATE_UUID())       AS measurement_id,
-    src.subject_id                          AS subject_id,
-    hadm.hadm_id                            AS hadm_id,     -- get hadm_id by datetime period
-    src.reference_id                        AS reference_id, -- make field unique for visit_detail_source_value
-    COALESCE(vc2.concept_id, 0)             AS target_concept_id,
-    COALESCE(vc2.domain_id, 'Measurement')  AS target_domain_id,
-    src.start_datetime                      AS start_datetime,
-    src.value_as_number                     AS value_as_number,
+    `@etl_project.@etl_dataset`.obf_id_str(trace_id, 32)    AS measurement_id,
+    src.subject_id                                          AS subject_id,
+    hadm.hadm_id                                            AS hadm_id,     -- get hadm_id by datetime period
+    src.reference_id                                        AS reference_id, -- make field unique for visit_detail_source_value
+    COALESCE(vc2.concept_id, 0)                             AS target_concept_id,
+    COALESCE(vc2.domain_id, 'Measurement')                  AS target_domain_id,
+    src.start_datetime                                      AS start_datetime,
+    src.value_as_number                                     AS value_as_number,
     IF(src.unit_source_value IS NOT NULL, 
-        COALESCE(uc.target_concept_id, 0), NULL)    AS unit_concept_id,
-    src.source_code                         AS source_code, 
-    COALESCE(vc1.concept_id, 0)             AS source_concept_id,
-    src.unit_source_value                   AS unit_source_value,
+        COALESCE(uc.target_concept_id, 0), NULL)            AS unit_concept_id,
+    src.source_code                                         AS source_code, 
+    COALESCE(vc1.concept_id, 0)                             AS source_concept_id,
+    src.unit_source_value                                   AS unit_source_value,
     -- 
-    src.unit_id                             AS unit_id,
-    src.load_table_id                       AS load_table_id,
-    src.load_row_id                         AS load_row_id,
-    src.trace_id                            AS trace_id
+    src.unit_id                                             AS unit_id,
+    src.load_table_id                                       AS load_table_id,
+    src.load_row_id                                         AS load_row_id,
+    src.trace_id                                            AS trace_id
 FROM
     @etl_project.@etl_dataset.lk_waveform_clean src
 -- mapping of the main source code
