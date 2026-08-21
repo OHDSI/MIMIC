@@ -7,6 +7,7 @@ DECLARE person_visit_mismatch INT64;
 DECLARE duplicate_channel_index INT64;
 DECLARE selected_channel_ambiguity INT64;
 DECLARE ambiguous_unit_mappings INT64;
+DECLARE missing_metadata_mappings INT64;
 
 -- Preflight 1: each channel trg_file must resolve to exactly one registry row (1:1)
 SET bad_registry_link = (
@@ -227,6 +228,46 @@ SET ambiguous_unit_mappings = (
 );
 ASSERT ambiguous_unit_mappings = 0 AS 'ambiguous unit mappings';
 
+-- Preflight 5: ETL-controlled metadata_type values must resolve to valid metadata concepts
+SET missing_metadata_mappings = (
+  WITH metadata_types AS (
+    SELECT 'AMPLITUDE' AS metadata_type
+    FROM @etl_project.@etl_dataset.waveform_channels
+    WHERE sample_units IS NOT NULL
+
+    UNION DISTINCT
+
+    SELECT 'SAMPLERATE' AS metadata_type
+    FROM @etl_project.@etl_dataset.waveform_channels
+    WHERE sample_rate IS NOT NULL
+
+    UNION DISTINCT
+
+    SELECT 'RESOLUTION' AS metadata_type
+    FROM @etl_project.@etl_dataset.waveform_channels
+    WHERE gain IS NOT NULL
+
+    UNION DISTINCT
+
+    SELECT 'SEGMENTLENGTH' AS metadata_type
+    FROM @etl_project.@etl_dataset.waveform_channels
+    WHERE segment_length IS NOT NULL
+  )
+  SELECT COUNT(*)
+  FROM metadata_types mt
+  LEFT JOIN (
+    SELECT DISTINCT concept_id, UPPER(concept_name) AS concept_name_u
+    FROM @etl_project.@etl_dataset.voc_concept
+    WHERE domain_id = 'Waveform Metadata'
+      AND standard_concept = 'S'
+      AND invalid_reason IS NULL
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY UPPER(concept_name) ORDER BY concept_id) = 1
+  ) vc_metadata
+    ON vc_metadata.concept_name_u = UPPER(mt.metadata_type)
+  WHERE vc_metadata.concept_id IS NULL
+);
+ASSERT missing_metadata_mappings = 0 AS 'unresolved metadata_type mappings';
+
 TRUNCATE TABLE @etl_project.@etl_dataset.cdm_waveform_channel_metadata;
 
 INSERT INTO @etl_project.@etl_dataset.cdm_waveform_channel_metadata
@@ -342,7 +383,9 @@ LEFT JOIN
   (SELECT DISTINCT concept_id, concept_name
    FROM @etl_project.@etl_dataset.voc_concept
    WHERE domain_id = 'Waveform Metadata'
-   QUALIFY ROW_NUMBER() OVER (PARTITION BY concept_name ORDER BY concept_id) = 1
+     AND standard_concept = 'S'
+     AND invalid_reason IS NULL
+   QUALIFY ROW_NUMBER() OVER (PARTITION BY UPPER(concept_name) ORDER BY concept_id) = 1
   ) vc_metadata
       ON UPPER(vc_metadata.concept_name) = UPPER(meta.metadata_type)
       
