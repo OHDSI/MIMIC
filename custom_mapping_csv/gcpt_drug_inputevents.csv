@@ -1,0 +1,12 @@
+concept_name,source_concept_id,source_vocabulary_id,source_domain_id,source_concept_class_id,standard_concept,concept_code,valid_start_date,valid_end_date,invalid_reason,target_concept_id,relationship_id,reverese_relationship_id,relationship_valid_start_date,relationship_end_date,invalid_reason_cr
+Norepinephrine,2000052001,mimiciv_drug_inputevents,Drug,Drug,,221906,1970-01-01,2099-12-31,,1321341,Maps to,Mapped from,1970-01-01,2099-12-31,
+Epinephrine,2000052002,mimiciv_drug_inputevents,Drug,Drug,,221289,1970-01-01,2099-12-31,,1343916,Maps to,Mapped from,1970-01-01,2099-12-31,
+Epinephrine.,2000052003,mimiciv_drug_inputevents,Drug,Drug,,229617,1970-01-01,2099-12-31,,1343916,Maps to,Mapped from,1970-01-01,2099-12-31,
+Phenylephrine,2000052004,mimiciv_drug_inputevents,Drug,Drug,,221749,1970-01-01,2099-12-31,,1135766,Maps to,Mapped from,1970-01-01,2099-12-31,
+Vasopressin,2000052005,mimiciv_drug_inputevents,Drug,Drug,,222315,1970-01-01,2099-12-31,,1507835,Maps to,Mapped from,1970-01-01,2099-12-31,
+Dopamine,2000052006,mimiciv_drug_inputevents,Drug,Drug,,221662,1970-01-01,2099-12-31,,1337860,Maps to,Mapped from,1970-01-01,2099-12-31,
+Dobutamine,2000052007,mimiciv_drug_inputevents,Drug,Drug,,221653,1970-01-01,2099-12-31,,1337720,Maps to,Mapped from,1970-01-01,2099-12-31,
+Propofol,2000052008,mimiciv_drug_inputevents,Drug,Drug,,222168,1970-01-01,2099-12-31,,753626,Maps to,Mapped from,1970-01-01,2099-12-31,
+Vancomycin,2000052009,mimiciv_drug_inputevents,Drug,Drug,,225798,1970-01-01,2099-12-31,,1707687,Maps to,Mapped from,1970-01-01,2099-12-31,
+Heparin,2000052010,mimiciv_drug_inputevents,Drug,Drug,,221668,1970-01-01,2099-12-31,,1367571,Maps to,Mapped from,1970-01-01,2099-12-31,
+Potassium Chloride,2000052011,mimiciv_drug_inputevents,Drug,Drug,,224167,1970-01-01,2099-12-31,,19049105,Maps to,Mapped from,1970-01-01,2099-12-31,
