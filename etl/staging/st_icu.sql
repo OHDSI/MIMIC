@@ -136,3 +136,46 @@ SELECT
 FROM
     `@source_project`.@icu_dataset.outputevents
 ;
+
+-- -------------------------------------------------------------------
+-- src_inputevents
+-- -------------------------------------------------------------------
+
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.src_inputevents AS
+SELECT
+    subject_id                          AS subject_id,
+    hadm_id                             AS hadm_id,
+    stay_id                             AS stay_id,
+    itemid                              AS itemid,
+    starttime                           AS starttime,
+    endtime                             AS endtime,
+    storetime                           AS storetime,
+    amount                              AS amount,
+    amountuom                           AS amountuom,
+    rate                                AS rate,
+    rateuom                             AS rateuom,
+    orderid                             AS orderid,
+    linkorderid                         AS linkorderid,
+    ordercategoryname                   AS ordercategoryname,
+    secondaryordercategoryname          AS secondaryordercategoryname,
+    ordercomponenttypedescription       AS ordercomponenttypedescription,
+    ordercategorydescription            AS ordercategorydescription,
+    patientweight                       AS patientweight,
+    totalamount                         AS totalamount,
+    totalamountuom                      AS totalamountuom,
+    isopenbag                           AS isopenbag,
+    continueinnextdept                   AS continueinnextdept,
+    statusdescription                   AS statusdescription,
+    --
+    'inputevents'                       AS load_table_id,
+    FARM_FINGERPRINT(GENERATE_UUID())   AS load_row_id,
+    TO_JSON_STRING(STRUCT(
+        subject_id AS subject_id,
+        hadm_id AS hadm_id,
+        stay_id AS stay_id,
+        starttime AS starttime,
+        itemid AS itemid
+    ))                                  AS trace_id
+FROM
+    @source_project.@icu_dataset.inputevents
+;
