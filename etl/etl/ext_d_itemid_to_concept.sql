@@ -55,6 +55,28 @@ counts AS
         src.source_vocabulary_id,
         src.source_concept_id,
         src.target_concept_id
+
+    UNION ALL
+
+    -- d_items for inputevents (administered ICU medications)
+    SELECT
+        -- itemid
+        src.itemid                  AS itemid,
+        src.source_label            AS source_label,
+        src.source_vocabulary_id    AS source_vocabulary_id,
+        src.source_concept_id       AS source_concept_id,
+        src.target_concept_id       AS target_concept_id,
+        COUNT(*)                    AS row_count
+    FROM
+        @etl_project.@etl_dataset.lk_drug_mapped src
+    WHERE
+        src.unit_id = 'drug.inputevents'
+    GROUP BY
+        src.itemid,
+        src.source_label,
+        src.source_vocabulary_id,
+        src.source_concept_id,
+        src.target_concept_id
 )
 SELECT
     -- itemid

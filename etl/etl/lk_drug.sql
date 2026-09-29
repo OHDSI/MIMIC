@@ -77,6 +77,47 @@ WHERE
 ;
 
 -- -------------------------------------------------------------------
+-- lk_inputevents_clean
+-- Rule 1
+-- -------------------------------------------------------------------
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_inputevents_clean AS
+SELECT
+    src.subject_id              AS subject_id,
+    src.hadm_id                 AS hadm_id,
+    src.stay_id                 AS stay_id,
+    src.itemid                  AS itemid,
+    di.label                    AS source_label,
+    src.starttime               AS start_datetime,
+    COALESCE(src.endtime, src.starttime) AS end_datetime,
+    src.amount                  AS amount,
+    src.amountuom               AS amountuom,
+    src.rate                    AS rate,
+    src.rateuom                 AS rateuom,
+    src.totalamount             AS quantity,
+    src.totalamountuom          AS dose_unit_source_code,
+    src.ordercategorydescription AS ordercategorydescription,
+    CASE
+        WHEN src.ordercategorydescription IN ('Continuous Med', 'Drug Push') THEN 'IV'
+        ELSE NULL
+    END                         AS route_source_code, -- IV infusions/pushes; see issue #18
+    'mimiciv_drug_route'        AS route_source_vocabulary,
+    CAST(src.itemid AS STRING)  AS gcpt_source_code, -- itemid, mapped via custom vocabulary
+    'mimiciv_drug_inputevents'  AS gcpt_source_vocabulary,
+    --
+    'inputevents'               AS unit_id,
+    src.load_table_id           AS load_table_id,
+    src.load_row_id             AS load_row_id,
+    src.trace_id                AS trace_id
+FROM
+    @etl_project.@etl_dataset.src_inputevents src
+LEFT JOIN
+    @etl_project.@etl_dataset.src_d_items di
+        ON src.itemid = di.itemid
+WHERE
+    src.starttime IS NOT NULL
+;
+
+-- -------------------------------------------------------------------
 -- lk_pr_ndc_concept
 -- Rule 1
 -- mapping is 85% done from gsn coding
@@ -162,13 +203,73 @@ LEFT JOIN
 ;
 
 -- -------------------------------------------------------------------
+-- lk_ie_gcpt_concept
+-- Rule 1
+-- -------------------------------------------------------------------
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_ie_gcpt_concept AS
+SELECT DISTINCT
+    src.gcpt_source_code    AS source_code,
+    vc.domain_id            AS source_domain_id,
+    vc.concept_id           AS source_concept_id,
+    vc2.domain_id           AS target_domain_id,
+    vc2.concept_id          AS target_concept_id
+FROM
+    @etl_project.@etl_dataset.lk_inputevents_clean src
+LEFT JOIN
+    @etl_project.@etl_dataset.voc_concept vc
+        ON  vc.concept_code = src.gcpt_source_code
+        AND vc.vocabulary_id = src.gcpt_source_vocabulary -- mimiciv_drug_inputevents
+LEFT JOIN
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
+        ON  vc.concept_id = vcr.concept_id_1
+        and vcr.relationship_id = 'Maps to'
+LEFT JOIN
+    @etl_project.@etl_dataset.voc_concept vc2
+        ON vc2.concept_id = vcr.concept_id_2
+        AND vc2.standard_concept = 'S'
+        AND vc2.invalid_reason IS NULL
+;
+
+-- -------------------------------------------------------------------
+-- lk_ie_route_concept
+-- Rule 1
+-- -------------------------------------------------------------------
+CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_ie_route_concept AS
+SELECT DISTINCT
+    src.route_source_code   AS source_code,
+    vc.domain_id            AS source_domain_id,
+    vc.concept_id           AS source_concept_id,
+    vc2.domain_id           AS target_domain_id,
+    vc2.concept_id          AS target_concept_id
+FROM
+    @etl_project.@etl_dataset.lk_inputevents_clean src
+LEFT JOIN
+    @etl_project.@etl_dataset.voc_concept vc
+        ON  vc.concept_code = src.route_source_code
+        AND vc.vocabulary_id = src.route_source_vocabulary
+LEFT JOIN
+    @etl_project.@etl_dataset.voc_concept_relationship vcr
+        ON  vc.concept_id = vcr.concept_id_1
+        and vcr.relationship_id = 'Maps to'
+LEFT JOIN
+    @etl_project.@etl_dataset.voc_concept vc2
+        ON vc2.concept_id = vcr.concept_id_2
+        AND vc2.standard_concept = 'S'
+        AND vc2.invalid_reason IS NULL
+;
+
+-- -------------------------------------------------------------------
 -- lk_drug_mapped
 -- -------------------------------------------------------------------
 
 CREATE OR REPLACE TABLE @etl_project.@etl_dataset.lk_drug_mapped AS
+-- prescriptions: ordered medications
 SELECT
     src.hadm_id                                     AS hadm_id,
     src.subject_id                                  AS subject_id,
+    CAST(NULL AS INT64)                             AS itemid,
+    CAST(NULL AS STRING)                            AS source_label,
+    CAST('mimiciv_drug_ndc' AS STRING)              AS source_vocabulary_id,
     COALESCE(vc_ndc.target_concept_id, vc_gcpt.target_concept_id, 0)    AS target_concept_id,
     COALESCE(vc_ndc.target_domain_id, vc_gcpt.target_domain_id, 'Drug') AS target_domain_id,
     src.start_datetime                                                  AS start_datetime,
@@ -185,7 +286,7 @@ SELECT
     src.dose_unit_source_code                       AS dose_unit_source_code,
     src.form_val_disp                               AS quantity_source_value,
     src.pharmacy_id                                 AS pharmacy_id, -- to investigate pharmacy.medication
-    -- 
+    --
     CONCAT('drug.', src.unit_id)    AS unit_id,
     src.load_table_id               AS load_table_id,
     src.load_row_id                 AS load_row_id,
@@ -202,6 +303,50 @@ LEFT JOIN
         AND vc_gcpt.target_concept_id IS NOT NULL
 LEFT JOIN
     @etl_project.@etl_dataset.lk_pr_route_concept vc_route
+        ON src.route_source_code = vc_route.source_code
+        AND vc_route.target_concept_id IS NOT NULL
+
+UNION ALL
+
+-- inputevents: administered ICU medications and fluids
+SELECT
+    src.hadm_id                                     AS hadm_id,
+    src.subject_id                                  AS subject_id,
+    src.itemid                                      AS itemid,
+    src.source_label                                AS source_label,
+    CAST('mimiciv_drug_inputevents' AS STRING)      AS source_vocabulary_id,
+    COALESCE(vc_ie.target_concept_id, 0)            AS target_concept_id,
+    COALESCE(vc_ie.target_domain_id, 'Drug')       AS target_domain_id,
+    src.start_datetime                              AS start_datetime,
+    CASE
+        WHEN src.end_datetime < src.start_datetime THEN src.start_datetime
+        ELSE src.end_datetime
+    END                                             AS end_datetime,
+    32839                                           AS type_concept_id, -- OMOP4976912 EHR administration record
+    src.quantity                                    AS quantity,
+    COALESCE(vc_route.target_concept_id, 0)         AS route_concept_id,
+    COALESCE(vc_ie.source_code, src.gcpt_source_code) AS source_code,
+    COALESCE(vc_ie.source_concept_id, 0)            AS source_concept_id,
+    src.route_source_code                           AS route_source_code,
+    src.dose_unit_source_code                       AS dose_unit_source_code,
+    CONCAT(
+        'amount=', COALESCE(CAST(src.amount AS STRING), 'null'), ' ', COALESCE(src.amountuom, ''),
+        '; rate=', COALESCE(CAST(src.rate AS STRING), 'null'), ' ', COALESCE(src.rateuom, '')
+    )                                               AS quantity_source_value,
+    CAST(NULL AS INT64)                             AS pharmacy_id,
+    --
+    CONCAT('drug.', src.unit_id)    AS unit_id,
+    src.load_table_id               AS load_table_id,
+    src.load_row_id                 AS load_row_id,
+    src.trace_id                    AS trace_id
+FROM
+    @etl_project.@etl_dataset.lk_inputevents_clean src
+LEFT JOIN
+    @etl_project.@etl_dataset.lk_ie_gcpt_concept vc_ie
+        ON  src.gcpt_source_code = vc_ie.source_code
+        AND vc_ie.target_concept_id IS NOT NULL
+LEFT JOIN
+    @etl_project.@etl_dataset.lk_ie_route_concept vc_route
         ON src.route_source_code = vc_route.source_code
         AND vc_route.target_concept_id IS NOT NULL
 ;

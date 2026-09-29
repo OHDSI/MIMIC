@@ -25,3 +25,4 @@ gcpt_meas_chartevents_main.csv	mimiciv_meas_chart	2000030001	2000030169	169	meas
 gcpt_meas_chartevents_value.csv	mimiciv_meas_chartevents_value	2000031001	2000031029	29	measurement, Meas Value, condition
 gcpt_meas_waveforms.csv	mimiciv_meas_wf	2000041001	2000041044	44	measurement (waveform)
 gcpt_outputevents.csv	mimiciv_outputevents	2000051001	2000051068	68	measurement
+gcpt_drug_inputevents.csv	mimiciv_drug_inputevents	2000052001	2000052999	11	drug
