@@ -48,11 +48,8 @@ The project implements an ETL conversion of MIMIC IV PhysioNet dataset to OMOP C
 
 * set the project root (location of this file) as the current directory
 ```
-cd vocabulary_refresh
-python vocabulary_refresh.py -s10
-python vocabulary_refresh.py -s20
-python vocabulary_refresh.py -s30
-cd ../
+python scripts/upload_vocab_to_bq.py # do this for Athena and all custom vocabs one at a time, adding each to it's own BQ dataset
+scripts/create_vocab_views.sql # run this directly in BigQuery to setup a single view of all the vocabs
 python scripts/wf_read.py -e conf/<env>.etlconf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_setup.conf
 python scripts/run_workflow.py -e conf/<env>.etlconf -c conf/workflow_ddl.conf
